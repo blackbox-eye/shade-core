@@ -1,2 +1,4 @@
 # Architecture
 
+Bootstrap structure only.
+
