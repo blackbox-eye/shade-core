@@ -13,4 +13,4 @@ Denne mappe samler Architecture Decision Records for `shade-core`.
 - `main` er protected.
 - Signed commits og linear history er obligatoriske.
 - Lokal redigering sker i VS Code med PowerShell som standard workflow.
-- Ingen deploy-, VPS- eller secrets-indhold i ADR’er.
+- Ingen deploy-, VPS- eller secrets-indhold i ADR'er.
