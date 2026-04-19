@@ -3,7 +3,7 @@ title: Opgave
 about: Spor en repository-opgave
 ---
 
-## Objective
+## Formål
 
 Beskriv kort det ønskede resultat.
 
@@ -11,11 +11,11 @@ Beskriv kort det ønskede resultat.
 
 - Hvad er omfattet.
 - Hvad er ikke omfattet.
-- Ingen deploy, VPS eller secrets.
+- Ingen deploy, VPS, secrets, produktion eller integration.
 
-## Done when
+## Klar når
 
 - Løsningen er afgrænset og reviewbar.
 - Arbejdet kan udføres lokalt i VS Code og PowerShell.
-- Ændringen kan leveres via PR-only merge til protected `main`.
+- Ændringen kan leveres via PR til `main`.
 - Signed commits og linear history er opfyldt.

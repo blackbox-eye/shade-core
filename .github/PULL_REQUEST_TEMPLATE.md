@@ -4,14 +4,14 @@ Beskriv kort hvorfor ændringen laves.
 
 ## Scope
 
-- Hvilke filer eller områder er omfattet.
+- Hvad er omfattet.
 - Hvad er bevidst uden for scope.
-- Ingen deploy, VPS eller secrets.
+- Ingen deploy, VPS, secrets, produktion eller integration.
 
-## Checks
+## Checkliste
 
 - [ ] Ændringen er gennemgået lokalt i VS Code.
-- [ ] Git-workflow er kørt lokalt via PowerShell.
 - [ ] Commits er signerede.
 - [ ] Historikken er lineær.
-- [ ] PR er klar til merge til protected `main`.
+- [ ] PR går mod `main`.
+- [ ] Required check `pr-baseline` er grøn.

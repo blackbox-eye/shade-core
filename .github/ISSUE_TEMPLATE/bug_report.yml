@@ -1,0 +1,44 @@
+name: Fejlrapport
+description: Rapporter en konkret fejl i shade-core
+title: "fejl: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Beskriv fejlen kort og konkret.
+      placeholder: Hvad er galt?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduktion
+    attributes:
+      label: Reproduktion
+      description: Beskriv de lokale trin i VS Code eller PowerShell.
+      placeholder: 1. Gør dette 2. Gør dette 3. Se fejlen
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Afgræns sagen kort.
+      placeholder: Ingen deploy, VPS, secrets, produktion eller integration.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: regler
+    attributes:
+      label: Locked regler
+      options:
+        - label: En løsning skal kunne leveres via PR til main.
+          required: true
+        - label: Signed commits og lineær historik gælder.
+          required: true
+        - label: Required check pr-baseline skal kunne bestås.
+          required: true
