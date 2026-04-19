@@ -2,41 +2,28 @@
 
 ## Formål
 
-Denne guide beskriver et enkelt lokalt workflow med PowerShell og VS Code.
+Denne guide dækker kun lokal arbejdsform i VS Code og PowerShell.
 
 ## Forudsætninger
 
-- Git installeret lokalt.
-- PowerShell som standard shell.
-- VS Code med adgang til repositoryet.
+- Git er installeret lokalt.
+- PowerShell bruges som shell.
+- Repositoryet er åbnet i VS Code.
 
-## Klargøring
-
-```powershell
-git clone <repo-url>
-cd shade-core
-code .
-```
-
-## Dagligt workflow
+## Lokal arbejdsform
 
 ```powershell
 git switch -c feature/<kort-navn>
 git status
 git add .
-git commit -S -m "Kort, præcis besked"
+git commit -S -m "Kort besked"
 git push -u origin feature/<kort-navn>
 ```
 
-## Arbejdsform
-
 - Lav ændringer lokalt i VS Code.
 - Brug PowerShell til Git-kommandoer.
-- Opret pull request for at få ændringer ind på `main`.
-- Hold historikken lineær og commits signerede.
+- Åbn pull request, når ændringen er klar.
 
-## Ikke omfattet
+## Afgrænsning
 
-- Deploy-trin.
-- VPS-opsætning.
-- Deling eller lagring af secrets.
+Denne guide dækker ikke deploy, VPS eller secrets.

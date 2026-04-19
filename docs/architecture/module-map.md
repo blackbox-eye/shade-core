@@ -2,20 +2,16 @@
 
 ## Formål
 
-Dette dokument giver et kort overblik over dokumentationsmodulerne i `shade-core`.
+Dette dokument viser foundation-niveauet for repositoryets dokumentationsområder.
 
-## Moduler
+## Områder
 
-- `docs/architecture/` beskriver struktur, afgrænsning og beslutningsgrundlag.
-- `docs/governance/` beskriver regler for samarbejde, review og ændringskontrol.
-- `docs/onboarding/` beskriver lokal opsætning i PowerShell og VS Code.
-- `docs/qa/` beskriver testprincipper og lokale kvalitetschecks.
-- `docs/releases/` beskriver release-forberedelse i repositoryet.
+- `docs/architecture/` giver kort system- og struktur-overblik.
+- `docs/governance/` samler styringsregler med repo-policy som autoritativ kilde.
+- `docs/onboarding/` dækker lokal arbejdsform i VS Code og PowerShell.
+- `docs/qa/` dækker lokal baseline og senere testretning.
+- `docs/releases/` dækker kort release-forberedelse i repositoryet.
 
-## Arbejdsramme
+## Afgrænsning
 
-- `main` er protected.
-- Ændringer går via pull request.
-- Historik holdes lineær med signed commits.
-- Ingen deploy-, VPS- eller secrets-relateret dokumentation i dette scope.
-
+Kortet beskriver ikke deploy, VPS, produktion, integration eller secrets.
