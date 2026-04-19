@@ -1,0 +1,44 @@
+name: Feature request
+description: Foreslå en lille og afgrænset ændring i shade-core
+title: "feature: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: behov
+    attributes:
+      label: Behov
+      description: Beskriv kort hvad der ønskes og hvorfor.
+      placeholder: Hvad mangler?
+    validations:
+      required: true
+
+  - type: textarea
+    id: forslag
+    attributes:
+      label: Forslag
+      description: Beskriv en kort og operationel løsning.
+      placeholder: Hvad skal ændres?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Angiv hvad der er inde og ude af scope.
+      placeholder: Ingen deploy, VPS, secrets, produktion eller integration.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: regler
+    attributes:
+      label: Locked regler
+      options:
+        - label: Ændringen skal kunne merges via PR til main.
+          required: true
+        - label: Signed commits og lineær historik gælder.
+          required: true
+        - label: Required check pr-baseline skal kunne bestås.
+          required: true
