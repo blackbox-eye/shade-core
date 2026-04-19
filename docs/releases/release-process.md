@@ -2,34 +2,21 @@
 
 ## Formål
 
-Denne proces beskriver den minimale repository-del af en releaseforberedelse.
+Denne fil beskriver kun den korte repository-del af en releaseforberedelse.
 
-## Forudsætninger
+## Arbejdsform
 
-- `main` er protected.
-- Merge til `main` sker kun via pull request.
-- Commits skal være signerede.
-- Historik skal være lineær.
+- Saml release-relevante ændringer i en separat branch.
+- Gennemgå ændringer lokalt i VS Code.
+- Brug PowerShell til commit og push.
+- Åbn pull request med kort beskrivelse af release-omfang.
 
-## Lokal arbejdsgang
+## Minimum før merge
 
-```powershell
-git switch -c release/<kort-navn>
-git status
-git add .
-git commit -S -m "Forbered release-noter eller metadata"
-git push -u origin release/<kort-navn>
-```
+- Baseline-checks er gennemført.
+- Ændringen er reviewet.
+- Repository-reglerne i repo-policy er overholdt.
 
-## Klar til merge
+## Afgrænsning
 
-- Ændringer er gennemgået i VS Code.
-- Pull request beskriver release-omfang kort.
-- Relevante lokale checks er gennemført.
-
-## Ikke omfattet
-
-- Deploy-trin.
-- VPS-procedurer.
-- Secrets eller miljøspecifik konfiguration.
-
+Denne proces dækker ikke deploy, VPS, produktion, integration eller secrets.

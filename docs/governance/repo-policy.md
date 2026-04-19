@@ -2,29 +2,30 @@
 
 ## Formål
 
-Denne policy fastlægger minimumskrav for ændringer i `shade-core`.
+Denne fil er repositoryets autoritative governance-grundlag for arbejde i `shade-core`.
 
-## Branch-regler
+## Styringsregler
 
 - `main` er protected.
-- Direkte pushes til `main` er ikke tilladt.
-- Ændringer merges kun via pull request.
-- Repositoryet bruger linear history.
+- Direkte push til `main` er ikke tilladt.
+- Ændringer kommer ind via pull request.
+- Historik holdes lineær.
+- Commits skal være signerede.
 
-## Commit-krav
+## Arbejdsform
 
-- Alle commits skal være signed commits.
-- Historik skal holdes ren og sporbar.
-- Små, afgrænsede ændringer foretrækkes.
+- Ændringer holdes små, afgrænsede og reviewbare.
+- Pull requests skal kort beskrive formål og omfang.
+- Branch protection må ikke omgås.
 
-## Review og merge
+## Scopegrænser
 
-- Hver ændring skal have en pull request med tydeligt formål.
-- Feedback håndteres i pull requesten før merge.
-- Merge må ikke omgå branch protection.
+- Repositoryet beskriver lokal arbejdsform og foundation-dokumentation.
+- Deploy er ikke en del af dette scope.
+- VPS er ikke en del af dette scope.
+- Secrets må ikke ligge i repositoryet.
 
-## Sikkerhedsgrænser
+## Supplerende filer
 
-- Secrets må ikke committes.
-- Repositoryet bruges ikke til deploy-konfiguration.
-- VPS-specifik drift dokumenteres ikke her.
+- `branch-protection.md` er en kort praktisk supplement-fil til denne policy.
+- Øvrige dokumenter må ikke udvide eller ændre reglerne i denne fil.

@@ -1,22 +1,16 @@
 # Branch protection
 
-## Main-regler
+## Formål
 
-- `main` er protected.
-- Direkte push til `main` er ikke tilladt.
-- Merge til `main` sker kun via pull request.
-- Commits skal være signerede.
-- Historikken på `main` holdes lineær.
+Denne fil er et kort praktisk supplement til repo-policy for `main`.
 
-## Lokal arbejdsgang
+## Praktiske regler
 
-- Arbejd lokalt i VS Code.
-- Brug PowerShell til branch, commit og push.
-- Åbn pull request, før ændringer kan merges.
+- Arbejd på en separat branch.
+- Push ikke direkte til `main`.
+- Åbn pull request for at få ændringer ind.
+- Respektér krav om signed commits og lineær historik.
 
-## Ikke omfattet
+## Note
 
-- Deploy.
-- VPS.
-- Secrets.
-
+Den autoritative regelkilde er `repo-policy.md`.

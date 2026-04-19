@@ -2,29 +2,25 @@
 
 ## Formål
 
-Denne strategi definerer en kort, lokal baseline for kvalitetssikring i repositoryet.
+Denne fil dækker kun lokal repo-baseline, PR-baseline og senere testretning.
 
-## Principper
+## Nuværende baseline
 
-- Test og review udføres før pull request merge.
-- `main` er protected og modtager kun ændringer via pull request.
-- Signed commits og linear history er obligatoriske.
+- Lokale ændringer gennemlæses i VS Code.
+- Enkle repository- og filchecks kan køres lokalt i PowerShell.
+- Pull request er den faste kvalitetssluse før merge.
 
-## Lokal kvalitetssikring
-
-- Brug VS Code til at gennemgå ændringer og markdown-indhold.
-- Brug PowerShell til lokale Git-kommandoer og enkle valideringer.
-- Hold ændringer små, afgrænsede og lette at reviewe.
-
-## Minimum før PR
+## Før pull request
 
 - Indhold er læst igennem lokalt.
-- Ændringen er sporbar i én eller få signerede commits.
-- Pull request beskriver formål og omfang kort.
+- Ændringen er lille nok til hurtigt review.
+- Baseline-checks er gennemført.
 
-## Ikke omfattet
+## Senere retning
 
-- Deploy-validering.
-- VPS-test eller driftstjek.
-- Håndtering af secrets.
+- Testdækning kan udvides, når kode og moduler vokser.
+- Nye tests skal følge repositoryets enkle foundation-ramme.
 
+## Afgrænsning
+
+Denne strategi dækker ikke deploy, VPS, produktion eller integration.
