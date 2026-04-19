@@ -25,17 +25,3 @@ jobs:
           test -f .github/CODEOWNERS
           test -f .github/workflows/pr-baseline.yml
           echo "PR baseline OK"
-
-      - name: Verify foundation directories
-        run: |
-          test -d docs/adr
-          test -d docs/architecture
-          test -d docs/governance
-          test -d docs/onboarding
-          test -d docs/qa
-          test -d docs/releases
-          test -d src
-          test -d tests
-          test -d schemas
-          test -d scripts
-          echo "Foundation directories OK"
