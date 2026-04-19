@@ -1,6 +1,22 @@
 # shade-core
 
-Isolated S2 build repository for SHADE.
+`shade-core` samler kerne-dokumentation, arbejdsrammer og beslutningsspor for repositoryet.
 
-Status: bootstrap only.
-Constraints: no deploy, no VPS, no secrets.
+## Rammer
+
+- Ingen deploy-beskrivelser.
+- Ingen VPS-relateret drift.
+- Ingen secrets i repositoryet.
+
+## Arbejdsform
+
+- `main` er protected.
+- Merge til `main` sker kun via pull request.
+- Commits skal være signerede.
+- Historik holdes lineær.
+
+## Lokal brug
+
+- Arbejd lokalt i VS Code.
+- Brug PowerShell til Git-kommandoer og daglig arbejdsgang.
+- Hold ændringer små, afgrænsede og lette at reviewe.
