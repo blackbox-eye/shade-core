@@ -15,4 +15,3 @@ Repositoryet havde behov for en enkel, lokal ramme for dokumentation og ændring
 - `main` beskyttes med PR-only merge.
 - Signed commits og linear history er faste krav.
 - Repositoryet omfatter ikke deploy, VPS eller secrets.
-

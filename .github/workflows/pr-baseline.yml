@@ -1,0 +1,41 @@
+name: pr-baseline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify baseline files
+        run: |
+          test -f README.md
+          test -f docs/README.md
+          test -f docs/adr/0001-repository-bootstrap.md
+          test -f docs/architecture/01-system-context-and-boundaries.md
+          test -f docs/governance/branch-pr-rules.md
+          test -f .github/CODEOWNERS
+          test -f .github/workflows/pr-baseline.yml
+          echo "PR baseline OK"
+
+      - name: Verify foundation directories
+        run: |
+          test -d docs/adr
+          test -d docs/architecture
+          test -d docs/governance
+          test -d docs/onboarding
+          test -d docs/qa
+          test -d docs/releases
+          test -d src
+          test -d tests
+          test -d schemas
+          test -d scripts
+          echo "Foundation directories OK"
