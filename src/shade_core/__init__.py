@@ -1,5 +1,20 @@
 """Minimal package for shade-core."""
 
-__all__ = ["__version__"]
+from .models import (
+	ConfidenceRecord,
+	MetaAuditEvent,
+	RuntimeDecision,
+	SelfModel,
+	WorkerRegistry,
+)
+
+__all__ = [
+	"__version__",
+	"ConfidenceRecord",
+	"MetaAuditEvent",
+	"RuntimeDecision",
+	"SelfModel",
+	"WorkerRegistry",
+]
 
 __version__ = "0.1.0"
