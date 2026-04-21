@@ -16,7 +16,7 @@ def decide(
     registry: WorkerRegistry,
     confidence: ConfidenceRecord,
 ) -> RuntimeDecision:
-    if not _has_active_worker(registry):
+    if not _has_active_worker(registry, self_model.role):
         return RuntimeDecision(
             decision="reject",
             reason=f"Ingen aktiv worker for {self_model.role}",
@@ -55,5 +55,8 @@ def audit_decision(
     )
 
 
-def _has_active_worker(registry: WorkerRegistry) -> bool:
-    return any(status == "active" for _, status in registry.workers.values())
+def _has_active_worker(registry: WorkerRegistry, role: str) -> bool:
+    return any(
+        worker_role == role and status == "active"
+        for worker_role, status in registry.workers.values()
+    )

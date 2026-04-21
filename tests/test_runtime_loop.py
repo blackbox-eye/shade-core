@@ -53,3 +53,15 @@ def test_decide_reject_without_active_worker_and_create_audit() -> None:
     assert event.event_type == "runtime_decision"
     assert event.reference == "ref-reject"
     assert event.run_id == "shade-v1"
+
+
+def test_decide_reject_with_active_worker_for_other_role() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="analysis-worker", role="analysis", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "klar", "ref-other-role")
+
+    decision = decide(self_model, registry, confidence)
+
+    assert decision.decision == "reject"
+    assert decision.next_step == "stop"
