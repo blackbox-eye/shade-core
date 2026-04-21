@@ -1,5 +1,6 @@
 """Minimal package for shade-core."""
 
+from .evaluation import evaluate
 from .models import (
 	ConfidenceRecord,
 	MetaAuditEvent,
@@ -16,6 +17,7 @@ __all__ = [
 	"RuntimeDecision",
 	"SelfModel",
 	"WorkerRegistry",
+	"evaluate",
 	"audit_decision",
 	"decide",
 ]
