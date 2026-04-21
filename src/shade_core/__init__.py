@@ -7,6 +7,7 @@ from .models import (
 	SelfModel,
 	WorkerRegistry,
 )
+from .runtime_loop import audit_decision, decide
 
 __all__ = [
 	"__version__",
@@ -15,6 +16,8 @@ __all__ = [
 	"RuntimeDecision",
 	"SelfModel",
 	"WorkerRegistry",
+	"audit_decision",
+	"decide",
 ]
 
 __version__ = "0.1.0"
