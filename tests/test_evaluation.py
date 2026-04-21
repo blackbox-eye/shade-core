@@ -1,6 +1,8 @@
 from pathlib import Path
 import sys
 
+import pytest
+
 
 src_path = Path(__file__).resolve().parents[1] / "src"
 if str(src_path) not in sys.path:
@@ -63,3 +65,31 @@ def test_evaluate_uses_strictest_result_on_conflict() -> None:
     )
 
     assert evaluate(decision, event) == "review"
+
+
+def test_evaluate_raises_for_unknown_severity() -> None:
+    decision = RuntimeDecision(decision="accept", reason="ok", next_step="continue")
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="unknown",
+        severity="debug",
+        reference="ref-unknown-severity",
+        run_id="run-1",
+    )
+
+    with pytest.raises(ValueError, match="Unknown severity: debug"):
+        evaluate(decision, event)
+
+
+def test_evaluate_raises_for_unknown_decision() -> None:
+    decision = RuntimeDecision(decision="hold", reason="ok", next_step="wait")
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accept",
+        severity="info",
+        reference="ref-unknown-decision",
+        run_id="run-1",
+    )
+
+    with pytest.raises(ValueError, match="Unknown decision: hold"):
+        evaluate(decision, event)

@@ -26,8 +26,15 @@ _RESULT_BY_LEVEL = {
 
 
 def evaluate(decision: RuntimeDecision, event: MetaAuditEvent) -> EvaluationResult:
-    level = max(
-        _DECISION_LEVELS.get(decision.decision, 2),
-        _SEVERITY_LEVELS.get(event.severity, 2),
-    )
+    try:
+        decision_level = _DECISION_LEVELS[decision.decision]
+    except KeyError as exc:
+        raise ValueError(f"Unknown decision: {decision.decision}") from exc
+
+    try:
+        severity_level = _SEVERITY_LEVELS[event.severity]
+    except KeyError as exc:
+        raise ValueError(f"Unknown severity: {event.severity}") from exc
+
+    level = max(decision_level, severity_level)
     return _RESULT_BY_LEVEL[level]
