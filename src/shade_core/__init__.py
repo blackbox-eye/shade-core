@@ -9,6 +9,11 @@ from .models import (
 	WorkerRegistry,
 )
 from .runtime_loop import audit_decision, decide
+from .serialization import (
+	serialize_evaluation_result,
+	serialize_meta_audit_event,
+	serialize_runtime_decision,
+)
 
 __all__ = [
 	"__version__",
@@ -20,6 +25,9 @@ __all__ = [
 	"evaluate",
 	"audit_decision",
 	"decide",
+	"serialize_evaluation_result",
+	"serialize_meta_audit_event",
+	"serialize_runtime_decision",
 ]
 
 __version__ = "0.1.0"
