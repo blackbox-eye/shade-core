@@ -59,7 +59,7 @@ def test_validate_artifact_handoff_fails_for_invalid_handoff() -> None:
     handoff = ArtifactHandoff(
         artifact_ref="",
         source_lane="",
-        target_lane="review-lane",
+        target_lane="",
     )
 
     result = validate_artifact_handoff(handoff)
@@ -68,4 +68,5 @@ def test_validate_artifact_handoff_fails_for_invalid_handoff() -> None:
     assert result.errors == (
         "artifact_ref is required",
         "source_lane is required",
+        "target_lane is required",
     )

@@ -10,7 +10,7 @@ This file maps documented `shade-core` components to the current code surface an
 | ------------------------ | ----------------------------------- | --------------------------------------------------------------------- | ------------------------------- |
 | Root package API         | `src/shade_core/__init__.py`        | Implemented, stable public import path                                | `tests/test_import.py`          |
 | Contract models          | `src/shade_core/models.py`          | Implemented, internal module and re-exported through the root package | `tests/test_models.py`          |
-| Artifact handoff boundary | `src/shade_core/models.py`         | Implemented as one internal typed handoff object; not re-exported     | `tests/test_models.py`          |
+| Artifact handoff boundary | `src/shade_core/models.py`          | Implemented as one internal typed handoff object; not re-exported     | `tests/test_models.py`          |
 | Run state                | `src/shade_core/state.py`           | Implemented, internal module and re-exported through the root package | `tests/test_state.py`           |
 | Contract gate            | `src/shade_core/contract_gate.py`   | Implemented, internal module and re-exported through the root package | `tests/test_contract_gate.py`   |
 | Handoff validation       | `src/shade_core/contract_gate.py`   | Implemented as one internal validator for the neutral handoff fields  | `tests/test_contract_gate.py`   |
