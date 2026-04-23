@@ -8,6 +8,7 @@
 - The Python core currently implements contract models, run state, contract validation, a minimal runtime decision slice, evaluation, evaluation gating, serialization, bundle output, and one internal runtime-fabric snapshot path.
 - The broader V1 architecture documents still describe target contracts and boundaries beyond the currently implemented runtime surface.
 - The required `pr-baseline` check validates baseline files and runs `python -m pytest` after editable install.
+- The existing pytest path also includes one narrow repo consistency check for baseline workflow tokens, documented code and test paths, and core docs index files.
 
 ## Constraints
 
