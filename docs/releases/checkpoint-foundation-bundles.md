@@ -18,7 +18,8 @@ and the repository baseline was established.
 ## Baseline at this checkpoint
 
 - pytest: 30 passed
-- `main` is synced with `origin/main` and is the baseline for future bundles
+- Verification command: `python -m pytest -q`
+- Baseline for future bundles: the `main` revision that contains this checkpoint document.
 
 ## Boundaries
 
