@@ -1,17 +1,17 @@
 # System overview
 
-## Formål
+## Purpose
 
-`shade-core` samler foundation-dokumentation for arkitektur, governance og lokal arbejdsform.
+`shade-core` collects foundation documentation for architecture, governance, and local working mode.
 
-## Systemramme
+## System frame
 
-- `docs/architecture/` beskriver foundation-struktur og overblik.
-- `docs/governance/` beskriver regler og ændringskontrol.
-- `docs/onboarding/`, `docs/qa/` og `docs/releases/` beskriver lokal arbejdspraksis.
+- `docs/architecture/` describes foundation structure and overview.
+- `docs/governance/` describes rules and change control.
+- `docs/onboarding/`, `docs/qa/`, and `docs/releases/` describe local working practice.
 
-## Afgrænsning
+## Boundaries
 
-- Dette niveau er kort og repository-nært.
-- Der beskrives ikke deploy, VPS, produktion eller integration.
-- Nye arkitekturvalg ligger uden for denne foundation-beskrivelse.
+- This level is short and repository-near.
+- It does not describe deploy, VPS, production, or integration.
+- New architecture decisions are outside this foundation description.

@@ -1,22 +1,22 @@
 # Release process
 
-## Formål
+## Purpose
 
-Denne fil beskriver kun den korte repository-del af en releaseforberedelse.
+This file describes only the short repository part of release preparation.
 
-## Arbejdsform
+## Working mode
 
-- Saml release-relevante ændringer i en separat branch.
-- Gennemgå ændringer lokalt i VS Code.
-- Brug PowerShell til commit og push.
-- Åbn pull request med kort beskrivelse af release-omfang.
+- Gather release-relevant changes in a separate branch.
+- Review changes locally in VS Code.
+- Use PowerShell for commit and push.
+- Open a pull request with a short description of release scope.
 
-## Minimum før merge
+## Minimum before merge
 
-- Baseline-checks er gennemført.
-- Ændringen er reviewet.
-- Repository-reglerne i repo-policy er overholdt.
+- Baseline checks have been completed.
+- The change has been reviewed.
+- The repository rules in repo-policy have been followed.
 
-## Afgrænsning
+## Boundaries
 
-Denne proces dækker ikke deploy, VPS, produktion, integration eller secrets.
+This process does not cover deploy, VPS, production, integration, or secrets.

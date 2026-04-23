@@ -1,17 +1,19 @@
-## Formål
+# Pull request
 
-Beskriv kort hvorfor ændringen laves.
+## Purpose
+
+Describe briefly why the change is made.
 
 ## Scope
 
-- Hvad er omfattet.
-- Hvad er bevidst uden for scope.
-- Ingen deploy, VPS, secrets, produktion eller integration.
+- What is included.
+- What is intentionally out of scope.
+- No deploy, VPS, secrets, production, or integration.
 
-## Checkliste
+## Checklist
 
-- [ ] Ændringen er gennemgået lokalt i VS Code.
-- [ ] Commits er signerede.
-- [ ] Historikken er lineær.
-- [ ] PR går mod `main`.
-- [ ] Required check `pr-baseline` er grøn.
+- [ ] The change has been reviewed locally in VS Code.
+- [ ] Commits are signed.
+- [ ] History is linear.
+- [ ] The PR targets `main`.
+- [ ] Required check `pr-baseline` is green.

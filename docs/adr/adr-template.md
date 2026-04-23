@@ -4,15 +4,15 @@ Status: Proposed
 
 ## Context
 
-Beskriv kort baggrund, begrænsninger og hvorfor beslutningen er nødvendig.
+Describe briefly the background, constraints, and why the decision is necessary.
 
 ## Decision
 
-Beskriv den valgte beslutning kort og præcist.
+Describe the chosen decision briefly and precisely.
 
 ## Consequences
 
-- Hvad beslutningen ændrer.
-- Hvad der bevidst ikke adresseres.
-- Ingen deploy, VPS eller secrets.
-- Arbejdet forventes leveret via signed commits, linear history og PR til protected `main`.
+- What the decision changes.
+- What is intentionally not addressed.
+- No deploy, VPS, or secrets.
+- The work is expected to be delivered through signed commits, linear history, and PR to protected `main`.

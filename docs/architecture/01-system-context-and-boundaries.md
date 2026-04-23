@@ -1,25 +1,25 @@
 # System context and boundaries
 
-## Formål
+## Purpose
 
-Denne fil beskriver den lokale systemkontekst og grænser for `shade-core`.
+This file describes the local system context and boundaries for `shade-core`.
 
-## Inden for scope
+## In scope
 
-- Repository-struktur og foundation-filer.
-- Dokumentation for arkitektur, governance og lokale checks.
-- Lokal arbejdsform via VS Code og PowerShell.
-- Afgrænset arbejde inden for låst S1/S2.
+- Repository structure and foundation files.
+- Documentation for architecture, governance, and local checks.
+- Local working mode through VS Code and PowerShell.
+- Scoped work within locked S1/S2.
 
-## Uden for scope
+## Out of scope
 
 - Deploy.
 - VPS.
 - Secrets.
-- Produktion og integration.
+- Production and integration.
 
-## Arbejdsregel
+## Working rule
 
-- `main` er protected og modtager kun ændringer via pull request.
-- Signed commits og linear history er obligatoriske.
-- Copilot må assistere med udkast og redigering, men er ikke autoritet.
+- `main` is protected and accepts changes only through pull request.
+- Signed commits and linear history are required.
+- Copilot may assist with drafts and editing, but is not an authority.

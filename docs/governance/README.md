@@ -1,18 +1,17 @@
 # Governance
 
-Denne mappe beskriver repositoryets arbejdsregler og ændringskontrol.
+This folder describes the repository working rules and change control.
 
-## Fokus
+## Focus
 
-- Regler for review, merge og historik.
-- Krav til sporbarhed og samarbejde.
-- Ingen deploy-, VPS- eller secrets-relateret dokumentation.
+- Rules for review, merge, and history.
+- Requirements for traceability and collaboration.
+- No deploy-, VPS-, or secrets-related documentation.
 
-## Arbejdsramme
+## Working frame
 
-- `main` er protected.
-- Merge til `main` sker kun via pull request.
-- Commits skal være signerede.
-- Historikken holdes lineær.
-- Lokal arbejdsgang sker i VS Code og PowerShell.
-
+- `main` is protected.
+- Merge to `main` happens only through pull request.
+- Commits must be signed.
+- History stays linear.
+- Local work happens in VS Code and PowerShell.

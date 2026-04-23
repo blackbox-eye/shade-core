@@ -1,30 +1,30 @@
 # Runtime loop A to O
 
-## Formål
+## Purpose
 
-Denne fil låser det sekventielle beslutnings- og kontrolflow for V1.
+This file locks the sequential decision and control flow for V1.
 
-## Sekvens
+## Sequence
 
-- A: modtag input og opret et forløb.
-- B: valider input mod kontrakterne.
-- C: fastlæg aktivt mål og tilladt scope.
-- D: vælg relevant worker-type.
-- E: klargør worker-opgave.
-- F: udfør et enkelt worker-trin.
-- G: registrér output og status.
-- H: kontroller output mod kontrakterne.
-- I: vurder om næste trin er nødvendigt.
-- J: stop ved brud, uklarhed eller manglende evidens.
-- K: send videre til næste worker, hvis kontrakten tillader det.
-- L: saml samlet tilstand for forløbet.
-- M: kør evaluering mod V1-målepunkter.
-- N: markér resultat som accept, afvisning eller behov for review.
-- O: afslut forløbet med inspectable slutstatus.
+- A: receive input and create a run.
+- B: validate input against the contracts.
+- C: determine the active goal and allowed scope.
+- D: select the relevant worker type.
+- E: prepare the worker task.
+- F: execute a single worker step.
+- G: record output and status.
+- H: check output against the contracts.
+- I: assess whether the next step is required.
+- J: stop on violation, uncertainty, or missing evidence.
+- K: pass onward to the next worker if the contract allows it.
+- L: collect the full state for the run.
+- M: run evaluation against the V1 metrics.
+- N: mark the result as acceptance, rejection, or need for review.
+- O: end the run with inspectable final status.
 
-## Arbejdsregler
+## Working rules
 
-- Kontrakter kommer før runtime-adfærd.
-- Hvert trin skal kunne inspiceres bagefter.
-- Hvert skifte mellem trin skal kunne testes som interface.
-- Copilot er assistent for arbejdet, ikke beslutningsmyndighed.
+- Contracts come before runtime behavior.
+- Each step must be inspectable afterwards.
+- Each transition between steps must be testable as an interface.
+- Copilot is an assistant for the work, not a decision authority.

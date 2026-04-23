@@ -1,16 +1,16 @@
 # Branch protection
 
-## Formål
+## Purpose
 
-Denne fil er et kort praktisk supplement til repo-policy for `main`.
+This file is a short practical supplement to repo-policy for `main`.
 
-## Praktiske regler
+## Practical rules
 
-- Arbejd på en separat branch.
-- Push ikke direkte til `main`.
-- Åbn pull request for at få ændringer ind.
-- Respektér krav om signed commits og lineær historik.
+- Work on a separate branch.
+- Do not push directly to `main`.
+- Open a pull request to bring changes in.
+- Respect the requirements for signed commits and linear history.
 
 ## Note
 
-Den autoritative regelkilde er `repo-policy.md`.
+The authoritative rule source is `repo-policy.md`.

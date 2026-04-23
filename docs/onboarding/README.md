@@ -1,18 +1,17 @@
 # Onboarding
 
-Denne mappe samler den minimale lokale introduktion til arbejdet i `shade-core`.
+This folder gathers the minimal local introduction to work in `shade-core`.
 
-## Fokus
+## Focus
 
-- Lokal opsætning i VS Code.
-- Git-workflow via PowerShell.
-- Korte, operationelle arbejdstrin for nye bidrag.
+- Local setup in VS Code.
+- Git workflow through PowerShell.
+- Short, operational work steps for new contributions.
 
-## Arbejdsramme
+## Working frame
 
-- Arbejd lokalt og åbn repositoryet i VS Code.
-- Brug PowerShell til branches, commits og push.
-- Ændringer går via pull request til protected `main`.
-- Signed commits og linear history er obligatoriske.
-- Deploy, VPS og secrets er ikke omfattet.
-
+- Work locally and open the repository in VS Code.
+- Use PowerShell for branches, commits, and push.
+- Changes go through pull request to protected `main`.
+- Signed commits and linear history are required.
+- Deploy, VPS, and secrets are not covered.
