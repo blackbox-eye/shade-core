@@ -3,7 +3,7 @@
 ## Purpose
 
 This file locks the sequential decision and control flow for V1.
-The current codebase implements only minimal supporting slices, not full A-to-O orchestration.
+The current codebase implements only minimal supporting slices and one internal runtime-fabric snapshot path, not full A-to-O orchestration.
 
 ## Sequence
 
@@ -26,6 +26,7 @@ The current codebase implements only minimal supporting slices, not full A-to-O 
 ## Working rules
 
 - Contracts come before runtime behavior.
+- The current core can assemble run state, handoff, decision, audit event, and evaluation gate result into one inspectable internal snapshot.
 - Each step must be inspectable afterwards.
 - Each transition between steps must be testable as an interface.
 - Copilot is an assistant for the work, not a decision authority.
