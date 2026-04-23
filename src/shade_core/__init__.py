@@ -3,6 +3,7 @@
 from .bundle import build_bundle
 from .contract_gate import ContractGateResult, validate_state_contract
 from .evaluation import evaluate
+from .evaluation_gate import EvaluationGateResult, run_evaluation_gate
 from .models import (
     ConfidenceRecord,
     MetaAuditEvent,
@@ -22,6 +23,7 @@ __all__ = [
     "__version__",
     "ContractGateResult",
     "ConfidenceRecord",
+    "EvaluationGateResult",
     "MetaAuditEvent",
     "RunState",
     "RuntimeDecision",
@@ -29,6 +31,7 @@ __all__ = [
     "WorkerRegistry",
     "build_bundle",
     "evaluate",
+    "run_evaluation_gate",
     "audit_decision",
     "decide",
     "serialize_evaluation_result",
