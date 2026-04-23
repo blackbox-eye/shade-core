@@ -1,6 +1,12 @@
 # shade-core
 
-`shade-core` er et lokalt foundation-repository for dokumentation, governance og afgrænset arbejdsflow.
+`shade-core` er et build-, contract- og QA-lag med en minimal Python-kerne.
+
+## Status
+
+- Repositoryet samler foundation-dokumentation, governance og en lille inspectable Python-package.
+- Python-kernen dækker kontraktmodeller, et minimalt runtime-beslutningssnit, evaluation og serialisering.
+- Build-gaten validerer både baseline-filer og lokale pytest-checks.
 
 ## Rammer
 
@@ -17,3 +23,9 @@
 - Historikken holdes lineær.
 - Arbejd lokalt i VS Code og PowerShell.
 - Copilot bruges som assistent, ikke autoritet.
+
+## Python-kerne
+
+- Package-navn er `shade_core`.
+- Kernen er bevidst lille og uden IO, persistence eller netværk.
+- Interfaces holdes testbare og inspectable.
