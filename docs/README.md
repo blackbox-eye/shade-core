@@ -1,18 +1,18 @@
 # Docs
 
-Denne mappe samler den centrale dokumentation for `shade-core`.
+This folder contains the central documentation for `shade-core`.
 
 ## Navigation
 
-- `adr/` for beslutningsspor og ADR'er.
-- `architecture/` for struktur og afgrænsning.
-- `governance/` for regler på `main` og samarbejdsrammer.
-- `onboarding/` for lokal arbejdsgang i VS Code og PowerShell.
-- `qa/` for lokale kvalitetschecks.
-- `releases/` for repository-nær releaseforberedelse.
+- `adr/` for decision records and ADRs.
+- `architecture/` for structure and boundaries.
+- `governance/` for rules on `main` and collaboration boundaries.
+- `onboarding/` for local working mode in VS Code and PowerShell.
+- `qa/` for local quality checks.
+- `releases/` for repository-near release preparation.
 
-## Rammer
+## Constraints
 
-- Ingen deploy.
-- Ingen VPS.
-- Ingen secrets.
+- No deploy.
+- No VPS.
+- No secrets.

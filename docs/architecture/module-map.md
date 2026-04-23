@@ -1,17 +1,17 @@
 # Module map
 
-## Formål
+## Purpose
 
-Dette dokument viser foundation-niveauet for repositoryets dokumentationsområder.
+This document shows the foundation-level map of the repository documentation areas.
 
-## Områder
+## Areas
 
-- `docs/architecture/` giver kort system- og struktur-overblik.
-- `docs/governance/` samler styringsregler med repo-policy som autoritativ kilde.
-- `docs/onboarding/` dækker lokal arbejdsform i VS Code og PowerShell.
-- `docs/qa/` dækker lokal baseline og senere testretning.
-- `docs/releases/` dækker kort release-forberedelse i repositoryet.
+- `docs/architecture/` provides a short system and structure overview.
+- `docs/governance/` collects governance rules with repo-policy as the authoritative source.
+- `docs/onboarding/` covers local working mode in VS Code and PowerShell.
+- `docs/qa/` covers local baseline and later test direction.
+- `docs/releases/` covers short release preparation in the repository.
 
-## Afgrænsning
+## Boundaries
 
-Kortet beskriver ikke deploy, VPS, produktion, integration eller secrets.
+The map does not describe deploy, VPS, production, integration, or secrets.

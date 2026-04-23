@@ -4,14 +4,14 @@ Status: Accepted
 
 ## Context
 
-Repositoryet havde behov for en enkel, lokal ramme for dokumentation og ændringskontrol i opstartsfasen.
+The repository needed a simple, local frame for documentation and change control in the bootstrap phase.
 
 ## Decision
 
-`shade-core` etableres som et letvægts repository med dokumentation, governance og lokalt workflow via VS Code og PowerShell.
+`shade-core` is established as a lightweight repository with documentation, governance, and a local workflow through VS Code and PowerShell.
 
 ## Consequences
 
-- `main` beskyttes med PR-only merge.
-- Signed commits og linear history er faste krav.
-- Repositoryet omfatter ikke deploy, VPS eller secrets.
+- `main` is protected with PR-only merge.
+- Signed commits and linear history are fixed requirements.
+- The repository does not include deploy, VPS, or secrets.

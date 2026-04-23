@@ -2,26 +2,26 @@
 
 ## Main
 
-- `main` er protected.
-- Direkte push til `main` er ikke tilladt.
-- Merge til `main` sker kun via pull request.
+- `main` is protected.
+- Direct push to `main` is not allowed.
+- Merge to `main` happens only through pull request.
 
-## Merge-krav
+## Merge requirements
 
-- Signed commits er obligatoriske.
-- Historikken holdes lineær.
-- Ændringer holdes små og reviewbare.
-- Lokal gennemgang sker i VS Code før PR.
-- Git-workflow køres lokalt via PowerShell.
+- Signed commits are required.
+- History stays linear.
+- Changes stay small and reviewable.
+- Local review happens in VS Code before PR.
+- Git workflow runs locally through PowerShell.
 
-## PR-flow
+## PR flow
 
-- Opret en lokal branch.
-- Commit med signering.
-- Push branch og åbn pull request mod `main`.
-- Copilot kan assistere med tekst og udkast, men review og beslutning er manuel.
+- Create a local branch.
+- Commit with signing.
+- Push the branch and open a pull request to `main`.
+- Copilot may assist with text and drafts, but review and decision are manual.
 
-## Ikke omfattet
+## Not covered
 
 - Deploy.
 - VPS.

@@ -1,16 +1,16 @@
 # ADR
 
-Denne mappe samler Architecture Decision Records for `shade-core`.
+This folder contains Architecture Decision Records for `shade-core`.
 
-## Brug
+## Usage
 
-- Opret en ADR, når en teknisk eller procesmæssig beslutning skal dokumenteres.
-- Hold beslutningen kort, begrundet og sporbar.
-- Opdater via en pull request, ikke direkte på `main`.
+- Create an ADR when a technical or process decision must be documented.
+- Keep the decision short, reasoned, and traceable.
+- Update through a pull request, not directly on `main`.
 
-## Arbejdsramme
+## Working frame
 
-- `main` er protected.
-- Signed commits og linear history er obligatoriske.
-- Lokal redigering sker i VS Code med PowerShell som standard workflow.
-- Ingen deploy-, VPS- eller secrets-indhold i ADR'er.
+- `main` is protected.
+- Signed commits and linear history are required.
+- Local editing happens in VS Code with PowerShell as the standard workflow.
+- No deploy, VPS, or secrets content belongs in ADRs.

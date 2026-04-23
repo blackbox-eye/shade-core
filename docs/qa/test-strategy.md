@@ -1,26 +1,26 @@
 # Test strategy
 
-## Formål
+## Purpose
 
-Denne fil dækker kun lokal repo-baseline, PR-baseline og senere testretning.
+This file covers only local repo baseline, PR baseline, and later test direction.
 
-## Nuværende baseline
+## Current baseline
 
-- Lokale ændringer gennemlæses i VS Code.
-- Enkle repository- og filchecks kan køres lokalt i PowerShell.
-- Pull request er den faste kvalitetssluse før merge.
+- Local changes are reviewed in VS Code.
+- Simple repository and file checks can be run locally in PowerShell.
+- Pull request is the fixed quality gate before merge.
 
-## Før pull request
+## Before pull request
 
-- Indhold er læst igennem lokalt.
-- Ændringen er lille nok til hurtigt review.
-- Baseline-checks er gennemført.
+- Content has been read through locally.
+- The change is small enough for fast review.
+- Baseline checks have been completed.
 
-## Senere retning
+## Later direction
 
-- Testdækning kan udvides, når kode og moduler vokser.
-- Nye tests skal følge repositoryets enkle foundation-ramme.
+- Test coverage can expand as code and modules grow.
+- New tests must follow the repository's simple foundation frame.
 
-## Afgrænsning
+## Boundaries
 
-Denne strategi dækker ikke deploy, VPS, produktion eller integration.
+This strategy does not cover deploy, VPS, production, or integration.

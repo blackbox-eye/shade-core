@@ -1,38 +1,38 @@
 # Data models
 
-## Formål
+## Purpose
 
-Denne fil låser de centrale kontraktobjekter og deres felter for V1.
+This file locks the central contract objects and their fields for V1.
 
 ## Contract object: Run
 
-- `run_id`: entydig identitet for et forløb.
-- `goal`: aktivt mål for forløbet.
-- `scope`: tilladt arbejdsramme.
-- `status`: nuværende tilstand.
-- `current_step`: aktuelt trin i loopet.
-- `result`: slutresultat eller mellemresultat.
+- `run_id`: unique identity for a run.
+- `goal`: active goal for the run.
+- `scope`: allowed working scope.
+- `status`: current state.
+- `current_step`: current step in the loop.
+- `result`: final result or intermediate result.
 
 ## Contract object: Worker task
 
-- `task_id`: entydig identitet for opgaven.
-- `worker_type`: valgt worker-type.
-- `input_ref`: reference til det input, der arbejdes på.
-- `expected_output`: det forventede outputformat.
-- `constraints`: aktive grænser for opgaven.
-- `task_status`: opgavens tilstand.
+- `task_id`: unique identity for the task.
+- `worker_type`: selected worker type.
+- `input_ref`: reference to the input being worked on.
+- `expected_output`: the expected output format.
+- `constraints`: active boundaries for the task.
+- `task_status`: task state.
 
 ## Contract object: Evaluation record
 
-- `evaluation_id`: entydig identitet for målingen.
-- `run_id`: reference til forløbet.
-- `checks`: hvilke checks der er kørt.
-- `findings`: observerede afvigelser.
-- `decision`: accept, afvisning eller review.
-- `notes`: korte operationelle noter.
+- `evaluation_id`: unique identity for the evaluation.
+- `run_id`: reference to the run.
+- `checks`: which checks have been run.
+- `findings`: observed deviations.
+- `decision`: acceptance, rejection, or review.
+- `notes`: short operational notes.
 
-## Feltregler
+## Field rules
 
-- Felter skal være entydige og inspectable.
-- Objekter skal kunne testes via deres input og output.
-- V1 holder kun de felter, som styrer kontrol, status og evaluering.
+- Fields must be unambiguous and inspectable.
+- Objects must be testable through their input and output.
+- V1 keeps only the fields that drive control, status, and evaluation.

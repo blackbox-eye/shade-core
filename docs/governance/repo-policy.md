@@ -1,31 +1,31 @@
 # Repo policy
 
-## Formål
+## Purpose
 
-Denne fil er repositoryets autoritative governance-grundlag for arbejde i `shade-core`.
+This file is the repository's authoritative governance foundation for work in `shade-core`.
 
-## Styringsregler
+## Governance rules
 
-- `main` er protected.
-- Direkte push til `main` er ikke tilladt.
-- Ændringer kommer ind via pull request.
-- Historik holdes lineær.
-- Commits skal være signerede.
+- `main` is protected.
+- Direct push to `main` is not allowed.
+- Changes enter through pull request.
+- History stays linear.
+- Commits must be signed.
 
-## Arbejdsform
+## Working mode
 
-- Ændringer holdes små, afgrænsede og reviewbare.
-- Pull requests skal kort beskrive formål og omfang.
-- Branch protection må ikke omgås.
+- Changes stay small, scoped, and reviewable.
+- Pull requests should briefly describe purpose and scope.
+- Branch protection must not be bypassed.
 
-## Scopegrænser
+## Scope boundaries
 
-- Repositoryet beskriver lokal arbejdsform og foundation-dokumentation.
-- Deploy er ikke en del af dette scope.
-- VPS er ikke en del af dette scope.
-- Secrets må ikke ligge i repositoryet.
+- The repository describes local working mode and foundation documentation.
+- Deploy is not part of this scope.
+- VPS is not part of this scope.
+- Secrets must not live in the repository.
 
-## Supplerende filer
+## Supporting files
 
-- `branch-protection.md` er en kort praktisk supplement-fil til denne policy.
-- Øvrige dokumenter må ikke udvide eller ændre reglerne i denne fil.
+- `branch-protection.md` is a short practical supplement file to this policy.
+- Other documents must not extend or change the rules in this file.

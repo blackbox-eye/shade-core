@@ -1,21 +1,21 @@
 ---
-title: Opgave
-about: Spor en repository-opgave
+title: Task
+about: Track a repository task
 ---
 
-## Formål
+## Purpose
 
-Beskriv kort det ønskede resultat.
+Describe the desired outcome briefly.
 
 ## Scope
 
-- Hvad er omfattet.
-- Hvad er ikke omfattet.
-- Ingen deploy, VPS, secrets, produktion eller integration.
+- What is included.
+- What is not included.
+- No deploy, VPS, secrets, production, or integration.
 
-## Klar når
+## Done when
 
-- Løsningen er afgrænset og reviewbar.
-- Arbejdet kan udføres lokalt i VS Code og PowerShell.
-- Ændringen kan leveres via PR til `main`.
-- Signed commits og linear history er opfyldt.
+- The solution is scoped and reviewable.
+- The work can be done locally in VS Code and PowerShell.
+- The change can be delivered via PR to `main`.
+- Signed commits and linear history are in place.

@@ -1,18 +1,17 @@
 # QA
 
-Denne mappe beskriver den lokale baseline for kvalitetssikring i repositoryet.
+This folder describes the local baseline for quality assurance in the repository.
 
-## Fokus
+## Focus
 
-- Enkle, lokale checks før pull request.
-- Reviewbar dokumentation og små ændringer.
-- Sporbar kvalitet uden miljøspecifik drift.
+- Simple, local checks before pull request.
+- Reviewable documentation and small changes.
+- Traceable quality without environment-specific operations.
 
-## Arbejdsramme
+## Working frame
 
-- Gennemgå ændringer i VS Code.
-- Brug PowerShell til lokale Git-kommandoer.
-- Merge sker kun via pull request til protected `main`.
-- Signed commits og linear history er en fast del af processen.
-- Ingen deploy-, VPS- eller secrets-scope.
-
+- Review changes in VS Code.
+- Use PowerShell for local Git commands.
+- Merge happens only through pull request to protected `main`.
+- Signed commits and linear history are a fixed part of the process.
+- No deploy-, VPS-, or secrets-scope.

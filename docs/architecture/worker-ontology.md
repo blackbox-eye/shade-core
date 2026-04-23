@@ -1,26 +1,26 @@
 # Worker ontology
 
-## Formål
+## Purpose
 
-Denne fil låser worker-typer, roller, ansvar og grænser for V1.
+This file locks worker types, roles, responsibilities, and boundaries for V1.
 
-## Worker-typer
+## Worker types
 
-- `intake-worker` afklarer input, mål og scope.
-- `analysis-worker` vurderer materiale mod aktive kontrakter.
-- `control-worker` beslutter næste tilladte trin i loopet.
-- `evaluation-worker` måler output mod QA-matrixen.
+- `intake-worker` clarifies input, goal, and scope.
+- `analysis-worker` assesses material against active contracts.
+- `control-worker` decides the next allowed step in the loop.
+- `evaluation-worker` measures output against the QA matrix.
 
-## Roller og ansvar
+## Roles and responsibilities
 
-- Hver worker løser én afgrænset opgave ad gangen.
-- En worker må kun arbejde inden for deklareret scope.
-- En worker skal aflevere inspectable output og status.
-- En worker må ikke omskrive kontrakterne.
+- Each worker solves one scoped task at a time.
+- A worker may only operate within declared scope.
+- A worker must deliver inspectable output and status.
+- A worker must not rewrite the contracts.
 
-## Grænser
+## Boundaries
 
-- Workers er ikke autoriteter; de udfører kontraktstyret arbejde.
-- Copilot er assistent til forslag og formulering, ikke beslutningstager.
-- Workers må ikke indføre deploy, VPS, secrets, produktion eller integration.
-- Workers må ikke springe kontrol- eller evalueringsled over.
+- Workers are not authorities; they perform contract-driven work.
+- Copilot is an assistant for suggestions and drafting, not a decision maker.
+- Workers must not introduce deploy, VPS, secrets, production, or integration.
+- Workers must not skip control or evaluation steps.
