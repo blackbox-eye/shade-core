@@ -4,6 +4,7 @@
 
 This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
+The current public package surface exposes only the implemented subset through the root `shade_core` import path.
 
 ## Contract object: Run
 
@@ -37,3 +38,4 @@ The current code implements only a smaller typed subset through `src/shade_core/
 - Fields must be unambiguous and inspectable.
 - Objects must be testable through their input and output.
 - V1 keeps only the fields that drive control, status, and evaluation.
+- This document remains broader than the current public API where V1 contract objects are still documented targets rather than implemented exports.
