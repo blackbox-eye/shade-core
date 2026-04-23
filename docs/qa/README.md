@@ -7,6 +7,7 @@ This folder describes the local baseline for quality assurance in the repository
 - Simple, local checks before pull request.
 - Reviewable documentation and small changes.
 - Traceable quality without environment-specific operations.
+- The existing pytest path includes one narrow automated repo consistency check for stable workflow and path drift.
 
 ## Working frame
 

@@ -3,6 +3,7 @@
 ## Purpose
 
 This file maps documented `shade-core` components to the current code surface and existing tests.
+Concrete code and test paths in the table are kept machine-checkable through one narrow repo consistency pytest check.
 
 ## Traceability
 
