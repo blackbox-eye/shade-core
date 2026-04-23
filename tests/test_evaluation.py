@@ -1,12 +1,4 @@
-from pathlib import Path
-import sys
-
 import pytest
-
-
-src_path = Path(__file__).resolve().parents[1] / "src"
-if str(src_path) not in sys.path:
-    sys.path.insert(0, str(src_path))
 
 from shade_core import MetaAuditEvent, RuntimeDecision, evaluate  # noqa: E402
 

@@ -1,11 +1,3 @@
-from pathlib import Path
-import sys
-
-
-src_path = Path(__file__).resolve().parents[1] / "src"
-if str(src_path) not in sys.path:
-    sys.path.insert(0, str(src_path))
-
 from shade_core import (  # noqa: E402
     ConfidenceRecord,
     MetaAuditEvent,
@@ -22,7 +14,7 @@ def test_model_instantiation_smoke() -> None:
     confidence = ConfidenceRecord(
         score=0.8,
         source="local-review",
-        reason="Kort og inspectable",
+        reason="Short and inspectable",
         reference="ref-1",
     )
     event = MetaAuditEvent(
@@ -34,7 +26,7 @@ def test_model_instantiation_smoke() -> None:
     )
     decision = RuntimeDecision(
         decision="needs_review",
-        reason="Mangler manuel accept",
+        reason="Needs manual approval",
         next_step="review",
     )
 

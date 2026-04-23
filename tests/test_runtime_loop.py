@@ -1,11 +1,3 @@
-from pathlib import Path
-import sys
-
-
-src_path = Path(__file__).resolve().parents[1] / "src"
-if str(src_path) not in sys.path:
-    sys.path.insert(0, str(src_path))
-
 from shade_core import (  # noqa: E402
     ConfidenceRecord,
     SelfModel,
@@ -19,7 +11,7 @@ def test_decide_accept() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
     registry.register(name="control-worker", role="control", status="active")
-    confidence = ConfidenceRecord(0.9, "local", "klar", "ref-accept")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-accept")
 
     decision = decide(self_model, registry, confidence)
 
@@ -31,7 +23,7 @@ def test_decide_needs_review() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
     registry.register(name="control-worker", role="control", status="active")
-    confidence = ConfidenceRecord(0.4, "local", "uklar", "ref-review")
+    confidence = ConfidenceRecord(0.4, "local", "unclear", "ref-review")
 
     decision = decide(self_model, registry, confidence)
 
@@ -43,7 +35,7 @@ def test_decide_reject_without_active_worker_and_create_audit() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
     registry.register(name="control-worker", role="control", status="idle")
-    confidence = ConfidenceRecord(0.9, "local", "klar", "ref-reject")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-reject")
 
     decision = decide(self_model, registry, confidence)
     event = audit_decision(self_model, decision, confidence)
@@ -59,7 +51,7 @@ def test_decide_reject_with_active_worker_for_other_role() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
     registry.register(name="analysis-worker", role="analysis", status="active")
-    confidence = ConfidenceRecord(0.9, "local", "klar", "ref-other-role")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-other-role")
 
     decision = decide(self_model, registry, confidence)
 
