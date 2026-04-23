@@ -10,6 +10,7 @@ This file covers only local repo baseline, PR baseline, and later test direction
 - Simple repository and file checks can be run locally in PowerShell.
 - The current pytest suite covers the implemented minimal Python core.
 - Pull request is the fixed quality gate before merge.
+- The `pr-baseline` workflow verifies baseline files and runs `python -m pytest`.
 
 ## Before pull request
 

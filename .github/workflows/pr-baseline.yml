@@ -5,12 +5,17 @@ on:
     branches:
       - main
 
+concurrency:
+  group: pr-baseline-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   baseline:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,4 +40,4 @@ jobs:
         run: python -m pip install -e ".[dev]"
 
       - name: Run pytest
-        run: pytest
+        run: python -m pytest

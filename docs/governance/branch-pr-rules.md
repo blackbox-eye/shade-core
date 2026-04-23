@@ -13,6 +13,8 @@
 - Changes stay small and reviewable.
 - Local review happens in VS Code before PR.
 - Git workflow runs locally through PowerShell.
+- The required `pr-baseline` check must pass.
+- `pr-baseline` verifies baseline files and runs `python -m pytest`.
 
 ## PR flow
 

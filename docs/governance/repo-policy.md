@@ -11,12 +11,14 @@ This file is the repository's authoritative governance foundation for work in `s
 - Changes enter through pull request.
 - History stays linear.
 - Commits must be signed.
+- The required repository check is `pr-baseline`.
 
 ## Working mode
 
 - Changes stay small, scoped, and reviewable.
 - Pull requests should briefly describe purpose and scope.
 - Branch protection must not be bypassed.
+- `pr-baseline` verifies baseline files and runs `python -m pytest`.
 
 ## Scope boundaries
 

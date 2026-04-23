@@ -17,3 +17,4 @@ Describe briefly why the change is made.
 - [ ] History is linear.
 - [ ] The PR targets `main`.
 - [ ] Required check `pr-baseline` is green.
+- [ ] `pr-baseline` baseline file checks and `python -m pytest` have passed.
