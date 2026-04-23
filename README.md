@@ -9,7 +9,7 @@
 - The broader V1 architecture documents still describe target contracts and boundaries beyond the currently implemented runtime surface.
 - The required `pr-baseline` check validates baseline files and runs `python -m pytest` after editable install.
 - The existing pytest path also includes one narrow repo consistency check for baseline workflow tokens, documented code and test paths, and core docs index files.
-- Six foundation build bundles have been completed and merged to `main`; the current pytest baseline is 30 passed.
+- Six foundation build bundles have been completed and merged to `main`; `main` passes the baseline `python -m pytest` check.
 
 ## Checkpoint
 
