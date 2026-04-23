@@ -5,7 +5,8 @@
 ## Status
 
 - The repository combines foundation documentation, governance, and a small inspectable Python package.
-- The Python core covers contract models, a minimal runtime decision slice, evaluation, and serialization.
+- The Python core currently implements contract models, run state, contract validation, a minimal runtime decision slice, evaluation, evaluation gating, serialization, and bundle output.
+- The broader V1 architecture documents still describe target contracts and boundaries beyond the currently implemented runtime surface.
 - The build gate validates both baseline files and local pytest checks.
 
 ## Constraints
@@ -28,4 +29,5 @@
 
 - The package name is `shade_core`.
 - The core is intentionally small and has no IO, persistence, or networking.
+- The root package exposes a curated stable surface for the current minimal core.
 - Interfaces stay testable and inspectable.

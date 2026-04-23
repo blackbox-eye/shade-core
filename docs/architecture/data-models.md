@@ -3,6 +3,7 @@
 ## Purpose
 
 This file locks the central contract objects and their fields for V1.
+The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 
 ## Contract object: Run
 

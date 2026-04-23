@@ -3,6 +3,7 @@
 ## Purpose
 
 This file locks worker types, roles, responsibilities, and boundaries for V1.
+The current code uses role names and gate/state primitives, not worker orchestration.
 
 ## Worker types
 

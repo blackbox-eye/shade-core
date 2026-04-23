@@ -1,7 +1,7 @@
 # src
 
-Denne mappe indeholder den minimale Python-package-struktur for `shade-core`.
+This folder contains the minimal Python package structure for `shade-core`.
 
-- Package-navn er `shade_core`.
-- Der er ingen app-logik endnu.
-- Scope er lokal foundation uden deploy, VPS, secrets eller netværkskald.
+- The package name is `shade_core`.
+- The package currently implements only the minimal core slices already described in the repository docs.
+- Scope is local foundation work without deploy, VPS, secrets, or network calls.
