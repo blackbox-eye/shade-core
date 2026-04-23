@@ -7,7 +7,7 @@
 - The repository combines foundation documentation, governance, and a small inspectable Python package.
 - The Python core currently implements contract models, run state, contract validation, a minimal runtime decision slice, evaluation, evaluation gating, serialization, and bundle output.
 - The broader V1 architecture documents still describe target contracts and boundaries beyond the currently implemented runtime surface.
-- The build gate validates both baseline files and local pytest checks.
+- The required `pr-baseline` check validates baseline files and runs `python -m pytest` after editable install.
 
 ## Constraints
 
