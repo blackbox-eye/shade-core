@@ -47,7 +47,14 @@ def test_traceability_paths_exist() -> None:
                 continue
 
             for relative_path in re.findall(r"`([^`]+)`", cell):
-                assert (REPO_ROOT / relative_path).is_file()
+                assert not Path(relative_path).is_absolute(), (
+                    f"Path must be repo-relative, got absolute: {relative_path!r}"
+                )
+                resolved = (REPO_ROOT / relative_path).resolve()
+                assert resolved.is_relative_to(REPO_ROOT), (
+                    f"Resolved path escapes repo root: {resolved}"
+                )
+                assert resolved.is_file()
 
 
 def test_docs_index_files_exist() -> None:
