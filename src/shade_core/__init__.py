@@ -1,5 +1,6 @@
 """Minimal package for shade-core."""
 
+from .bundle import build_bundle
 from .evaluation import evaluate
 from .models import (
 	ConfidenceRecord,
@@ -22,6 +23,7 @@ __all__ = [
 	"RuntimeDecision",
 	"SelfModel",
 	"WorkerRegistry",
+	"build_bundle",
 	"evaluate",
 	"audit_decision",
 	"decide",
