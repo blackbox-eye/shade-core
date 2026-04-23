@@ -29,6 +29,6 @@
 
 - The package name is `shade_core`.
 - The core is intentionally small and has no IO, persistence, or networking.
-- The stable public package surface is the root `shade_core` import surface.
-- Internal modules under `src/shade_core/` implement that surface and are not separately described here as stable package entrypoints.
+- The stable public package surface is the root `shade_core` import path.
+- Internal modules under `src/shade_core/` implement that path and are not separately described here as stable package entrypoints.
 - Interfaces stay testable and inspectable.
