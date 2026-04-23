@@ -12,6 +12,11 @@ This document shows the foundation-level map of the repository documentation are
 - `docs/qa/` covers local baseline, docs-to-code traceability, and later test direction.
 - `docs/releases/` covers short release preparation in the repository.
 
+## Package surface
+
+- The stable public package surface is the root `shade_core` import path defined by `src/shade_core/__init__.py`.
+- The remaining `src/shade_core/*.py` files are implementation modules behind that public surface.
+
 ## Boundaries
 
 The map does not describe deploy, VPS, production, integration, or secrets.
