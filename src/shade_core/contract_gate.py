@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .models import ArtifactHandoff
 from .state import RunState
 
 _DECISION_CLASSES = {"accept", "reject", "needs_review"}
@@ -12,6 +13,19 @@ _VERIFICATION_STATES = {"pending", "verified", "failed"}
 class ContractGateResult:
     is_valid: bool
     errors: tuple[str, ...]
+
+
+def validate_artifact_handoff(handoff: ArtifactHandoff) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not handoff.artifact_ref:
+        errors.append("artifact_ref is required")
+    if not handoff.source_lane:
+        errors.append("source_lane is required")
+    if not handoff.target_lane:
+        errors.append("target_lane is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 
 
 def validate_state_contract(state: RunState) -> ContractGateResult:

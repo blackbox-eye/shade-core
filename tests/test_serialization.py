@@ -5,6 +5,8 @@ from shade_core import (  # noqa: E402
     serialize_meta_audit_event,
     serialize_runtime_decision,
 )
+from shade_core.models import ArtifactHandoff
+from shade_core.serialization import serialize_artifact_handoff
 
 
 def test_serialize_runtime_decision() -> None:
@@ -18,6 +20,20 @@ def test_serialize_runtime_decision() -> None:
         "decision": "accept",
         "reason": "clear",
         "next_step": "continue",
+    }
+
+
+def test_serialize_artifact_handoff() -> None:
+    handoff = ArtifactHandoff(
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert serialize_artifact_handoff(handoff) == {
+        "artifact_ref": "artifact-1",
+        "source_lane": "analysis-lane",
+        "target_lane": "review-lane",
     }
 
 

@@ -5,6 +5,15 @@
 This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
+The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now.
+
+## Current internal object: Artifact handoff
+
+- `artifact_ref`: reference to the artifact being handed off.
+- `source_lane`: neutral source lane label for the handoff.
+- `target_lane`: neutral target lane label for the handoff.
+
+This object is an internal preparation boundary only. It is not a new public package export and does not add provider-specific fields or runtime behavior.
 
 ## Contract object: Run
 

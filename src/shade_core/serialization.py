@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .evaluation import EvaluationResult
-from .models import MetaAuditEvent, RuntimeDecision
+from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision
 
 
 def serialize_runtime_decision(decision: RuntimeDecision) -> dict[str, str]:
@@ -9,6 +9,14 @@ def serialize_runtime_decision(decision: RuntimeDecision) -> dict[str, str]:
         "decision": decision.decision,
         "reason": decision.reason,
         "next_step": decision.next_step,
+    }
+
+
+def serialize_artifact_handoff(handoff: ArtifactHandoff) -> dict[str, str]:
+    return {
+        "artifact_ref": handoff.artifact_ref,
+        "source_lane": handoff.source_lane,
+        "target_lane": handoff.target_lane,
     }
 
 
