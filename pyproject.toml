@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "shade_core"
 version = "0.1.0"
-description = "Minimal lokal Python-foundation for shade-core"
+description = "Minimal local Python foundation for shade-core"
 requires-python = ">=3.11"
 dependencies = []
 

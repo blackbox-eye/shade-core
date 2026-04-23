@@ -1,31 +1,31 @@
 # shade-core
 
-`shade-core` er et build-, contract- og QA-lag med en minimal Python-kerne.
+`shade-core` is a build, contract, and QA layer with a minimal Python core.
 
 ## Status
 
-- Repositoryet samler foundation-dokumentation, governance og en lille inspectable Python-package.
-- Python-kernen dækker kontraktmodeller, et minimalt runtime-beslutningssnit, evaluation og serialisering.
-- Build-gaten validerer både baseline-filer og lokale pytest-checks.
+- The repository combines foundation documentation, governance, and a small inspectable Python package.
+- The Python core covers contract models, a minimal runtime decision slice, evaluation, and serialization.
+- The build gate validates both baseline files and local pytest checks.
 
-## Rammer
+## Constraints
 
-- Ingen deploy.
-- Ingen VPS.
-- Ingen secrets.
-- Ingen produktion eller integration.
+- No deploy.
+- No VPS.
+- No secrets.
+- No production or integration.
 
-## Arbejdsform
+## Working mode
 
-- `main` er protected.
-- Merge til `main` sker kun via pull request.
-- Signed commits er obligatoriske.
-- Historikken holdes lineær.
-- Arbejd lokalt i VS Code og PowerShell.
-- Copilot bruges som assistent, ikke autoritet.
+- `main` is protected.
+- Merge to `main` happens only through pull request.
+- Signed commits are required.
+- History stays linear.
+- Work locally in VS Code and PowerShell.
+- Copilot is used as an assistant, not an authority.
 
-## Python-kerne
+## Python core
 
-- Package-navn er `shade_core`.
-- Kernen er bevidst lille og uden IO, persistence eller netværk.
-- Interfaces holdes testbare og inspectable.
+- The package name is `shade_core`.
+- The core is intentionally small and has no IO, persistence, or networking.
+- Interfaces stay testable and inspectable.
