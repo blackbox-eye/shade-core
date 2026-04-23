@@ -5,6 +5,7 @@ from shade_core import (  # noqa: E402
     SelfModel,
     WorkerRegistry,
 )
+from shade_core.models import ArtifactHandoff
 
 
 def test_model_instantiation_smoke() -> None:
@@ -35,3 +36,15 @@ def test_model_instantiation_smoke() -> None:
     assert confidence.reference == "ref-1"
     assert event.run_id == "run-1"
     assert decision.decision == "needs_review"
+
+
+def test_artifact_handoff_retains_fields() -> None:
+    handoff = ArtifactHandoff(
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert handoff.artifact_ref == "artifact-1"
+    assert handoff.source_lane == "analysis-lane"
+    assert handoff.target_lane == "review-lane"

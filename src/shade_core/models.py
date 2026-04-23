@@ -43,3 +43,10 @@ class RuntimeDecision:
     decision: DecisionValue
     reason: str
     next_step: str
+
+
+@dataclass(slots=True)
+class ArtifactHandoff:
+    artifact_ref: str
+    source_lane: str
+    target_lane: str
