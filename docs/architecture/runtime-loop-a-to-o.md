@@ -3,6 +3,7 @@
 ## Purpose
 
 This file locks the sequential decision and control flow for V1.
+The current codebase implements only minimal supporting slices, not full A-to-O orchestration.
 
 ## Sequence
 

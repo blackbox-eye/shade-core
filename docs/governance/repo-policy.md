@@ -20,7 +20,7 @@ This file is the repository's authoritative governance foundation for work in `s
 
 ## Scope boundaries
 
-- The repository describes local working mode and foundation documentation.
+- The repository describes local working mode, foundation documentation, and a minimal Python core.
 - Deploy is not part of this scope.
 - VPS is not part of this scope.
 - Secrets must not live in the repository.

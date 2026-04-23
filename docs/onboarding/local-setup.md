@@ -22,6 +22,7 @@ git push -u origin feature/<short-name>
 
 - Make changes locally in VS Code.
 - Use PowerShell for Git commands.
+- Use `python -m pip install -e ".[dev]"` and `pytest` for local verification when needed.
 - Open a pull request when the change is ready.
 
 ## Boundaries

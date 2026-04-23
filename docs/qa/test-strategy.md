@@ -8,6 +8,7 @@ This file covers only local repo baseline, PR baseline, and later test direction
 
 - Local changes are reviewed in VS Code.
 - Simple repository and file checks can be run locally in PowerShell.
+- The current pytest suite covers the implemented minimal Python core.
 - Pull request is the fixed quality gate before merge.
 
 ## Before pull request
@@ -20,6 +21,7 @@ This file covers only local repo baseline, PR baseline, and later test direction
 
 - Test coverage can expand as code and modules grow.
 - New tests must follow the repository's simple foundation frame.
+- Docs-to-code alignment is tracked in `docs/qa/docs-to-code-traceability.md`.
 
 ## Boundaries
 

@@ -1,7 +1,7 @@
 # tests
 
-Denne mappe indeholder lokale og minimale tests for `shade-core`.
+This folder contains local and minimal tests for `shade-core`.
 
-- `pytest` bruges til en enkel import- og smoke-test.
-- Testene dækker kun foundation-niveau lige nu.
-- Der er ingen produktion, integration, deploy eller netværkskald i dette scope.
+- `pytest` is used for direct import, unit, and smoke coverage.
+- The tests cover only the currently implemented minimal core.
+- There is no production, integration, deploy, or network-call scope here.
