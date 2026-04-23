@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
 from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision
@@ -19,7 +21,7 @@ def _build_runtime_fabric_snapshot(
     decision: RuntimeDecision,
     audit_event: MetaAuditEvent,
     evaluation_gate_result: EvaluationGateResult,
-) -> dict[str, dict[str, object]]:
+) -> Mapping[str, Mapping[str, object]]:
     handoff = ArtifactHandoff(
         artifact_ref=state.artifact_ref,
         source_lane=state.source_lane,
