@@ -10,7 +10,7 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Component                 | Code file                           | Current implementation status                                         | Relevant tests                  |
 | ------------------------- | ----------------------------------- | --------------------------------------------------------------------- | ------------------------------- |
 | Root package API          | `src/shade_core/__init__.py`        | Implemented, stable public import path                                | `tests/test_import.py`          |
-| Contract models           | `src/shade_core/models.py`          | Implemented, internal module and re-exported through the root package | `tests/test_models.py`          |
+| Contract models           | `src/shade_core/models.py`          | Implemented, internal module; only a subset of model types is re-exported through the stable root package surface; transition and route-related objects are not re-exported | `tests/test_models.py`          |
 | Artifact handoff boundary | `src/shade_core/models.py`          | Implemented as one internal typed handoff object; not re-exported     | `tests/test_models.py`          |
 | Run state                 | `src/shade_core/state.py`           | Implemented, internal module and re-exported through the root package | `tests/test_state.py`           |
 | Contract gate             | `src/shade_core/contract_gate.py`   | Implemented, internal module and re-exported through the root package | `tests/test_contract_gate.py`   |
