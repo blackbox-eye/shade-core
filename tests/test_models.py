@@ -5,7 +5,14 @@ from shade_core import (  # noqa: E402
     SelfModel,
     WorkerRegistry,
 )
-from shade_core.models import ArtifactHandoff, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
+from shade_core.models import (
+    ArtifactHandoff,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 
 
 def test_model_instantiation_smoke() -> None:
