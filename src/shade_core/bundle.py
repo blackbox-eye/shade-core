@@ -4,7 +4,7 @@ from collections.abc import Mapping
 
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
-from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision, TaskRoute, WorkerResult, WorkerTask
+from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
 from .state import RunState
 from .serialization import (
     serialize_artifact_handoff,
@@ -12,8 +12,10 @@ from .serialization import (
     serialize_evaluation_result,
     serialize_meta_audit_event,
     serialize_run_state,
+    serialize_run_transition,
     serialize_runtime_decision,
     serialize_task_route,
+    serialize_task_transition,
     serialize_worker_result,
     serialize_worker_task,
 )
@@ -63,4 +65,14 @@ def _build_orchestration_contract_snapshot(
         "worker_task": serialize_worker_task(task),
         "worker_result": serialize_worker_result(result),
         "task_route": serialize_task_route(route),
+    }
+
+
+def _build_state_transition_snapshot(
+    task_transition: TaskTransition,
+    run_transition: RunTransition,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "task_transition": serialize_task_transition(task_transition),
+        "run_transition": serialize_run_transition(run_transition),
     }

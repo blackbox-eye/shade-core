@@ -28,6 +28,7 @@ The current codebase implements only minimal supporting slices and one internal 
 - Contracts come before runtime behavior.
 - The current core can assemble run state, handoff, decision, audit event, and evaluation gate result into one inspectable internal snapshot.
 - The current core also holds neutral internal contract objects for worker task, worker result, and task route. These are contract boundaries only; they do not execute steps D through K.
+- The current core also holds neutral internal contract objects for task transition and run transition. These prepare step-junction verification without executing transitions.
 - Each step must be inspectable afterwards.
 - Each transition between steps must be testable as an interface.
 - Copilot is an assistant for the work, not a decision authority.

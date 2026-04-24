@@ -5,7 +5,7 @@
 This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
-The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, and three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration.
+The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration, and two neutral state-transition contract objects that prepare step-junction boundaries without implementing step transitions.
 
 ## Current internal object: Artifact handoff
 
@@ -39,6 +39,24 @@ This object is an internal contract boundary only. It is not a public package ex
 - `source_role`: neutral source role label.
 - `target_role`: neutral target role label.
 - `route_ref`: reference key for this route.
+
+This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Task transition
+
+- `task_id`: which task is transitioning.
+- `from_status`: the status the task is transitioning from.
+- `to_status`: the status the task is transitioning to.
+- `transition_ref`: reference key for this transition event.
+
+This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Run transition
+
+- `run_id`: which run is transitioning.
+- `from_step`: the step the run is transitioning from.
+- `to_step`: the step the run is transitioning to.
+- `transition_ref`: reference key for this transition event.
 
 This object is an internal contract boundary only. It is not a public package export.
 

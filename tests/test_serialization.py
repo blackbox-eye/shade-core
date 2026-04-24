@@ -5,10 +5,19 @@ from shade_core import (  # noqa: E402
     serialize_meta_audit_event,
     serialize_runtime_decision,
 )
-from shade_core.models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
+from shade_core.models import (
+    ArtifactHandoff,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 from shade_core.serialization import (
     serialize_artifact_handoff,
+    serialize_run_transition,
     serialize_task_route,
+    serialize_task_transition,
     serialize_worker_result,
     serialize_worker_task,
 )
@@ -109,4 +118,36 @@ def test_serialize_task_route() -> None:
         "source_role": "analysis",
         "target_role": "review",
         "route_ref": "route-1",
+    }
+
+
+def test_serialize_task_transition() -> None:
+    transition = TaskTransition(
+        task_id="task-1",
+        from_status="pending",
+        to_status="running",
+        transition_ref="tr-1",
+    )
+
+    assert serialize_task_transition(transition) == {
+        "task_id": "task-1",
+        "from_status": "pending",
+        "to_status": "running",
+        "transition_ref": "tr-1",
+    }
+
+
+def test_serialize_run_transition() -> None:
+    transition = RunTransition(
+        run_id="run-1",
+        from_step="ingest",
+        to_step="evaluate",
+        transition_ref="tr-2",
+    )
+
+    assert serialize_run_transition(transition) == {
+        "run_id": "run-1",
+        "from_step": "ingest",
+        "to_step": "evaluate",
+        "transition_ref": "tr-2",
     }

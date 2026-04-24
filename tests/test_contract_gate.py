@@ -1,11 +1,20 @@
 from shade_core import RunState, validate_state_contract
 from shade_core.contract_gate import (
     validate_artifact_handoff,
+    validate_run_transition,
     validate_task_route,
+    validate_task_transition,
     validate_worker_result,
     validate_worker_task,
 )
-from shade_core.models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
+from shade_core.models import (
+    ArtifactHandoff,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 
 
 def test_validate_state_contract_passes_for_valid_state() -> None:
@@ -173,4 +182,70 @@ def test_validate_task_route_fails_for_invalid_route() -> None:
         "source_role is required",
         "target_role is required",
         "route_ref is required",
+    )
+
+
+def test_validate_task_transition_passes_for_valid_transition() -> None:
+    transition = TaskTransition(
+        task_id="task-1",
+        from_status="pending",
+        to_status="running",
+        transition_ref="tr-1",
+    )
+
+    result = validate_task_transition(transition)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_task_transition_fails_for_invalid_transition() -> None:
+    transition = TaskTransition(
+        task_id="",
+        from_status="",
+        to_status="",
+        transition_ref="",
+    )
+
+    result = validate_task_transition(transition)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "task_id is required",
+        "from_status is required",
+        "to_status is required",
+        "transition_ref is required",
+    )
+
+
+def test_validate_run_transition_passes_for_valid_transition() -> None:
+    transition = RunTransition(
+        run_id="run-1",
+        from_step="ingest",
+        to_step="evaluate",
+        transition_ref="tr-2",
+    )
+
+    result = validate_run_transition(transition)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_run_transition_fails_for_invalid_transition() -> None:
+    transition = RunTransition(
+        run_id="",
+        from_step="",
+        to_step="",
+        transition_ref="",
+    )
+
+    result = validate_run_transition(transition)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "run_id is required",
+        "from_step is required",
+        "to_step is required",
+        "transition_ref is required",
     )
