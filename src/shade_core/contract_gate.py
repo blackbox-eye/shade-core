@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
+from .models import ArtifactHandoff, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
 from .state import RunState
 
 _DECISION_CLASSES = {"accept", "reject", "needs_review"}
@@ -75,6 +75,36 @@ def validate_worker_result(result: WorkerResult) -> ContractGateResult:
         errors.append("output_ref is required")
     if not result.result_status:
         errors.append("result_status is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_task_transition(transition: TaskTransition) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not transition.task_id:
+        errors.append("task_id is required")
+    if not transition.from_status:
+        errors.append("from_status is required")
+    if not transition.to_status:
+        errors.append("to_status is required")
+    if not transition.transition_ref:
+        errors.append("transition_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_run_transition(transition: RunTransition) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not transition.run_id:
+        errors.append("run_id is required")
+    if not transition.from_step:
+        errors.append("from_step is required")
+    if not transition.to_step:
+        errors.append("to_step is required")
+    if not transition.transition_ref:
+        errors.append("transition_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 

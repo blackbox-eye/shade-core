@@ -34,5 +34,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Worker result serial.     | `src/shade_core/serialization.py`   | Implemented as one internal serializer for worker result fields       | `tests/test_serialization.py`   |
 | Task route serialization  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task route fields          | `tests/test_serialization.py`   |
 | Orchestration contract snapshot | `src/shade_core/bundle.py`    | Implemented as one internal helper for task/result/route view         | `tests/test_bundle.py`          |
+| Task transition contract  | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
+| Run transition contract   | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
+| Task transition validation | `src/shade_core/contract_gate.py`  | Implemented as one internal validator for task transition fields      | `tests/test_contract_gate.py`   |
+| Run transition validation | `src/shade_core/contract_gate.py`   | Implemented as one internal validator for run transition fields       | `tests/test_contract_gate.py`   |
+| Task transition serial.   | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task transition fields     | `tests/test_serialization.py`   |
+| Run transition serial.    | `src/shade_core/serialization.py`   | Implemented as one internal serializer for run transition fields      | `tests/test_serialization.py`   |
+| State transition snapshot | `src/shade_core/bundle.py`          | Implemented as one internal helper for task/run transition view       | `tests/test_bundle.py`          |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

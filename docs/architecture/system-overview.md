@@ -12,6 +12,7 @@
 - Adapter-awareness in the current core is limited to one neutral typed handoff boundary for `artifact_ref`, `source_lane`, and `target_lane`.
 - The current internal fabric links run state, handoff, decision, audit event, and evaluation gate result into one inspectable snapshot.
 - The current internal contract layer also prepares worker-task, worker-result, and task-route boundaries as neutral typed objects. These do not implement orchestration behavior.
+- The current internal contract layer also prepares task-transition and run-transition boundaries as neutral typed objects. These prepare step-junction boundaries without implementing step transitions.
 - `docs/architecture/` describes foundation structure, current boundaries, and documented V1 target contracts.
 - `docs/governance/` describes rules and change control.
 - `docs/onboarding/`, `docs/qa/`, and `docs/releases/` describe local working practice.

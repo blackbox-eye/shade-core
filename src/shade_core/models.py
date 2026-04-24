@@ -74,3 +74,19 @@ class TaskRoute:
     source_role: str
     target_role: str
     route_ref: str
+
+
+@dataclass(slots=True)
+class TaskTransition:
+    task_id: str
+    from_status: str
+    to_status: str
+    transition_ref: str
+
+
+@dataclass(slots=True)
+class RunTransition:
+    run_id: str
+    from_step: str
+    to_step: str
+    transition_ref: str

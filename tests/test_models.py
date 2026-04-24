@@ -5,7 +5,7 @@ from shade_core import (  # noqa: E402
     SelfModel,
     WorkerRegistry,
 )
-from shade_core.models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
+from shade_core.models import ArtifactHandoff, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
 
 
 def test_model_instantiation_smoke() -> None:
@@ -90,3 +90,31 @@ def test_task_route_retains_fields() -> None:
     assert route.source_role == "analysis"
     assert route.target_role == "review"
     assert route.route_ref == "route-1"
+
+
+def test_task_transition_retains_fields() -> None:
+    transition = TaskTransition(
+        task_id="task-1",
+        from_status="pending",
+        to_status="running",
+        transition_ref="tr-1",
+    )
+
+    assert transition.task_id == "task-1"
+    assert transition.from_status == "pending"
+    assert transition.to_status == "running"
+    assert transition.transition_ref == "tr-1"
+
+
+def test_run_transition_retains_fields() -> None:
+    transition = RunTransition(
+        run_id="run-1",
+        from_step="ingest",
+        to_step="evaluate",
+        transition_ref="tr-2",
+    )
+
+    assert transition.run_id == "run-1"
+    assert transition.from_step == "ingest"
+    assert transition.to_step == "evaluate"
+    assert transition.transition_ref == "tr-2"

@@ -13,8 +13,8 @@ from shade_core import (  # noqa: E402
     RuntimeDecision,
     build_bundle,
 )
-from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot  # noqa: E402
-from shade_core.models import TaskRoute, WorkerResult, WorkerTask  # noqa: E402
+from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
+from shade_core.models import RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask  # noqa: E402
 
 
 def test_build_bundle_returns_expected_structure() -> None:
@@ -156,5 +156,35 @@ def test_build_orchestration_contract_snapshot_returns_expected_structure() -> N
             "source_role": "analysis",
             "target_role": "review",
             "route_ref": "route-1",
+        },
+    }
+
+
+def test_build_state_transition_snapshot_returns_expected_structure() -> None:
+    task_transition = TaskTransition(
+        task_id="task-1",
+        from_status="pending",
+        to_status="running",
+        transition_ref="tr-1",
+    )
+    run_transition = RunTransition(
+        run_id="run-1",
+        from_step="ingest",
+        to_step="evaluate",
+        transition_ref="tr-2",
+    )
+
+    assert _build_state_transition_snapshot(task_transition, run_transition) == {
+        "task_transition": {
+            "task_id": "task-1",
+            "from_status": "pending",
+            "to_status": "running",
+            "transition_ref": "tr-1",
+        },
+        "run_transition": {
+            "run_id": "run-1",
+            "from_step": "ingest",
+            "to_step": "evaluate",
+            "transition_ref": "tr-2",
         },
     }
