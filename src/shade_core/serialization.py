@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
-from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision
+from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision, TaskRoute, WorkerResult, WorkerTask
 from .state import RunState
 
 
@@ -55,4 +55,31 @@ def serialize_evaluation_gate_result(
         "result": result.result,
         "contract_valid": result.contract_valid,
         "errors": result.errors,
+    }
+
+
+def serialize_worker_task(task: WorkerTask) -> dict[str, str]:
+    return {
+        "task_id": task.task_id,
+        "worker_role": task.worker_role,
+        "input_ref": task.input_ref,
+        "task_status": task.task_status,
+    }
+
+
+def serialize_worker_result(result: WorkerResult) -> dict[str, str]:
+    return {
+        "task_id": result.task_id,
+        "worker_role": result.worker_role,
+        "output_ref": result.output_ref,
+        "result_status": result.result_status,
+    }
+
+
+def serialize_task_route(route: TaskRoute) -> dict[str, str]:
+    return {
+        "task_id": route.task_id,
+        "source_role": route.source_role,
+        "target_role": route.target_role,
+        "route_ref": route.route_ref,
     }

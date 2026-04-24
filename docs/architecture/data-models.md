@@ -5,7 +5,7 @@
 This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
-The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now.
+The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, and three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration.
 
 ## Current internal object: Artifact handoff
 
@@ -14,6 +14,33 @@ The current internal model set also includes one neutral handoff object for futu
 - `target_lane`: neutral target lane label for the handoff.
 
 This object is an internal preparation boundary only. It is not a new public package export and does not add provider-specific fields or runtime behavior.
+
+## Current internal object: Worker task
+
+- `task_id`: unique identity for this task.
+- `worker_role`: which role executes this task.
+- `input_ref`: reference to the input for this task.
+- `task_status`: current state of the task.
+
+This object is an internal contract boundary only. It is not a public package export and does not add orchestration behavior.
+
+## Current internal object: Worker result
+
+- `task_id`: matches the task this result belongs to.
+- `worker_role`: which role produced this result.
+- `output_ref`: reference to the output produced.
+- `result_status`: state or disposition of the result.
+
+This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Task route
+
+- `task_id`: which task is being routed.
+- `source_role`: neutral source role label.
+- `target_role`: neutral target role label.
+- `route_ref`: reference key for this route.
+
+This object is an internal contract boundary only. It is not a public package export.
 
 ## Contract object: Run
 

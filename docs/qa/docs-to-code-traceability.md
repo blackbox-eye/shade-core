@@ -24,5 +24,15 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Evaluation gate snapshot  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for evaluation gate results    | `tests/test_bundle.py`          |
 | Bundle output             | `src/shade_core/bundle.py`          | Implemented, internal module and re-exported through the root package | `tests/test_bundle.py`          |
 | Runtime fabric snapshot   | `src/shade_core/bundle.py`          | Implemented as one internal helper for a consolidated runtime view    | `tests/test_bundle.py`          |
+| Worker task contract      | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
+| Worker result contract    | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
+| Task route contract       | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
+| Worker task validation    | `src/shade_core/contract_gate.py`   | Implemented as one internal validator for worker task fields          | `tests/test_contract_gate.py`   |
+| Worker result validation  | `src/shade_core/contract_gate.py`   | Implemented as one internal validator for worker result fields        | `tests/test_contract_gate.py`   |
+| Task route validation     | `src/shade_core/contract_gate.py`   | Implemented as one internal validator for task route fields           | `tests/test_contract_gate.py`   |
+| Worker task serialization | `src/shade_core/serialization.py`   | Implemented as one internal serializer for worker task fields         | `tests/test_serialization.py`   |
+| Worker result serial.     | `src/shade_core/serialization.py`   | Implemented as one internal serializer for worker result fields       | `tests/test_serialization.py`   |
+| Task route serialization  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task route fields          | `tests/test_serialization.py`   |
+| Orchestration contract snapshot | `src/shade_core/bundle.py`    | Implemented as one internal helper for task/result/route view         | `tests/test_bundle.py`          |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |
