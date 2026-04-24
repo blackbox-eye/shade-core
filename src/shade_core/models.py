@@ -50,3 +50,27 @@ class ArtifactHandoff:
     artifact_ref: str
     source_lane: str
     target_lane: str
+
+
+@dataclass(slots=True)
+class WorkerTask:
+    task_id: str
+    worker_role: str
+    input_ref: str
+    task_status: str
+
+
+@dataclass(slots=True)
+class WorkerResult:
+    task_id: str
+    worker_role: str
+    output_ref: str
+    result_status: str
+
+
+@dataclass(slots=True)
+class TaskRoute:
+    task_id: str
+    source_role: str
+    target_role: str
+    route_ref: str

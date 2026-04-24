@@ -5,7 +5,7 @@ from shade_core import (  # noqa: E402
     SelfModel,
     WorkerRegistry,
 )
-from shade_core.models import ArtifactHandoff
+from shade_core.models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
 
 
 def test_model_instantiation_smoke() -> None:
@@ -48,3 +48,45 @@ def test_artifact_handoff_retains_fields() -> None:
     assert handoff.artifact_ref == "artifact-1"
     assert handoff.source_lane == "analysis-lane"
     assert handoff.target_lane == "review-lane"
+
+
+def test_worker_task_retains_fields() -> None:
+    task = WorkerTask(
+        task_id="task-1",
+        worker_role="analysis",
+        input_ref="artifact-1",
+        task_status="pending",
+    )
+
+    assert task.task_id == "task-1"
+    assert task.worker_role == "analysis"
+    assert task.input_ref == "artifact-1"
+    assert task.task_status == "pending"
+
+
+def test_worker_result_retains_fields() -> None:
+    result = WorkerResult(
+        task_id="task-1",
+        worker_role="analysis",
+        output_ref="output-1",
+        result_status="complete",
+    )
+
+    assert result.task_id == "task-1"
+    assert result.worker_role == "analysis"
+    assert result.output_ref == "output-1"
+    assert result.result_status == "complete"
+
+
+def test_task_route_retains_fields() -> None:
+    route = TaskRoute(
+        task_id="task-1",
+        source_role="analysis",
+        target_role="review",
+        route_ref="route-1",
+    )
+
+    assert route.task_id == "task-1"
+    assert route.source_role == "analysis"
+    assert route.target_role == "review"
+    assert route.route_ref == "route-1"

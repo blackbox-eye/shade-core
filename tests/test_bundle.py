@@ -13,7 +13,8 @@ from shade_core import (  # noqa: E402
     RuntimeDecision,
     build_bundle,
 )
-from shade_core.bundle import _build_runtime_fabric_snapshot  # noqa: E402
+from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot  # noqa: E402
+from shade_core.models import TaskRoute, WorkerResult, WorkerTask  # noqa: E402
 
 
 def test_build_bundle_returns_expected_structure() -> None:
@@ -113,5 +114,47 @@ def test_build_runtime_fabric_snapshot_returns_expected_structure() -> None:
             "result": "pass",
             "contract_valid": True,
             "errors": (),
+        },
+    }
+
+
+def test_build_orchestration_contract_snapshot_returns_expected_structure() -> None:
+    task = WorkerTask(
+        task_id="task-1",
+        worker_role="analysis",
+        input_ref="artifact-1",
+        task_status="pending",
+    )
+    result = WorkerResult(
+        task_id="task-1",
+        worker_role="analysis",
+        output_ref="output-1",
+        result_status="complete",
+    )
+    route = TaskRoute(
+        task_id="task-1",
+        source_role="analysis",
+        target_role="review",
+        route_ref="route-1",
+    )
+
+    assert _build_orchestration_contract_snapshot(task, result, route) == {
+        "worker_task": {
+            "task_id": "task-1",
+            "worker_role": "analysis",
+            "input_ref": "artifact-1",
+            "task_status": "pending",
+        },
+        "worker_result": {
+            "task_id": "task-1",
+            "worker_role": "analysis",
+            "output_ref": "output-1",
+            "result_status": "complete",
+        },
+        "task_route": {
+            "task_id": "task-1",
+            "source_role": "analysis",
+            "target_role": "review",
+            "route_ref": "route-1",
         },
     }

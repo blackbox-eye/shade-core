@@ -5,8 +5,13 @@ from shade_core import (  # noqa: E402
     serialize_meta_audit_event,
     serialize_runtime_decision,
 )
-from shade_core.models import ArtifactHandoff
-from shade_core.serialization import serialize_artifact_handoff
+from shade_core.models import ArtifactHandoff, TaskRoute, WorkerResult, WorkerTask
+from shade_core.serialization import (
+    serialize_artifact_handoff,
+    serialize_task_route,
+    serialize_worker_result,
+    serialize_worker_task,
+)
 
 
 def test_serialize_runtime_decision() -> None:
@@ -57,3 +62,51 @@ def test_serialize_meta_audit_event() -> None:
 
 def test_serialize_evaluation_result() -> None:
     assert serialize_evaluation_result("review") == {"result": "review"}
+
+
+def test_serialize_worker_task() -> None:
+    task = WorkerTask(
+        task_id="task-1",
+        worker_role="analysis",
+        input_ref="artifact-1",
+        task_status="pending",
+    )
+
+    assert serialize_worker_task(task) == {
+        "task_id": "task-1",
+        "worker_role": "analysis",
+        "input_ref": "artifact-1",
+        "task_status": "pending",
+    }
+
+
+def test_serialize_worker_result() -> None:
+    result = WorkerResult(
+        task_id="task-1",
+        worker_role="analysis",
+        output_ref="output-1",
+        result_status="complete",
+    )
+
+    assert serialize_worker_result(result) == {
+        "task_id": "task-1",
+        "worker_role": "analysis",
+        "output_ref": "output-1",
+        "result_status": "complete",
+    }
+
+
+def test_serialize_task_route() -> None:
+    route = TaskRoute(
+        task_id="task-1",
+        source_role="analysis",
+        target_role="review",
+        route_ref="route-1",
+    )
+
+    assert serialize_task_route(route) == {
+        "task_id": "task-1",
+        "source_role": "analysis",
+        "target_role": "review",
+        "route_ref": "route-1",
+    }
