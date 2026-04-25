@@ -48,5 +48,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Task transition serial.   | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task transition fields     | `tests/test_serialization.py`   |
 | Run transition serial.    | `src/shade_core/serialization.py`   | Implemented as one internal serializer for run transition fields      | `tests/test_serialization.py`   |
 | State transition snapshot | `src/shade_core/bundle.py`          | Implemented as one internal helper for task/run transition view       | `tests/test_bundle.py`          |
+| Orchestration verification contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration outcome contract | `src/shade_core/models.py`      | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration verification validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for verification bridge fields | `tests/test_contract_gate.py` |
+| Orchestration outcome validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for outcome bridge fields     | `tests/test_contract_gate.py`   |
+| Orchestration verification serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for verification bridge fields | `tests/test_serialization.py` |
+| Orchestration outcome serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for outcome bridge fields     | `tests/test_serialization.py`   |
+| Verification outcome snapshot | `src/shade_core/bundle.py`      | Implemented as one internal helper for the verification/outcome bridge view | `tests/test_bundle.py`    |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

@@ -9,6 +9,8 @@ from shade_core.models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -127,6 +129,34 @@ def test_orchestration_junction_retains_fields() -> None:
     assert junction.task_transition_ref == "task-transition-1"
     assert junction.run_transition_ref == "run-transition-1"
     assert junction.junction_ref == "junction-1"
+
+
+def test_orchestration_verification_retains_fields() -> None:
+    verification = OrchestrationVerification(
+        checkpoint_ref="checkpoint-1",
+        junction_ref="junction-1",
+        task_transition_ref="task-transition-1",
+        verification_ref="verification-1",
+    )
+
+    assert verification.checkpoint_ref == "checkpoint-1"
+    assert verification.junction_ref == "junction-1"
+    assert verification.task_transition_ref == "task-transition-1"
+    assert verification.verification_ref == "verification-1"
+
+
+def test_orchestration_outcome_retains_fields() -> None:
+    outcome = OrchestrationOutcome(
+        verification_ref="verification-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        outcome_ref="outcome-1",
+    )
+
+    assert outcome.verification_ref == "verification-1"
+    assert outcome.decision_ref == "decision-1"
+    assert outcome.evaluation_ref == "evaluation-1"
+    assert outcome.outcome_ref == "outcome-1"
 
 
 def test_task_transition_retains_fields() -> None:

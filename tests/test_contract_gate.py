@@ -3,6 +3,8 @@ from shade_core.contract_gate import (
     validate_artifact_handoff,
     validate_orchestration_checkpoint,
     validate_orchestration_junction,
+    validate_orchestration_outcome,
+    validate_orchestration_verification,
     validate_run_transition,
     validate_task_route,
     validate_task_transition,
@@ -13,6 +15,8 @@ from shade_core.models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -252,6 +256,72 @@ def test_validate_orchestration_junction_fails_for_invalid_junction() -> None:
         "task_transition_ref is required",
         "run_transition_ref is required",
         "junction_ref is required",
+    )
+
+
+def test_validate_orchestration_verification_passes_for_valid_verification() -> None:
+    verification = OrchestrationVerification(
+        checkpoint_ref="checkpoint-1",
+        junction_ref="junction-1",
+        task_transition_ref="task-transition-1",
+        verification_ref="verification-1",
+    )
+
+    result = validate_orchestration_verification(verification)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_verification_fails_for_invalid_verification() -> None:
+    verification = OrchestrationVerification(
+        checkpoint_ref="",
+        junction_ref="",
+        task_transition_ref="",
+        verification_ref="",
+    )
+
+    result = validate_orchestration_verification(verification)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "checkpoint_ref is required",
+        "junction_ref is required",
+        "task_transition_ref is required",
+        "verification_ref is required",
+    )
+
+
+def test_validate_orchestration_outcome_passes_for_valid_outcome() -> None:
+    outcome = OrchestrationOutcome(
+        verification_ref="verification-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        outcome_ref="outcome-1",
+    )
+
+    result = validate_orchestration_outcome(outcome)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_outcome_fails_for_invalid_outcome() -> None:
+    outcome = OrchestrationOutcome(
+        verification_ref="",
+        decision_ref="",
+        evaluation_ref="",
+        outcome_ref="",
+    )
+
+    result = validate_orchestration_outcome(outcome)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_ref is required",
+        "decision_ref is required",
+        "evaluation_ref is required",
+        "outcome_ref is required",
     )
 
 

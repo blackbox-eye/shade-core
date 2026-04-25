@@ -7,6 +7,7 @@ The current code implements only a smaller typed subset through `src/shade_core/
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
 The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration, and two neutral state-transition contract objects that prepare step-junction boundaries without implementing step transitions.
 The current internal model set also includes two neutral checkpoint/junction bridge objects that connect the existing worker-result and route layer to the existing transition-prep layer without executing orchestration or routing behavior.
+The current internal model set also includes two neutral verification/outcome bridge objects that connect the existing checkpoint/junction and transition-prep layers to the decision/evaluation side without executing verification, evaluation, or decision behavior.
 
 ## Current internal object: Artifact handoff
 
@@ -78,6 +79,24 @@ This object is an internal contract boundary only. It is not a public package ex
 - `transition_ref`: reference key for this transition event.
 
 This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Orchestration verification
+
+- `checkpoint_ref`: reference to the checkpoint being verified.
+- `junction_ref`: reference to the junction being carried into verification prep.
+- `task_transition_ref`: reference to the prepared task transition carried into verification prep.
+- `verification_ref`: reference key for this verification boundary.
+
+This object is a neutral internal bridge contract only. It connects current checkpoint/junction and transition preparation to the decision/evaluation side without executing verification behavior. It is not a public package export.
+
+## Current internal object: Orchestration outcome
+
+- `verification_ref`: reference to the prepared verification boundary.
+- `decision_ref`: reference to the related decision-side boundary.
+- `evaluation_ref`: reference to the related evaluation-side boundary.
+- `outcome_ref`: reference key for this outcome boundary.
+
+This object is a neutral internal bridge contract only. It connects current verification preparation to the decision/evaluation side without executing evaluation or decision behavior. It is not a public package export.
 
 ## Contract object: Run
 

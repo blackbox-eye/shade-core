@@ -9,6 +9,8 @@ from .models import (
     MetaAuditEvent,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RuntimeDecision,
     RunTransition,
     TaskRoute,
@@ -24,6 +26,8 @@ from .serialization import (
     serialize_meta_audit_event,
     serialize_orchestration_checkpoint,
     serialize_orchestration_junction,
+    serialize_orchestration_outcome,
+    serialize_orchestration_verification,
     serialize_run_state,
     serialize_run_transition,
     serialize_runtime_decision,
@@ -101,5 +105,19 @@ def _build_checkpoint_junction_snapshot(
         ),
         "orchestration_junction": serialize_orchestration_junction(
             junction,
+        ),
+    }
+
+
+def _build_verification_outcome_snapshot(
+    verification: OrchestrationVerification,
+    outcome: OrchestrationOutcome,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_verification": serialize_orchestration_verification(
+            verification,
+        ),
+        "orchestration_outcome": serialize_orchestration_outcome(
+            outcome,
         ),
     }

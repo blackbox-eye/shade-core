@@ -93,6 +93,22 @@ class OrchestrationJunction:
 
 
 @dataclass(slots=True)
+class OrchestrationVerification:
+    checkpoint_ref: str
+    junction_ref: str
+    task_transition_ref: str
+    verification_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationOutcome:
+    verification_ref: str
+    decision_ref: str
+    evaluation_ref: str
+    outcome_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str

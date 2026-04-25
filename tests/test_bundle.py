@@ -13,11 +13,14 @@ from shade_core import (  # noqa: E402
     RuntimeDecision,
     build_bundle,
 )
-from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
+from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
+from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -225,5 +228,35 @@ def test_build_checkpoint_junction_snapshot_returns_expected_structure() -> None
             "task_transition_ref": "task-transition-1",
             "run_transition_ref": "run-transition-1",
             "junction_ref": "junction-1",
+        },
+    }
+
+
+def test_build_verification_outcome_snapshot_returns_expected_structure() -> None:
+    verification = OrchestrationVerification(
+        checkpoint_ref="checkpoint-1",
+        junction_ref="junction-1",
+        task_transition_ref="task-transition-1",
+        verification_ref="verification-1",
+    )
+    outcome = OrchestrationOutcome(
+        verification_ref="verification-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        outcome_ref="outcome-1",
+    )
+
+    assert _build_verification_outcome_snapshot(verification, outcome) == {
+        "orchestration_verification": {
+            "checkpoint_ref": "checkpoint-1",
+            "junction_ref": "junction-1",
+            "task_transition_ref": "task-transition-1",
+            "verification_ref": "verification-1",
+        },
+        "orchestration_outcome": {
+            "verification_ref": "verification-1",
+            "decision_ref": "decision-1",
+            "evaluation_ref": "evaluation-1",
+            "outcome_ref": "outcome-1",
         },
     }
