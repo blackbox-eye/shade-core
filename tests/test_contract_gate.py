@@ -1,6 +1,8 @@
 from shade_core import RunState, validate_state_contract
 from shade_core.contract_gate import (
     validate_artifact_handoff,
+    validate_orchestration_checkpoint,
+    validate_orchestration_junction,
     validate_run_transition,
     validate_task_route,
     validate_task_transition,
@@ -9,6 +11,8 @@ from shade_core.contract_gate import (
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -182,6 +186,72 @@ def test_validate_task_route_fails_for_invalid_route() -> None:
         "source_role is required",
         "target_role is required",
         "route_ref is required",
+    )
+
+
+def test_validate_orchestration_checkpoint_passes_for_valid_checkpoint() -> None:
+    checkpoint = OrchestrationCheckpoint(
+        task_id="task-1",
+        output_ref="output-1",
+        route_ref="route-1",
+        checkpoint_ref="checkpoint-1",
+    )
+
+    result = validate_orchestration_checkpoint(checkpoint)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_checkpoint_fails_for_invalid_checkpoint() -> None:
+    checkpoint = OrchestrationCheckpoint(
+        task_id="",
+        output_ref="",
+        route_ref="",
+        checkpoint_ref="",
+    )
+
+    result = validate_orchestration_checkpoint(checkpoint)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "task_id is required",
+        "output_ref is required",
+        "route_ref is required",
+        "checkpoint_ref is required",
+    )
+
+
+def test_validate_orchestration_junction_passes_for_valid_junction() -> None:
+    junction = OrchestrationJunction(
+        route_ref="route-1",
+        task_transition_ref="task-transition-1",
+        run_transition_ref="run-transition-1",
+        junction_ref="junction-1",
+    )
+
+    result = validate_orchestration_junction(junction)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_junction_fails_for_invalid_junction() -> None:
+    junction = OrchestrationJunction(
+        route_ref="",
+        task_transition_ref="",
+        run_transition_ref="",
+        junction_ref="",
+    )
+
+    result = validate_orchestration_junction(junction)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "route_ref is required",
+        "task_transition_ref is required",
+        "run_transition_ref is required",
+        "junction_ref is required",
     )
 
 

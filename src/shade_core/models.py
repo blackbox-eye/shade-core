@@ -77,6 +77,22 @@ class TaskRoute:
 
 
 @dataclass(slots=True)
+class OrchestrationCheckpoint:
+    task_id: str
+    output_ref: str
+    route_ref: str
+    checkpoint_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationJunction:
+    route_ref: str
+    task_transition_ref: str
+    run_transition_ref: str
+    junction_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str

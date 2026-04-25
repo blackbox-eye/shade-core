@@ -2,7 +2,18 @@ from __future__ import annotations
 
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
-from .models import ArtifactHandoff, MetaAuditEvent, RuntimeDecision, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
+from .models import (
+    ArtifactHandoff,
+    MetaAuditEvent,
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
+    RuntimeDecision,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 from .state import RunState
 
 
@@ -82,6 +93,28 @@ def serialize_task_route(route: TaskRoute) -> dict[str, str]:
         "source_role": route.source_role,
         "target_role": route.target_role,
         "route_ref": route.route_ref,
+    }
+
+
+def serialize_orchestration_checkpoint(
+    checkpoint: OrchestrationCheckpoint,
+) -> dict[str, str]:
+    return {
+        "task_id": checkpoint.task_id,
+        "output_ref": checkpoint.output_ref,
+        "route_ref": checkpoint.route_ref,
+        "checkpoint_ref": checkpoint.checkpoint_ref,
+    }
+
+
+def serialize_orchestration_junction(
+    junction: OrchestrationJunction,
+) -> dict[str, str]:
+    return {
+        "route_ref": junction.route_ref,
+        "task_transition_ref": junction.task_transition_ref,
+        "run_transition_ref": junction.run_transition_ref,
+        "junction_ref": junction.junction_ref,
     }
 
 

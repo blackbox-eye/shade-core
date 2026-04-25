@@ -7,6 +7,8 @@ from shade_core import (  # noqa: E402
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -15,6 +17,8 @@ from shade_core.models import (
 )
 from shade_core.serialization import (
     serialize_artifact_handoff,
+    serialize_orchestration_checkpoint,
+    serialize_orchestration_junction,
     serialize_run_transition,
     serialize_task_route,
     serialize_task_transition,
@@ -118,6 +122,38 @@ def test_serialize_task_route() -> None:
         "source_role": "analysis",
         "target_role": "review",
         "route_ref": "route-1",
+    }
+
+
+def test_serialize_orchestration_checkpoint() -> None:
+    checkpoint = OrchestrationCheckpoint(
+        task_id="task-1",
+        output_ref="output-1",
+        route_ref="route-1",
+        checkpoint_ref="checkpoint-1",
+    )
+
+    assert serialize_orchestration_checkpoint(checkpoint) == {
+        "task_id": "task-1",
+        "output_ref": "output-1",
+        "route_ref": "route-1",
+        "checkpoint_ref": "checkpoint-1",
+    }
+
+
+def test_serialize_orchestration_junction() -> None:
+    junction = OrchestrationJunction(
+        route_ref="route-1",
+        task_transition_ref="task-transition-1",
+        run_transition_ref="run-transition-1",
+        junction_ref="junction-1",
+    )
+
+    assert serialize_orchestration_junction(junction) == {
+        "route_ref": "route-1",
+        "task_transition_ref": "task-transition-1",
+        "run_transition_ref": "run-transition-1",
+        "junction_ref": "junction-1",
     }
 
 

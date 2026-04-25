@@ -14,7 +14,16 @@ from shade_core import (  # noqa: E402
     build_bundle,
 )
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
-from shade_core.models import RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask  # noqa: E402
+from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
+from shade_core.models import (  # noqa: E402
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 
 
 def test_build_bundle_returns_expected_structure() -> None:
@@ -186,5 +195,35 @@ def test_build_state_transition_snapshot_returns_expected_structure() -> None:
             "from_step": "ingest",
             "to_step": "evaluate",
             "transition_ref": "tr-2",
+        },
+    }
+
+
+def test_build_checkpoint_junction_snapshot_returns_expected_structure() -> None:
+    checkpoint = OrchestrationCheckpoint(
+        task_id="task-1",
+        output_ref="output-1",
+        route_ref="route-1",
+        checkpoint_ref="checkpoint-1",
+    )
+    junction = OrchestrationJunction(
+        route_ref="route-1",
+        task_transition_ref="task-transition-1",
+        run_transition_ref="run-transition-1",
+        junction_ref="junction-1",
+    )
+
+    assert _build_checkpoint_junction_snapshot(checkpoint, junction) == {
+        "orchestration_checkpoint": {
+            "task_id": "task-1",
+            "output_ref": "output-1",
+            "route_ref": "route-1",
+            "checkpoint_ref": "checkpoint-1",
+        },
+        "orchestration_junction": {
+            "route_ref": "route-1",
+            "task_transition_ref": "task-transition-1",
+            "run_transition_ref": "run-transition-1",
+            "junction_ref": "junction-1",
         },
     }

@@ -7,6 +7,8 @@ from shade_core import (  # noqa: E402
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -97,6 +99,34 @@ def test_task_route_retains_fields() -> None:
     assert route.source_role == "analysis"
     assert route.target_role == "review"
     assert route.route_ref == "route-1"
+
+
+def test_orchestration_checkpoint_retains_fields() -> None:
+    checkpoint = OrchestrationCheckpoint(
+        task_id="task-1",
+        output_ref="output-1",
+        route_ref="route-1",
+        checkpoint_ref="checkpoint-1",
+    )
+
+    assert checkpoint.task_id == "task-1"
+    assert checkpoint.output_ref == "output-1"
+    assert checkpoint.route_ref == "route-1"
+    assert checkpoint.checkpoint_ref == "checkpoint-1"
+
+
+def test_orchestration_junction_retains_fields() -> None:
+    junction = OrchestrationJunction(
+        route_ref="route-1",
+        task_transition_ref="task-transition-1",
+        run_transition_ref="run-transition-1",
+        junction_ref="junction-1",
+    )
+
+    assert junction.route_ref == "route-1"
+    assert junction.task_transition_ref == "task-transition-1"
+    assert junction.run_transition_ref == "run-transition-1"
+    assert junction.junction_ref == "junction-1"
 
 
 def test_task_transition_retains_fields() -> None:
