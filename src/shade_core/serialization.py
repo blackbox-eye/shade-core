@@ -7,6 +7,8 @@ from .models import (
     MetaAuditEvent,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RuntimeDecision,
     RunTransition,
     TaskRoute,
@@ -115,6 +117,28 @@ def serialize_orchestration_junction(
         "task_transition_ref": junction.task_transition_ref,
         "run_transition_ref": junction.run_transition_ref,
         "junction_ref": junction.junction_ref,
+    }
+
+
+def serialize_orchestration_verification(
+    verification: OrchestrationVerification,
+) -> dict[str, str]:
+    return {
+        "checkpoint_ref": verification.checkpoint_ref,
+        "junction_ref": verification.junction_ref,
+        "task_transition_ref": verification.task_transition_ref,
+        "verification_ref": verification.verification_ref,
+    }
+
+
+def serialize_orchestration_outcome(
+    outcome: OrchestrationOutcome,
+) -> dict[str, str]:
+    return {
+        "verification_ref": outcome.verification_ref,
+        "decision_ref": outcome.decision_ref,
+        "evaluation_ref": outcome.evaluation_ref,
+        "outcome_ref": outcome.outcome_ref,
     }
 
 

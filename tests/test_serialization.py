@@ -9,6 +9,8 @@ from shade_core.models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -19,6 +21,8 @@ from shade_core.serialization import (
     serialize_artifact_handoff,
     serialize_orchestration_checkpoint,
     serialize_orchestration_junction,
+    serialize_orchestration_outcome,
+    serialize_orchestration_verification,
     serialize_run_transition,
     serialize_task_route,
     serialize_task_transition,
@@ -154,6 +158,38 @@ def test_serialize_orchestration_junction() -> None:
         "task_transition_ref": "task-transition-1",
         "run_transition_ref": "run-transition-1",
         "junction_ref": "junction-1",
+    }
+
+
+def test_serialize_orchestration_verification() -> None:
+    verification = OrchestrationVerification(
+        checkpoint_ref="checkpoint-1",
+        junction_ref="junction-1",
+        task_transition_ref="task-transition-1",
+        verification_ref="verification-1",
+    )
+
+    assert serialize_orchestration_verification(verification) == {
+        "checkpoint_ref": "checkpoint-1",
+        "junction_ref": "junction-1",
+        "task_transition_ref": "task-transition-1",
+        "verification_ref": "verification-1",
+    }
+
+
+def test_serialize_orchestration_outcome() -> None:
+    outcome = OrchestrationOutcome(
+        verification_ref="verification-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        outcome_ref="outcome-1",
+    )
+
+    assert serialize_orchestration_outcome(outcome) == {
+        "verification_ref": "verification-1",
+        "decision_ref": "decision-1",
+        "evaluation_ref": "evaluation-1",
+        "outcome_ref": "outcome-1",
     }
 
 

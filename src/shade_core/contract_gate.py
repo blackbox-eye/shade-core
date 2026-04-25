@@ -6,6 +6,8 @@ from .models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
     OrchestrationJunction,
+    OrchestrationOutcome,
+    OrchestrationVerification,
     RunTransition,
     TaskRoute,
     TaskTransition,
@@ -163,5 +165,39 @@ def validate_orchestration_junction(
         errors.append("run_transition_ref is required")
     if not junction.junction_ref:
         errors.append("junction_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_verification(
+    verification: OrchestrationVerification,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not verification.checkpoint_ref:
+        errors.append("checkpoint_ref is required")
+    if not verification.junction_ref:
+        errors.append("junction_ref is required")
+    if not verification.task_transition_ref:
+        errors.append("task_transition_ref is required")
+    if not verification.verification_ref:
+        errors.append("verification_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_outcome(
+    outcome: OrchestrationOutcome,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not outcome.verification_ref:
+        errors.append("verification_ref is required")
+    if not outcome.decision_ref:
+        errors.append("decision_ref is required")
+    if not outcome.evaluation_ref:
+        errors.append("evaluation_ref is required")
+    if not outcome.outcome_ref:
+        errors.append("outcome_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
