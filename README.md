@@ -11,12 +11,15 @@
 - The existing pytest path also includes one narrow repo consistency check for baseline workflow tokens, documented code and test paths, and core docs index files.
 - Six foundation build bundles have been completed and merged to `main`; `main` passes the baseline `python -m pytest` check.
 - The first completed post-foundation 3-bundle cycle has been merged to `main`.
+- The second completed post-foundation 3-bundle cycle has been merged to `main`.
 
 ## Checkpoint
 
 The completed foundation bundle set is recorded in `docs/releases/checkpoint-foundation-bundles.md`.
 
 The first completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-1.md`.
+
+The second completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-2.md`.
 
 ## Constraints
 
