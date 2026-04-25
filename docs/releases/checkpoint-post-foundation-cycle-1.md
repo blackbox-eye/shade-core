@@ -10,10 +10,11 @@ This file records the first completed post-foundation 3-bundle cycle for `shade-
 2. orchestration state-transition contract prep
 3. orchestration checkpoint junction contract prep
 
-## Current baseline at this checkpoint
+## Baseline at this checkpoint
 
+- Verification command: `pytest`
 - pytest: 61 passed
-- Baseline for future work: the `main` revision that contains this checkpoint.
+- Baseline for future work: the `main` revision that contains this checkpoint document.
 
 ## Boundaries
 
