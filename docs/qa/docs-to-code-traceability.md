@@ -34,6 +34,13 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Worker result serial.     | `src/shade_core/serialization.py`   | Implemented as one internal serializer for worker result fields       | `tests/test_serialization.py`   |
 | Task route serialization  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task route fields          | `tests/test_serialization.py`   |
 | Orchestration contract snapshot | `src/shade_core/bundle.py`    | Implemented as one internal helper for task/result/route view         | `tests/test_bundle.py`          |
+| Orchestration checkpoint contract | `src/shade_core/models.py`   | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration junction contract | `src/shade_core/models.py`    | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration checkpoint validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for checkpoint bridge fields | `tests/test_contract_gate.py`   |
+| Orchestration junction validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for junction bridge fields   | `tests/test_contract_gate.py`   |
+| Orchestration checkpoint serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for checkpoint bridge fields | `tests/test_serialization.py`   |
+| Orchestration junction serial. | `src/shade_core/serialization.py`  | Implemented as one internal serializer for junction bridge fields  | `tests/test_serialization.py`   |
+| Checkpoint junction snapshot | `src/shade_core/bundle.py`         | Implemented as one internal helper for the checkpoint/junction bridge view | `tests/test_bundle.py`      |
 | Task transition contract  | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Run transition contract   | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Task transition validation | `src/shade_core/contract_gate.py`  | Implemented as one internal validator for task transition fields      | `tests/test_contract_gate.py`   |

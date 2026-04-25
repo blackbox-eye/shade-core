@@ -6,6 +6,7 @@ This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
 The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration, and two neutral state-transition contract objects that prepare step-junction boundaries without implementing step transitions.
+The current internal model set also includes two neutral checkpoint/junction bridge objects that connect the existing worker-result and route layer to the existing transition-prep layer without executing orchestration or routing behavior.
 
 ## Current internal object: Artifact handoff
 
@@ -41,6 +42,24 @@ This object is an internal contract boundary only. It is not a public package ex
 - `route_ref`: reference key for this route.
 
 This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Orchestration checkpoint
+
+- `task_id`: which task reached the checkpoint.
+- `output_ref`: reference to the current worker result output.
+- `route_ref`: reference to the route already associated with this checkpoint.
+- `checkpoint_ref`: reference key for this checkpoint event.
+
+This object is a neutral internal bridge contract only. It connects current result and route preparation to later transition preparation without executing orchestration behavior. It is not a public package export.
+
+## Current internal object: Orchestration junction
+
+- `route_ref`: reference to the route being joined to transition preparation.
+- `task_transition_ref`: reference to the prepared task transition.
+- `run_transition_ref`: reference to the prepared run transition.
+- `junction_ref`: reference key for this junction event.
+
+This object is a neutral internal bridge contract only. It connects current result and route preparation to later transition preparation without executing orchestration behavior. It is not a public package export.
 
 ## Current internal object: Task transition
 

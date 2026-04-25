@@ -2,7 +2,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .models import ArtifactHandoff, RunTransition, TaskRoute, TaskTransition, WorkerResult, WorkerTask
+from .models import (
+    ArtifactHandoff,
+    OrchestrationCheckpoint,
+    OrchestrationJunction,
+    RunTransition,
+    TaskRoute,
+    TaskTransition,
+    WorkerResult,
+    WorkerTask,
+)
 from .state import RunState
 
 _DECISION_CLASSES = {"accept", "reject", "needs_review"}
@@ -120,5 +129,39 @@ def validate_task_route(route: TaskRoute) -> ContractGateResult:
         errors.append("target_role is required")
     if not route.route_ref:
         errors.append("route_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_checkpoint(
+    checkpoint: OrchestrationCheckpoint,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not checkpoint.task_id:
+        errors.append("task_id is required")
+    if not checkpoint.output_ref:
+        errors.append("output_ref is required")
+    if not checkpoint.route_ref:
+        errors.append("route_ref is required")
+    if not checkpoint.checkpoint_ref:
+        errors.append("checkpoint_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_junction(
+    junction: OrchestrationJunction,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not junction.route_ref:
+        errors.append("route_ref is required")
+    if not junction.task_transition_ref:
+        errors.append("task_transition_ref is required")
+    if not junction.run_transition_ref:
+        errors.append("run_transition_ref is required")
+    if not junction.junction_ref:
+        errors.append("junction_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
