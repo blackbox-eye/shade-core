@@ -9,6 +9,7 @@ The current internal model set also includes one neutral handoff object for futu
 The current internal model set also includes two neutral checkpoint/junction bridge objects that connect the existing worker-result and route layer to the existing transition-prep layer without executing orchestration or routing behavior.
 The current internal model set also includes two neutral verification/outcome bridge objects that connect the existing checkpoint/junction and transition-prep layers to the decision/evaluation side without executing verification, evaluation, or decision behavior.
 The current internal model set also includes two neutral evidence/gate bridge objects that connect the existing verification/outcome seam to the evaluation-gate and audit side without executing evidence, gate, evaluation-gate, or audit behavior.
+The current internal model set also includes two neutral audit/closure bridge objects that connect the existing evidence/gate seam to the current audit and closing end without executing audit, closure, evaluation-gate, decision, or runtime behavior.
 
 ## Current internal object: Artifact handoff
 
@@ -116,6 +117,24 @@ This object is a neutral internal bridge contract only. It connects current veri
 - `gate_ref`: reference key for this gate boundary.
 
 This object is a neutral internal bridge contract only. It connects current evidence preparation to the evaluation-gate and audit side without executing gate or audit behavior. It is not a public package export.
+
+## Current internal object: Orchestration audit
+
+- `gate_ref`: reference to the prepared gate boundary.
+- `evaluation_gate_ref`: reference to the related evaluation-gate-side boundary.
+- `audit_event_ref`: reference to the related audit-event-side boundary.
+- `audit_ref`: reference key for this audit boundary.
+
+This object is a neutral internal bridge contract only. It connects current evidence/gate preparation to the current audit side without executing audit or evaluation-gate behavior. It is not a public package export.
+
+## Current internal object: Orchestration closure
+
+- `audit_ref`: reference to the prepared audit boundary.
+- `decision_ref`: reference to the related decision-side boundary.
+- `evaluation_ref`: reference to the related evaluation-side boundary.
+- `closure_ref`: reference key for this closure boundary.
+
+This object is a neutral internal bridge contract only. It connects current audit preparation to the current closing end without executing closure, decision, or runtime behavior. It is not a public package export.
 
 ## Contract object: Run
 

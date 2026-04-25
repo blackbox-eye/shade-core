@@ -125,6 +125,22 @@ class OrchestrationGate:
 
 
 @dataclass(slots=True)
+class OrchestrationAudit:
+    gate_ref: str
+    evaluation_gate_ref: str
+    audit_event_ref: str
+    audit_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationClosure:
+    audit_ref: str
+    decision_ref: str
+    evaluation_ref: str
+    closure_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str

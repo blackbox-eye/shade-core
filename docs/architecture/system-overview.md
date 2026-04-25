@@ -16,6 +16,7 @@
 - The current internal contract layer also prepares task-transition and run-transition boundaries as neutral typed objects. These prepare step-junction boundaries without implementing step transitions.
 - The current internal contract layer also prepares orchestration-verification and orchestration-outcome boundaries as neutral typed bridge objects between the current checkpoint/junction plus transition-prep layer and the current decision/evaluation side. These do not implement verification, evaluation, or decision behavior.
 - The current internal contract layer also prepares orchestration-evidence and orchestration-gate boundaries as neutral typed bridge objects between the current verification/outcome seam and the current evaluation-gate and audit side. These do not implement evidence, gate, evaluation-gate, or audit behavior.
+- The current internal contract layer also prepares orchestration-audit and orchestration-closure boundaries as neutral typed bridge objects between the current evidence/gate seam and the current audit and closing end. These do not implement audit, closure, evaluation-gate, decision, or runtime behavior.
 - `docs/architecture/` describes foundation structure, current boundaries, and documented V1 target contracts.
 - `docs/governance/` describes rules and change control.
 - `docs/onboarding/`, `docs/qa/`, and `docs/releases/` describe local working practice.
@@ -29,4 +30,5 @@
 - It does not claim checkpoint or junction execution behavior as implemented today; those bridge objects are preparation boundaries only.
 - It does not claim verification or outcome execution behavior as implemented today; those bridge objects are preparation boundaries only.
 - It does not claim evidence or gate execution behavior as implemented today; those bridge objects are preparation boundaries only.
+- It does not claim audit or closure execution behavior as implemented today; those bridge objects are preparation boundaries only.
 - New architecture decisions are outside this foundation description.

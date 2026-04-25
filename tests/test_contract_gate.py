@@ -1,6 +1,8 @@
 from shade_core import RunState, validate_state_contract
 from shade_core.contract_gate import (
     validate_artifact_handoff,
+    validate_orchestration_audit,
+    validate_orchestration_closure,
     validate_orchestration_checkpoint,
     validate_orchestration_evidence,
     validate_orchestration_gate,
@@ -15,6 +17,8 @@ from shade_core.contract_gate import (
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationAudit,
+    OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
     OrchestrationGate,
@@ -392,6 +396,72 @@ def test_validate_orchestration_gate_fails_for_invalid_gate() -> None:
         "evaluation_gate_ref is required",
         "audit_ref is required",
         "gate_ref is required",
+    )
+
+
+def test_validate_orchestration_audit_passes_for_valid_audit() -> None:
+    audit = OrchestrationAudit(
+        gate_ref="gate-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_event_ref="audit-event-1",
+        audit_ref="audit-1",
+    )
+
+    result = validate_orchestration_audit(audit)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_audit_fails_for_invalid_audit() -> None:
+    audit = OrchestrationAudit(
+        gate_ref="",
+        evaluation_gate_ref="",
+        audit_event_ref="",
+        audit_ref="",
+    )
+
+    result = validate_orchestration_audit(audit)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "gate_ref is required",
+        "evaluation_gate_ref is required",
+        "audit_event_ref is required",
+        "audit_ref is required",
+    )
+
+
+def test_validate_orchestration_closure_passes_for_valid_closure() -> None:
+    closure = OrchestrationClosure(
+        audit_ref="audit-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        closure_ref="closure-1",
+    )
+
+    result = validate_orchestration_closure(closure)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_closure_fails_for_invalid_closure() -> None:
+    closure = OrchestrationClosure(
+        audit_ref="",
+        decision_ref="",
+        evaluation_ref="",
+        closure_ref="",
+    )
+
+    result = validate_orchestration_closure(closure)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "audit_ref is required",
+        "decision_ref is required",
+        "evaluation_ref is required",
+        "closure_ref is required",
     )
 
 

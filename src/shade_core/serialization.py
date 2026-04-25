@@ -5,6 +5,8 @@ from .evaluation_gate import EvaluationGateResult
 from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
+    OrchestrationAudit,
+    OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
     OrchestrationGate,
@@ -163,6 +165,28 @@ def serialize_orchestration_gate(
         "evaluation_gate_ref": gate.evaluation_gate_ref,
         "audit_ref": gate.audit_ref,
         "gate_ref": gate.gate_ref,
+    }
+
+
+def serialize_orchestration_audit(
+    audit: OrchestrationAudit,
+) -> dict[str, str]:
+    return {
+        "gate_ref": audit.gate_ref,
+        "evaluation_gate_ref": audit.evaluation_gate_ref,
+        "audit_event_ref": audit.audit_event_ref,
+        "audit_ref": audit.audit_ref,
+    }
+
+
+def serialize_orchestration_closure(
+    closure: OrchestrationClosure,
+) -> dict[str, str]:
+    return {
+        "audit_ref": closure.audit_ref,
+        "decision_ref": closure.decision_ref,
+        "evaluation_ref": closure.evaluation_ref,
+        "closure_ref": closure.closure_ref,
     }
 
 

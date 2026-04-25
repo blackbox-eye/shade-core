@@ -62,5 +62,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration evidence serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for evidence bridge fields   | `tests/test_serialization.py`   |
 | Orchestration gate serial. | `src/shade_core/serialization.py`   | Implemented as one internal serializer for gate bridge fields       | `tests/test_serialization.py`   |
 | Evidence gate snapshot | `src/shade_core/bundle.py`            | Implemented as one internal helper for the evidence/gate bridge view | `tests/test_bundle.py`          |
+| Orchestration audit contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration closure contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration audit validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for audit bridge fields | `tests/test_contract_gate.py` |
+| Orchestration closure validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for closure bridge fields | `tests/test_contract_gate.py` |
+| Orchestration audit serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for audit bridge fields | `tests/test_serialization.py` |
+| Orchestration closure serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for closure bridge fields | `tests/test_serialization.py` |
+| Audit closure snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the audit/closure bridge view | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

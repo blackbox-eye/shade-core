@@ -7,6 +7,8 @@ from shade_core import (  # noqa: E402
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationAudit,
+    OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
     OrchestrationGate,
@@ -187,6 +189,34 @@ def test_orchestration_gate_retains_fields() -> None:
     assert gate.evaluation_gate_ref == "evaluation-gate-1"
     assert gate.audit_ref == "audit-1"
     assert gate.gate_ref == "gate-1"
+
+
+def test_orchestration_audit_retains_fields() -> None:
+    audit = OrchestrationAudit(
+        gate_ref="gate-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_event_ref="audit-event-1",
+        audit_ref="audit-1",
+    )
+
+    assert audit.gate_ref == "gate-1"
+    assert audit.evaluation_gate_ref == "evaluation-gate-1"
+    assert audit.audit_event_ref == "audit-event-1"
+    assert audit.audit_ref == "audit-1"
+
+
+def test_orchestration_closure_retains_fields() -> None:
+    closure = OrchestrationClosure(
+        audit_ref="audit-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        closure_ref="closure-1",
+    )
+
+    assert closure.audit_ref == "audit-1"
+    assert closure.decision_ref == "decision-1"
+    assert closure.evaluation_ref == "evaluation-1"
+    assert closure.closure_ref == "closure-1"
 
 
 def test_task_transition_retains_fields() -> None:
