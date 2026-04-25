@@ -8,6 +8,7 @@ The current public package surface exposes only the implemented subset through t
 The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration, and two neutral state-transition contract objects that prepare step-junction boundaries without implementing step transitions.
 The current internal model set also includes two neutral checkpoint/junction bridge objects that connect the existing worker-result and route layer to the existing transition-prep layer without executing orchestration or routing behavior.
 The current internal model set also includes two neutral verification/outcome bridge objects that connect the existing checkpoint/junction and transition-prep layers to the decision/evaluation side without executing verification, evaluation, or decision behavior.
+The current internal model set also includes two neutral evidence/gate bridge objects that connect the existing verification/outcome seam to the evaluation-gate and audit side without executing evidence, gate, evaluation-gate, or audit behavior.
 
 ## Current internal object: Artifact handoff
 
@@ -97,6 +98,24 @@ This object is a neutral internal bridge contract only. It connects current chec
 - `outcome_ref`: reference key for this outcome boundary.
 
 This object is a neutral internal bridge contract only. It connects current verification preparation to the decision/evaluation side without executing evaluation or decision behavior. It is not a public package export.
+
+## Current internal object: Orchestration evidence
+
+- `verification_ref`: reference to the prepared verification boundary.
+- `outcome_ref`: reference to the prepared outcome boundary.
+- `evaluation_ref`: reference to the related evaluation-side boundary.
+- `evidence_ref`: reference key for this evidence boundary.
+
+This object is a neutral internal bridge contract only. It connects current verification/outcome preparation to the evaluation-gate and audit side without executing evidence or evaluation-gate behavior. It is not a public package export.
+
+## Current internal object: Orchestration gate
+
+- `evidence_ref`: reference to the prepared evidence boundary.
+- `evaluation_gate_ref`: reference to the related evaluation-gate-side boundary.
+- `audit_ref`: reference to the related audit-side boundary.
+- `gate_ref`: reference key for this gate boundary.
+
+This object is a neutral internal bridge contract only. It connects current evidence preparation to the evaluation-gate and audit side without executing gate or audit behavior. It is not a public package export.
 
 ## Contract object: Run
 

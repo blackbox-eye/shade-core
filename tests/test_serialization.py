@@ -8,6 +8,8 @@ from shade_core import (  # noqa: E402
 from shade_core.models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -20,6 +22,8 @@ from shade_core.models import (
 from shade_core.serialization import (
     serialize_artifact_handoff,
     serialize_orchestration_checkpoint,
+    serialize_orchestration_evidence,
+    serialize_orchestration_gate,
     serialize_orchestration_junction,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
@@ -190,6 +194,38 @@ def test_serialize_orchestration_outcome() -> None:
         "decision_ref": "decision-1",
         "evaluation_ref": "evaluation-1",
         "outcome_ref": "outcome-1",
+    }
+
+
+def test_serialize_orchestration_evidence() -> None:
+    evidence = OrchestrationEvidence(
+        verification_ref="verification-1",
+        outcome_ref="outcome-1",
+        evaluation_ref="evaluation-1",
+        evidence_ref="evidence-1",
+    )
+
+    assert serialize_orchestration_evidence(evidence) == {
+        "verification_ref": "verification-1",
+        "outcome_ref": "outcome-1",
+        "evaluation_ref": "evaluation-1",
+        "evidence_ref": "evidence-1",
+    }
+
+
+def test_serialize_orchestration_gate() -> None:
+    gate = OrchestrationGate(
+        evidence_ref="evidence-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_ref="audit-1",
+        gate_ref="gate-1",
+    )
+
+    assert serialize_orchestration_gate(gate) == {
+        "evidence_ref": "evidence-1",
+        "evaluation_gate_ref": "evaluation-gate-1",
+        "audit_ref": "audit-1",
+        "gate_ref": "gate-1",
     }
 
 

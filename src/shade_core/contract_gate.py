@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from .models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -199,5 +201,39 @@ def validate_orchestration_outcome(
         errors.append("evaluation_ref is required")
     if not outcome.outcome_ref:
         errors.append("outcome_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_evidence(
+    evidence: OrchestrationEvidence,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not evidence.verification_ref:
+        errors.append("verification_ref is required")
+    if not evidence.outcome_ref:
+        errors.append("outcome_ref is required")
+    if not evidence.evaluation_ref:
+        errors.append("evaluation_ref is required")
+    if not evidence.evidence_ref:
+        errors.append("evidence_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_gate(
+    gate: OrchestrationGate,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not gate.evidence_ref:
+        errors.append("evidence_ref is required")
+    if not gate.evaluation_gate_ref:
+        errors.append("evaluation_gate_ref is required")
+    if not gate.audit_ref:
+        errors.append("audit_ref is required")
+    if not gate.gate_ref:
+        errors.append("gate_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))

@@ -14,10 +14,13 @@ from shade_core import (  # noqa: E402
     build_bundle,
 )
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
+from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -258,5 +261,35 @@ def test_build_verification_outcome_snapshot_returns_expected_structure() -> Non
             "decision_ref": "decision-1",
             "evaluation_ref": "evaluation-1",
             "outcome_ref": "outcome-1",
+        },
+    }
+
+
+def test_build_evidence_gate_snapshot_returns_expected_structure() -> None:
+    evidence = OrchestrationEvidence(
+        verification_ref="verification-1",
+        outcome_ref="outcome-1",
+        evaluation_ref="evaluation-1",
+        evidence_ref="evidence-1",
+    )
+    gate = OrchestrationGate(
+        evidence_ref="evidence-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_ref="audit-1",
+        gate_ref="gate-1",
+    )
+
+    assert _build_evidence_gate_snapshot(evidence, gate) == {
+        "orchestration_evidence": {
+            "verification_ref": "verification-1",
+            "outcome_ref": "outcome-1",
+            "evaluation_ref": "evaluation-1",
+            "evidence_ref": "evidence-1",
+        },
+        "orchestration_gate": {
+            "evidence_ref": "evidence-1",
+            "evaluation_gate_ref": "evaluation-gate-1",
+            "audit_ref": "audit-1",
+            "gate_ref": "gate-1",
         },
     }
