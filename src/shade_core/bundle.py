@@ -8,6 +8,8 @@ from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -25,6 +27,8 @@ from .serialization import (
     serialize_evaluation_result,
     serialize_meta_audit_event,
     serialize_orchestration_checkpoint,
+    serialize_orchestration_evidence,
+    serialize_orchestration_gate,
     serialize_orchestration_junction,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
@@ -119,5 +123,19 @@ def _build_verification_outcome_snapshot(
         ),
         "orchestration_outcome": serialize_orchestration_outcome(
             outcome,
+        ),
+    }
+
+
+def _build_evidence_gate_snapshot(
+    evidence: OrchestrationEvidence,
+    gate: OrchestrationGate,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_evidence": serialize_orchestration_evidence(
+            evidence,
+        ),
+        "orchestration_gate": serialize_orchestration_gate(
+            gate,
         ),
     }

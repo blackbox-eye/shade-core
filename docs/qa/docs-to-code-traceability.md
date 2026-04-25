@@ -55,5 +55,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration verification serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for verification bridge fields | `tests/test_serialization.py` |
 | Orchestration outcome serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for outcome bridge fields     | `tests/test_serialization.py`   |
 | Verification outcome snapshot | `src/shade_core/bundle.py`      | Implemented as one internal helper for the verification/outcome bridge view | `tests/test_bundle.py`    |
+| Orchestration evidence contract | `src/shade_core/models.py`     | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration gate contract | `src/shade_core/models.py`         | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
+| Orchestration evidence validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for evidence bridge fields   | `tests/test_contract_gate.py`   |
+| Orchestration gate validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for gate bridge fields         | `tests/test_contract_gate.py`   |
+| Orchestration evidence serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for evidence bridge fields   | `tests/test_serialization.py`   |
+| Orchestration gate serial. | `src/shade_core/serialization.py`   | Implemented as one internal serializer for gate bridge fields       | `tests/test_serialization.py`   |
+| Evidence gate snapshot | `src/shade_core/bundle.py`            | Implemented as one internal helper for the evidence/gate bridge view | `tests/test_bundle.py`          |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

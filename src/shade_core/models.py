@@ -109,6 +109,22 @@ class OrchestrationOutcome:
 
 
 @dataclass(slots=True)
+class OrchestrationEvidence:
+    verification_ref: str
+    outcome_ref: str
+    evaluation_ref: str
+    evidence_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationGate:
+    evidence_ref: str
+    evaluation_gate_ref: str
+    audit_ref: str
+    gate_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str

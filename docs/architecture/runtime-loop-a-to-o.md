@@ -31,6 +31,7 @@ The current codebase implements only minimal supporting slices and one internal 
 - The current core also holds neutral internal orchestration-checkpoint and orchestration-junction bridge objects that connect current result and route preparation to current transition preparation. These are contract boundaries only; they do not execute routing, checkpoint progression, or orchestration steps.
 - The current core also holds neutral internal contract objects for task transition and run transition. These prepare step-junction verification without executing transitions.
 - The current core also holds neutral internal orchestration-verification and orchestration-outcome bridge objects that connect current checkpoint/junction and transition preparation to the decision/evaluation side. These are contract boundaries only; they do not execute verification, evaluation, or decision steps.
+- The current core also holds neutral internal orchestration-evidence and orchestration-gate bridge objects that connect current verification/outcome preparation to the evaluation-gate and audit side. These are contract boundaries only; they do not execute evidence, gate, evaluation-gate, or audit steps.
 - Each step must be inspectable afterwards.
 - Each transition between steps must be testable as an interface.
 - Copilot is an assistant for the work, not a decision authority.

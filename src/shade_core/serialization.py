@@ -6,6 +6,8 @@ from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -139,6 +141,28 @@ def serialize_orchestration_outcome(
         "decision_ref": outcome.decision_ref,
         "evaluation_ref": outcome.evaluation_ref,
         "outcome_ref": outcome.outcome_ref,
+    }
+
+
+def serialize_orchestration_evidence(
+    evidence: OrchestrationEvidence,
+) -> dict[str, str]:
+    return {
+        "verification_ref": evidence.verification_ref,
+        "outcome_ref": evidence.outcome_ref,
+        "evaluation_ref": evidence.evaluation_ref,
+        "evidence_ref": evidence.evidence_ref,
+    }
+
+
+def serialize_orchestration_gate(
+    gate: OrchestrationGate,
+) -> dict[str, str]:
+    return {
+        "evidence_ref": gate.evidence_ref,
+        "evaluation_gate_ref": gate.evaluation_gate_ref,
+        "audit_ref": gate.audit_ref,
+        "gate_ref": gate.gate_ref,
     }
 
 

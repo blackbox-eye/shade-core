@@ -2,6 +2,8 @@ from shade_core import RunState, validate_state_contract
 from shade_core.contract_gate import (
     validate_artifact_handoff,
     validate_orchestration_checkpoint,
+    validate_orchestration_evidence,
+    validate_orchestration_gate,
     validate_orchestration_junction,
     validate_orchestration_outcome,
     validate_orchestration_verification,
@@ -14,6 +16,8 @@ from shade_core.contract_gate import (
 from shade_core.models import (
     ArtifactHandoff,
     OrchestrationCheckpoint,
+    OrchestrationEvidence,
+    OrchestrationGate,
     OrchestrationJunction,
     OrchestrationOutcome,
     OrchestrationVerification,
@@ -322,6 +326,72 @@ def test_validate_orchestration_outcome_fails_for_invalid_outcome() -> None:
         "decision_ref is required",
         "evaluation_ref is required",
         "outcome_ref is required",
+    )
+
+
+def test_validate_orchestration_evidence_passes_for_valid_evidence() -> None:
+    evidence = OrchestrationEvidence(
+        verification_ref="verification-1",
+        outcome_ref="outcome-1",
+        evaluation_ref="evaluation-1",
+        evidence_ref="evidence-1",
+    )
+
+    result = validate_orchestration_evidence(evidence)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_evidence_fails_for_invalid_evidence() -> None:
+    evidence = OrchestrationEvidence(
+        verification_ref="",
+        outcome_ref="",
+        evaluation_ref="",
+        evidence_ref="",
+    )
+
+    result = validate_orchestration_evidence(evidence)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_ref is required",
+        "outcome_ref is required",
+        "evaluation_ref is required",
+        "evidence_ref is required",
+    )
+
+
+def test_validate_orchestration_gate_passes_for_valid_gate() -> None:
+    gate = OrchestrationGate(
+        evidence_ref="evidence-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_ref="audit-1",
+        gate_ref="gate-1",
+    )
+
+    result = validate_orchestration_gate(gate)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_gate_fails_for_invalid_gate() -> None:
+    gate = OrchestrationGate(
+        evidence_ref="",
+        evaluation_gate_ref="",
+        audit_ref="",
+        gate_ref="",
+    )
+
+    result = validate_orchestration_gate(gate)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "evidence_ref is required",
+        "evaluation_gate_ref is required",
+        "audit_ref is required",
+        "gate_ref is required",
     )
 
 
