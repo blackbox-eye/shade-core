@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 from .models import (
     ArtifactHandoff,
+    OrchestrationAudit,
+    OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
     OrchestrationGate,
@@ -235,5 +237,39 @@ def validate_orchestration_gate(
         errors.append("audit_ref is required")
     if not gate.gate_ref:
         errors.append("gate_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_audit(
+    audit: OrchestrationAudit,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not audit.gate_ref:
+        errors.append("gate_ref is required")
+    if not audit.evaluation_gate_ref:
+        errors.append("evaluation_gate_ref is required")
+    if not audit.audit_event_ref:
+        errors.append("audit_event_ref is required")
+    if not audit.audit_ref:
+        errors.append("audit_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_closure(
+    closure: OrchestrationClosure,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not closure.audit_ref:
+        errors.append("audit_ref is required")
+    if not closure.decision_ref:
+        errors.append("decision_ref is required")
+    if not closure.evaluation_ref:
+        errors.append("evaluation_ref is required")
+    if not closure.closure_ref:
+        errors.append("closure_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))

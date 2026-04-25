@@ -7,6 +7,8 @@ from .evaluation_gate import EvaluationGateResult
 from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
+    OrchestrationAudit,
+    OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
     OrchestrationGate,
@@ -26,6 +28,8 @@ from .serialization import (
     serialize_evaluation_gate_result,
     serialize_evaluation_result,
     serialize_meta_audit_event,
+    serialize_orchestration_audit,
+    serialize_orchestration_closure,
     serialize_orchestration_checkpoint,
     serialize_orchestration_evidence,
     serialize_orchestration_gate,
@@ -137,5 +141,19 @@ def _build_evidence_gate_snapshot(
         ),
         "orchestration_gate": serialize_orchestration_gate(
             gate,
+        ),
+    }
+
+
+def _build_audit_closure_snapshot(
+    audit: OrchestrationAudit,
+    closure: OrchestrationClosure,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_audit": serialize_orchestration_audit(
+            audit,
+        ),
+        "orchestration_closure": serialize_orchestration_closure(
+            closure,
         ),
     }
