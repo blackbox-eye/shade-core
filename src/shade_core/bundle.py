@@ -13,6 +13,8 @@ from .models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RuntimeDecision,
@@ -34,6 +36,8 @@ from .serialization import (
     serialize_orchestration_evidence,
     serialize_orchestration_gate,
     serialize_orchestration_junction,
+    serialize_orchestration_lineage,
+    serialize_orchestration_manifest,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
     serialize_run_state,
@@ -155,5 +159,19 @@ def _build_audit_closure_snapshot(
         ),
         "orchestration_closure": serialize_orchestration_closure(
             closure,
+        ),
+    }
+
+
+def _build_lineage_manifest_snapshot(
+    lineage: OrchestrationLineage,
+    manifest: OrchestrationManifest,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_lineage": serialize_orchestration_lineage(
+            lineage,
+        ),
+        "orchestration_manifest": serialize_orchestration_manifest(
+            manifest,
         ),
     }

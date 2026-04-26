@@ -13,6 +13,8 @@ from shade_core.models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RunTransition,
@@ -29,6 +31,8 @@ from shade_core.serialization import (
     serialize_orchestration_evidence,
     serialize_orchestration_gate,
     serialize_orchestration_junction,
+    serialize_orchestration_lineage,
+    serialize_orchestration_manifest,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
     serialize_run_transition,
@@ -294,4 +298,36 @@ def test_serialize_run_transition() -> None:
         "from_step": "ingest",
         "to_step": "evaluate",
         "transition_ref": "tr-2",
+    }
+
+
+def test_serialize_orchestration_lineage() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+
+    assert serialize_orchestration_lineage(lineage) == {
+        "closure_ref": "closure-1",
+        "audit_ref": "audit-1",
+        "outcome_ref": "outcome-1",
+        "lineage_ref": "lineage-1",
+    }
+
+
+def test_serialize_orchestration_manifest() -> None:
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+
+    assert serialize_orchestration_manifest(manifest) == {
+        "lineage_ref": "lineage-1",
+        "closure_ref": "closure-1",
+        "evidence_ref": "evidence-1",
+        "manifest_ref": "manifest-1",
     }

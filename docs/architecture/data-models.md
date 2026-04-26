@@ -136,6 +136,24 @@ This object is a neutral internal bridge contract only. It connects current evid
 
 This object is a neutral internal bridge contract only. It connects current audit preparation to the current closing end without executing closure, decision, or runtime behavior. It is not a public package export.
 
+## Current internal object: Orchestration lineage
+
+- `closure_ref`: reference to the prepared closure boundary.
+- `audit_ref`: reference to the prepared audit boundary.
+- `outcome_ref`: reference to the prepared outcome boundary.
+- `lineage_ref`: reference key for this lineage boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the terminal seam references from the already-built contract chain into one inspectable lineage record without executing lineage, audit, decision, or runtime behavior. It is not a public package export.
+
+## Current internal object: Orchestration manifest
+
+- `lineage_ref`: reference to the prepared lineage boundary.
+- `closure_ref`: reference to the closure end of the chain.
+- `evidence_ref`: reference to the prepared evidence boundary.
+- `manifest_ref`: reference key for this manifest boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the lineage, closure, and evidence references into the outermost inspectable description of the completed contract chain without executing manifest, lineage, or runtime behavior. It is not a public package export.
+
 ## Contract object: Run
 
 - `run_id`: unique identity for a run.

@@ -13,6 +13,8 @@ from shade_core.models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RunTransition,
@@ -245,3 +247,31 @@ def test_run_transition_retains_fields() -> None:
     assert transition.from_step == "ingest"
     assert transition.to_step == "evaluate"
     assert transition.transition_ref == "tr-2"
+
+
+def test_orchestration_lineage_retains_fields() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+
+    assert lineage.closure_ref == "closure-1"
+    assert lineage.audit_ref == "audit-1"
+    assert lineage.outcome_ref == "outcome-1"
+    assert lineage.lineage_ref == "lineage-1"
+
+
+def test_orchestration_manifest_retains_fields() -> None:
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+
+    assert manifest.lineage_ref == "lineage-1"
+    assert manifest.closure_ref == "closure-1"
+    assert manifest.evidence_ref == "evidence-1"
+    assert manifest.manifest_ref == "manifest-1"
