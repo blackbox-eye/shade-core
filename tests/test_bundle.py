@@ -17,9 +17,11 @@ from shade_core.bundle import _build_audit_closure_snapshot  # noqa: E402
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
 from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
+from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
+    OrchestrationAssertion,
     OrchestrationAudit,
     OrchestrationClosure,
     OrchestrationCheckpoint,
@@ -29,6 +31,7 @@ from shade_core.models import (  # noqa: E402
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
     TaskRoute,
@@ -357,5 +360,35 @@ def test_build_lineage_manifest_snapshot_returns_expected_structure() -> None:
             "closure_ref": "closure-1",
             "evidence_ref": "evidence-1",
             "manifest_ref": "manifest-1",
+        },
+    }
+
+
+def test_build_review_assertion_snapshot_returns_expected_structure() -> None:
+    review = OrchestrationReview(
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        review_ref="review-1",
+    )
+    assertion = OrchestrationAssertion(
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        assertion_ref="assertion-1",
+    )
+
+    assert _build_review_assertion_snapshot(review, assertion) == {
+        "orchestration_review": {
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "review_ref": "review-1",
+        },
+        "orchestration_assertion": {
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "assertion_ref": "assertion-1",
         },
     }

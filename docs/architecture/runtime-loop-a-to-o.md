@@ -34,6 +34,7 @@ The current codebase implements only minimal supporting slices and one internal 
 - The current core also holds neutral internal orchestration-evidence and orchestration-gate bridge objects that connect current verification/outcome preparation to the evaluation-gate and audit side. These are contract boundaries only; they do not execute evidence, gate, evaluation-gate, or audit steps.
 - The current core also holds neutral internal orchestration-audit and orchestration-closure bridge objects that connect current evidence/gate preparation to the current audit and closing end. These are contract boundaries only; they do not execute audit, closure, evaluation-gate, decision, or runtime steps.
 - The current core also holds neutral internal orchestration-lineage and orchestration-manifest bridge objects that consolidate the already-built contract chain into one inspectable description. These are contract boundaries only; they do not execute lineage, manifest, decision, audit, or runtime steps.
+- The current core also holds neutral internal orchestration-review and orchestration-assertion bridge objects that consolidate the manifest, lineage, and closure references into one inspectable review and assertion record. These are contract boundaries only; they do not execute review, assertion, manifest, or runtime steps.
 - Each step must be inspectable afterwards.
 - Each transition between steps must be testable as an interface.
 - Copilot is an assistant for the work, not a decision authority.

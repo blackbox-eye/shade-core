@@ -5,6 +5,7 @@ from .evaluation_gate import EvaluationGateResult
 from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
+    OrchestrationAssertion,
     OrchestrationAudit,
     OrchestrationClosure,
     OrchestrationCheckpoint,
@@ -14,6 +15,7 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RuntimeDecision,
     RunTransition,
@@ -229,4 +231,26 @@ def serialize_orchestration_manifest(
         "closure_ref": manifest.closure_ref,
         "evidence_ref": manifest.evidence_ref,
         "manifest_ref": manifest.manifest_ref,
+    }
+
+
+def serialize_orchestration_review(
+    review: OrchestrationReview,
+) -> dict[str, str]:
+    return {
+        "manifest_ref": review.manifest_ref,
+        "lineage_ref": review.lineage_ref,
+        "closure_ref": review.closure_ref,
+        "review_ref": review.review_ref,
+    }
+
+
+def serialize_orchestration_assertion(
+    assertion: OrchestrationAssertion,
+) -> dict[str, str]:
+    return {
+        "review_ref": assertion.review_ref,
+        "manifest_ref": assertion.manifest_ref,
+        "lineage_ref": assertion.lineage_ref,
+        "assertion_ref": assertion.assertion_ref,
     }
