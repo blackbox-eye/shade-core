@@ -141,6 +141,22 @@ class OrchestrationClosure:
 
 
 @dataclass(slots=True)
+class OrchestrationLineage:
+    closure_ref: str
+    audit_ref: str
+    outcome_ref: str
+    lineage_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationManifest:
+    lineage_ref: str
+    closure_ref: str
+    evidence_ref: str
+    manifest_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str

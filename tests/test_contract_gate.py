@@ -7,6 +7,8 @@ from shade_core.contract_gate import (
     validate_orchestration_evidence,
     validate_orchestration_gate,
     validate_orchestration_junction,
+    validate_orchestration_lineage,
+    validate_orchestration_manifest,
     validate_orchestration_outcome,
     validate_orchestration_verification,
     validate_run_transition,
@@ -23,6 +25,8 @@ from shade_core.models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RunTransition,
@@ -528,4 +532,70 @@ def test_validate_run_transition_fails_for_invalid_transition() -> None:
         "from_step is required",
         "to_step is required",
         "transition_ref is required",
+    )
+
+
+def test_validate_orchestration_lineage_passes_for_valid_lineage() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+
+    result = validate_orchestration_lineage(lineage)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_lineage_fails_for_invalid_lineage() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="",
+        audit_ref="",
+        outcome_ref="",
+        lineage_ref="",
+    )
+
+    result = validate_orchestration_lineage(lineage)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "closure_ref is required",
+        "audit_ref is required",
+        "outcome_ref is required",
+        "lineage_ref is required",
+    )
+
+
+def test_validate_orchestration_manifest_passes_for_valid_manifest() -> None:
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+
+    result = validate_orchestration_manifest(manifest)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_manifest_fails_for_invalid_manifest() -> None:
+    manifest = OrchestrationManifest(
+        lineage_ref="",
+        closure_ref="",
+        evidence_ref="",
+        manifest_ref="",
+    )
+
+    result = validate_orchestration_manifest(manifest)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "lineage_ref is required",
+        "closure_ref is required",
+        "evidence_ref is required",
+        "manifest_ref is required",
     )

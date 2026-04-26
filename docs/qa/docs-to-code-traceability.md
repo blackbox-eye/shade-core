@@ -69,5 +69,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration audit serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for audit bridge fields | `tests/test_serialization.py` |
 | Orchestration closure serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for closure bridge fields | `tests/test_serialization.py` |
 | Audit closure snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the audit/closure bridge view | `tests/test_bundle.py` |
+| Orchestration lineage contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration manifest contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration lineage validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for lineage bridge fields | `tests/test_contract_gate.py` |
+| Orchestration manifest validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for manifest bridge fields | `tests/test_contract_gate.py` |
+| Orchestration lineage serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for lineage bridge fields | `tests/test_serialization.py` |
+| Orchestration manifest serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for manifest bridge fields | `tests/test_serialization.py` |
+| Lineage manifest snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the lineage/manifest bridge view | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

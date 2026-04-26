@@ -16,6 +16,7 @@ from shade_core import (  # noqa: E402
 from shade_core.bundle import _build_audit_closure_snapshot  # noqa: E402
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
 from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
+from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -25,6 +26,8 @@ from shade_core.models import (  # noqa: E402
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RunTransition,
@@ -324,5 +327,35 @@ def test_build_audit_closure_snapshot_returns_expected_structure() -> None:
             "decision_ref": "decision-1",
             "evaluation_ref": "evaluation-1",
             "closure_ref": "closure-1",
+        },
+    }
+
+
+def test_build_lineage_manifest_snapshot_returns_expected_structure() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+
+    assert _build_lineage_manifest_snapshot(lineage, manifest) == {
+        "orchestration_lineage": {
+            "closure_ref": "closure-1",
+            "audit_ref": "audit-1",
+            "outcome_ref": "outcome-1",
+            "lineage_ref": "lineage-1",
+        },
+        "orchestration_manifest": {
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "evidence_ref": "evidence-1",
+            "manifest_ref": "manifest-1",
         },
     }

@@ -11,6 +11,8 @@ from .models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RuntimeDecision,
@@ -205,4 +207,26 @@ def serialize_run_transition(transition: RunTransition) -> dict[str, str]:
         "from_step": transition.from_step,
         "to_step": transition.to_step,
         "transition_ref": transition.transition_ref,
+    }
+
+
+def serialize_orchestration_lineage(
+    lineage: OrchestrationLineage,
+) -> dict[str, str]:
+    return {
+        "closure_ref": lineage.closure_ref,
+        "audit_ref": lineage.audit_ref,
+        "outcome_ref": lineage.outcome_ref,
+        "lineage_ref": lineage.lineage_ref,
+    }
+
+
+def serialize_orchestration_manifest(
+    manifest: OrchestrationManifest,
+) -> dict[str, str]:
+    return {
+        "lineage_ref": manifest.lineage_ref,
+        "closure_ref": manifest.closure_ref,
+        "evidence_ref": manifest.evidence_ref,
+        "manifest_ref": manifest.manifest_ref,
     }

@@ -10,6 +10,8 @@ from .models import (
     OrchestrationEvidence,
     OrchestrationGate,
     OrchestrationJunction,
+    OrchestrationLineage,
+    OrchestrationManifest,
     OrchestrationOutcome,
     OrchestrationVerification,
     RunTransition,
@@ -271,5 +273,39 @@ def validate_orchestration_closure(
         errors.append("evaluation_ref is required")
     if not closure.closure_ref:
         errors.append("closure_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_lineage(
+    lineage: OrchestrationLineage,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not lineage.closure_ref:
+        errors.append("closure_ref is required")
+    if not lineage.audit_ref:
+        errors.append("audit_ref is required")
+    if not lineage.outcome_ref:
+        errors.append("outcome_ref is required")
+    if not lineage.lineage_ref:
+        errors.append("lineage_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_manifest(
+    manifest: OrchestrationManifest,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not manifest.lineage_ref:
+        errors.append("lineage_ref is required")
+    if not manifest.closure_ref:
+        errors.append("closure_ref is required")
+    if not manifest.evidence_ref:
+        errors.append("evidence_ref is required")
+    if not manifest.manifest_ref:
+        errors.append("manifest_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
