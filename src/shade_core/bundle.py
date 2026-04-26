@@ -7,6 +7,7 @@ from .evaluation_gate import EvaluationGateResult
 from .models import (
     ArtifactHandoff,
     MetaAuditEvent,
+    OrchestrationAssertion,
     OrchestrationAudit,
     OrchestrationClosure,
     OrchestrationCheckpoint,
@@ -16,6 +17,7 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RuntimeDecision,
     RunTransition,
@@ -38,6 +40,8 @@ from .serialization import (
     serialize_orchestration_junction,
     serialize_orchestration_lineage,
     serialize_orchestration_manifest,
+    serialize_orchestration_assertion,
+    serialize_orchestration_review,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
     serialize_run_state,
@@ -173,5 +177,19 @@ def _build_lineage_manifest_snapshot(
         ),
         "orchestration_manifest": serialize_orchestration_manifest(
             manifest,
+        ),
+    }
+
+
+def _build_review_assertion_snapshot(
+    review: OrchestrationReview,
+    assertion: OrchestrationAssertion,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_review": serialize_orchestration_review(
+            review,
+        ),
+        "orchestration_assertion": serialize_orchestration_assertion(
+            assertion,
         ),
     }

@@ -7,6 +7,7 @@ from shade_core import (  # noqa: E402
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationAssertion,
     OrchestrationAudit,
     OrchestrationClosure,
     OrchestrationCheckpoint,
@@ -16,6 +17,7 @@ from shade_core.models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
     TaskRoute,
@@ -275,3 +277,31 @@ def test_orchestration_manifest_retains_fields() -> None:
     assert manifest.closure_ref == "closure-1"
     assert manifest.evidence_ref == "evidence-1"
     assert manifest.manifest_ref == "manifest-1"
+
+
+def test_orchestration_review_retains_fields() -> None:
+    review = OrchestrationReview(
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        review_ref="review-1",
+    )
+
+    assert review.manifest_ref == "manifest-1"
+    assert review.lineage_ref == "lineage-1"
+    assert review.closure_ref == "closure-1"
+    assert review.review_ref == "review-1"
+
+
+def test_orchestration_assertion_retains_fields() -> None:
+    assertion = OrchestrationAssertion(
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        assertion_ref="assertion-1",
+    )
+
+    assert assertion.review_ref == "review-1"
+    assert assertion.manifest_ref == "manifest-1"
+    assert assertion.lineage_ref == "lineage-1"
+    assert assertion.assertion_ref == "assertion-1"

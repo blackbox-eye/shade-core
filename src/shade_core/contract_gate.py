@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from .models import (
     ArtifactHandoff,
     OrchestrationAudit,
+    OrchestrationAssertion,
     OrchestrationClosure,
     OrchestrationCheckpoint,
     OrchestrationEvidence,
@@ -13,6 +14,7 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
     TaskRoute,
@@ -307,5 +309,39 @@ def validate_orchestration_manifest(
         errors.append("evidence_ref is required")
     if not manifest.manifest_ref:
         errors.append("manifest_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_review(
+    review: OrchestrationReview,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not review.manifest_ref:
+        errors.append("manifest_ref is required")
+    if not review.lineage_ref:
+        errors.append("lineage_ref is required")
+    if not review.closure_ref:
+        errors.append("closure_ref is required")
+    if not review.review_ref:
+        errors.append("review_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_assertion(
+    assertion: OrchestrationAssertion,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not assertion.review_ref:
+        errors.append("review_ref is required")
+    if not assertion.manifest_ref:
+        errors.append("manifest_ref is required")
+    if not assertion.lineage_ref:
+        errors.append("lineage_ref is required")
+    if not assertion.assertion_ref:
+        errors.append("assertion_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))

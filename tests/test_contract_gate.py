@@ -1,6 +1,7 @@
 from shade_core import RunState, validate_state_contract
 from shade_core.contract_gate import (
     validate_artifact_handoff,
+    validate_orchestration_assertion,
     validate_orchestration_audit,
     validate_orchestration_closure,
     validate_orchestration_checkpoint,
@@ -10,6 +11,7 @@ from shade_core.contract_gate import (
     validate_orchestration_lineage,
     validate_orchestration_manifest,
     validate_orchestration_outcome,
+    validate_orchestration_review,
     validate_orchestration_verification,
     validate_run_transition,
     validate_task_route,
@@ -19,6 +21,7 @@ from shade_core.contract_gate import (
 )
 from shade_core.models import (
     ArtifactHandoff,
+    OrchestrationAssertion,
     OrchestrationAudit,
     OrchestrationClosure,
     OrchestrationCheckpoint,
@@ -28,6 +31,7 @@ from shade_core.models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
     TaskRoute,
@@ -598,4 +602,70 @@ def test_validate_orchestration_manifest_fails_for_invalid_manifest() -> None:
         "closure_ref is required",
         "evidence_ref is required",
         "manifest_ref is required",
+    )
+
+
+def test_validate_orchestration_review_passes_for_valid_review() -> None:
+    review = OrchestrationReview(
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        review_ref="review-1",
+    )
+
+    result = validate_orchestration_review(review)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_review_fails_for_invalid_review() -> None:
+    review = OrchestrationReview(
+        manifest_ref="",
+        lineage_ref="",
+        closure_ref="",
+        review_ref="",
+    )
+
+    result = validate_orchestration_review(review)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "manifest_ref is required",
+        "lineage_ref is required",
+        "closure_ref is required",
+        "review_ref is required",
+    )
+
+
+def test_validate_orchestration_assertion_passes_for_valid_assertion() -> None:
+    assertion = OrchestrationAssertion(
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        assertion_ref="assertion-1",
+    )
+
+    result = validate_orchestration_assertion(assertion)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_assertion_fails_for_invalid_assertion() -> None:
+    assertion = OrchestrationAssertion(
+        review_ref="",
+        manifest_ref="",
+        lineage_ref="",
+        assertion_ref="",
+    )
+
+    result = validate_orchestration_assertion(assertion)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "review_ref is required",
+        "manifest_ref is required",
+        "lineage_ref is required",
+        "assertion_ref is required",
     )

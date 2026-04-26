@@ -154,6 +154,24 @@ This object is a neutral internal bridge contract only. It consolidates the term
 
 This object is a neutral internal bridge contract only. It consolidates the lineage, closure, and evidence references into the outermost inspectable description of the completed contract chain without executing manifest, lineage, or runtime behavior. It is not a public package export.
 
+## Current internal object: Orchestration review
+
+- `manifest_ref`: reference to the prepared manifest boundary.
+- `lineage_ref`: reference to the prepared lineage boundary.
+- `closure_ref`: reference to the prepared closure boundary.
+- `review_ref`: reference key for this review boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the manifest, lineage, and closure references into one inspectable review record without executing review, manifest, lineage, or runtime behavior. It is not a public package export.
+
+## Current internal object: Orchestration assertion
+
+- `review_ref`: reference to the prepared review boundary.
+- `manifest_ref`: reference to the prepared manifest boundary.
+- `lineage_ref`: reference to the prepared lineage boundary.
+- `assertion_ref`: reference key for this assertion boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the review, manifest, and lineage references into one inspectable assertion record without executing assertion, review, manifest, or runtime behavior. It is not a public package export.
+
 ## Contract object: Run
 
 - `run_id`: unique identity for a run.

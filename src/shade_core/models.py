@@ -157,6 +157,22 @@ class OrchestrationManifest:
 
 
 @dataclass(slots=True)
+class OrchestrationReview:
+    manifest_ref: str
+    lineage_ref: str
+    closure_ref: str
+    review_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationAssertion:
+    review_ref: str
+    manifest_ref: str
+    lineage_ref: str
+    assertion_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str
