@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 from .models import (
     ArtifactHandoff,
@@ -116,6 +117,8 @@ def validate_confidence_record(
 ) -> ContractGateResult:
     errors: list[str] = []
 
+    if not math.isfinite(confidence.score) or not 0.0 <= confidence.score <= 1.0:
+        errors.append("score must be finite and between 0.0 and 1.0 inclusive")
     if not confidence.source:
         errors.append("source is required")
     if not confidence.reason:

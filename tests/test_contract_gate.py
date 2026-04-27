@@ -181,6 +181,22 @@ def test_validate_confidence_record_fails_for_invalid_confidence_record() -> Non
     )
 
 
+def test_validate_confidence_record_fails_for_invalid_score() -> None:
+    confidence = ConfidenceRecord(
+        score=float("inf"),
+        source="local",
+        reason="clear",
+        reference="ref-1",
+    )
+
+    result = validate_confidence_record(confidence)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "score must be finite and between 0.0 and 1.0 inclusive",
+    )
+
+
 def test_validate_meta_audit_event_passes_for_valid_meta_audit_event() -> None:
     event = MetaAuditEvent(
         event_type="runtime_decision",
