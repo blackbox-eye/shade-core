@@ -188,7 +188,7 @@ This object is a neutral internal bridge contract only. It consolidates the asse
 - `review_ref`: reference to the prepared review boundary.
 - `release_view_ref`: reference key for this release-view boundary.
 
-This object is a neutral internal bridge contract only. It consolidates the publication, assertion, and review references into one inspectable release-view record without executing release, publication, assertion, or runtime behavior. It is not a public package export.
+This object is a neutral internal bridge contract only. It consolidates the publication, assertion, and review references into one inspectable release-view record without executing release, publication, assertion, review, or runtime behavior. It is not a public package export.
 
 ## Contract object: Run
 
