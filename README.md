@@ -21,6 +21,8 @@ The first completed post-foundation 3-bundle cycle is recorded in `docs/releases
 
 The second completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-2.md`.
 
+The third completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-3.md`.
+
 ## Constraints
 
 - No deploy.
