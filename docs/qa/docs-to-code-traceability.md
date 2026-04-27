@@ -83,5 +83,12 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration review serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for review bridge fields | `tests/test_serialization.py` |
 | Orchestration assertion serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for assertion bridge fields | `tests/test_serialization.py` |
 | Review assertion snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the review/assertion bridge view | `tests/test_bundle.py` |
+| Orchestration publication contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration release-view contract | `src/shade_core/models.py` | Implemented as one internal typed bridge object; not re-exported | `tests/test_models.py` |
+| Orchestration publication validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for publication bridge fields | `tests/test_contract_gate.py` |
+| Orchestration release-view validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for release-view bridge fields | `tests/test_contract_gate.py` |
+| Orchestration publication serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for publication bridge fields | `tests/test_serialization.py` |
+| Orchestration release-view serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for release-view bridge fields | `tests/test_serialization.py` |
+| Publication release-view snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the publication/release-view bridge view | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |

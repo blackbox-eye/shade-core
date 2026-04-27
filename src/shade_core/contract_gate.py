@@ -14,6 +14,8 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
@@ -326,6 +328,40 @@ def validate_orchestration_review(
         errors.append("closure_ref is required")
     if not review.review_ref:
         errors.append("review_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_publication(
+    publication: OrchestrationPublication,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not publication.assertion_ref:
+        errors.append("assertion_ref is required")
+    if not publication.review_ref:
+        errors.append("review_ref is required")
+    if not publication.manifest_ref:
+        errors.append("manifest_ref is required")
+    if not publication.publication_ref:
+        errors.append("publication_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_release_view(
+    release_view: OrchestrationReleaseView,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not release_view.publication_ref:
+        errors.append("publication_ref is required")
+    if not release_view.assertion_ref:
+        errors.append("assertion_ref is required")
+    if not release_view.review_ref:
+        errors.append("review_ref is required")
+    if not release_view.release_view_ref:
+        errors.append("release_view_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 

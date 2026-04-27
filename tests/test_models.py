@@ -17,6 +17,8 @@ from shade_core.models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
@@ -305,3 +307,31 @@ def test_orchestration_assertion_retains_fields() -> None:
     assert assertion.manifest_ref == "manifest-1"
     assert assertion.lineage_ref == "lineage-1"
     assert assertion.assertion_ref == "assertion-1"
+
+
+def test_orchestration_publication_retains_fields() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+
+    assert publication.assertion_ref == "assertion-1"
+    assert publication.review_ref == "review-1"
+    assert publication.manifest_ref == "manifest-1"
+    assert publication.publication_ref == "publication-1"
+
+
+def test_orchestration_release_view_retains_fields() -> None:
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    assert release_view.publication_ref == "publication-1"
+    assert release_view.assertion_ref == "assertion-1"
+    assert release_view.review_ref == "review-1"
+    assert release_view.release_view_ref == "release-view-1"

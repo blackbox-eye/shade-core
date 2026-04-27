@@ -173,6 +173,22 @@ class OrchestrationAssertion:
 
 
 @dataclass(slots=True)
+class OrchestrationPublication:
+    assertion_ref: str
+    review_ref: str
+    manifest_ref: str
+    publication_ref: str
+
+
+@dataclass(slots=True)
+class OrchestrationReleaseView:
+    publication_ref: str
+    assertion_ref: str
+    review_ref: str
+    release_view_ref: str
+
+
+@dataclass(slots=True)
 class TaskTransition:
     task_id: str
     from_status: str
