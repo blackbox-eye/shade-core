@@ -17,6 +17,8 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RuntimeDecision,
@@ -42,6 +44,8 @@ from .serialization import (
     serialize_orchestration_manifest,
     serialize_orchestration_assertion,
     serialize_orchestration_review,
+    serialize_orchestration_publication,
+    serialize_orchestration_release_view,
     serialize_orchestration_outcome,
     serialize_orchestration_verification,
     serialize_run_state,
@@ -191,5 +195,19 @@ def _build_review_assertion_snapshot(
         ),
         "orchestration_assertion": serialize_orchestration_assertion(
             assertion,
+        ),
+    }
+
+
+def _build_publication_release_view_snapshot(
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "orchestration_publication": serialize_orchestration_publication(
+            publication,
+        ),
+        "orchestration_release_view": serialize_orchestration_release_view(
+            release_view,
         ),
     }

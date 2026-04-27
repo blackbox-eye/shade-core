@@ -18,6 +18,7 @@ from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
 from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
+from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -31,6 +32,8 @@ from shade_core.models import (  # noqa: E402
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
@@ -390,5 +393,35 @@ def test_build_review_assertion_snapshot_returns_expected_structure() -> None:
             "manifest_ref": "manifest-1",
             "lineage_ref": "lineage-1",
             "assertion_ref": "assertion-1",
+        },
+    }
+
+
+def test_build_publication_release_view_snapshot_returns_expected_structure() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    assert _build_publication_release_view_snapshot(publication, release_view) == {
+        "orchestration_publication": {
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "publication_ref": "publication-1",
+        },
+        "orchestration_release_view": {
+            "publication_ref": "publication-1",
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "release_view_ref": "release-view-1",
         },
     }

@@ -11,6 +11,8 @@ from shade_core.contract_gate import (
     validate_orchestration_lineage,
     validate_orchestration_manifest,
     validate_orchestration_outcome,
+    validate_orchestration_publication,
+    validate_orchestration_release_view,
     validate_orchestration_review,
     validate_orchestration_verification,
     validate_run_transition,
@@ -31,6 +33,8 @@ from shade_core.models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
@@ -668,4 +672,70 @@ def test_validate_orchestration_assertion_fails_for_invalid_assertion() -> None:
         "manifest_ref is required",
         "lineage_ref is required",
         "assertion_ref is required",
+    )
+
+
+def test_validate_orchestration_publication_passes_for_valid_publication() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+
+    result = validate_orchestration_publication(publication)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_publication_fails_for_invalid_publication() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="",
+        review_ref="",
+        manifest_ref="",
+        publication_ref="",
+    )
+
+    result = validate_orchestration_publication(publication)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "assertion_ref is required",
+        "review_ref is required",
+        "manifest_ref is required",
+        "publication_ref is required",
+    )
+
+
+def test_validate_orchestration_release_view_passes_for_valid_release_view() -> None:
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    result = validate_orchestration_release_view(release_view)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_release_view_fails_for_invalid_release_view() -> None:
+    release_view = OrchestrationReleaseView(
+        publication_ref="",
+        assertion_ref="",
+        review_ref="",
+        release_view_ref="",
+    )
+
+    result = validate_orchestration_release_view(release_view)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "publication_ref is required",
+        "assertion_ref is required",
+        "review_ref is required",
+        "release_view_ref is required",
     )

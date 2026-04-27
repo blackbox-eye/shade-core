@@ -17,6 +17,8 @@ from shade_core.models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RunTransition,
@@ -37,6 +39,8 @@ from shade_core.serialization import (
     serialize_orchestration_lineage,
     serialize_orchestration_manifest,
     serialize_orchestration_outcome,
+    serialize_orchestration_publication,
+    serialize_orchestration_release_view,
     serialize_orchestration_review,
     serialize_orchestration_verification,
     serialize_run_transition,
@@ -366,4 +370,36 @@ def test_serialize_orchestration_assertion() -> None:
         "manifest_ref": "manifest-1",
         "lineage_ref": "lineage-1",
         "assertion_ref": "assertion-1",
+    }
+
+
+def test_serialize_orchestration_publication() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+
+    assert serialize_orchestration_publication(publication) == {
+        "assertion_ref": "assertion-1",
+        "review_ref": "review-1",
+        "manifest_ref": "manifest-1",
+        "publication_ref": "publication-1",
+    }
+
+
+def test_serialize_orchestration_release_view() -> None:
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    assert serialize_orchestration_release_view(release_view) == {
+        "publication_ref": "publication-1",
+        "assertion_ref": "assertion-1",
+        "review_ref": "review-1",
+        "release_view_ref": "release-view-1",
     }

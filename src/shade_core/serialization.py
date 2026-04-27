@@ -15,6 +15,8 @@ from .models import (
     OrchestrationLineage,
     OrchestrationManifest,
     OrchestrationOutcome,
+    OrchestrationPublication,
+    OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
     RuntimeDecision,
@@ -253,4 +255,26 @@ def serialize_orchestration_assertion(
         "manifest_ref": assertion.manifest_ref,
         "lineage_ref": assertion.lineage_ref,
         "assertion_ref": assertion.assertion_ref,
+    }
+
+
+def serialize_orchestration_publication(
+    publication: OrchestrationPublication,
+) -> dict[str, str]:
+    return {
+        "assertion_ref": publication.assertion_ref,
+        "review_ref": publication.review_ref,
+        "manifest_ref": publication.manifest_ref,
+        "publication_ref": publication.publication_ref,
+    }
+
+
+def serialize_orchestration_release_view(
+    release_view: OrchestrationReleaseView,
+) -> dict[str, str]:
+    return {
+        "publication_ref": release_view.publication_ref,
+        "assertion_ref": release_view.assertion_ref,
+        "review_ref": release_view.review_ref,
+        "release_view_ref": release_view.release_view_ref,
     }

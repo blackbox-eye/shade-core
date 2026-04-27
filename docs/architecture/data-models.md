@@ -172,6 +172,24 @@ This object is a neutral internal bridge contract only. It consolidates the mani
 
 This object is a neutral internal bridge contract only. It consolidates the review, manifest, and lineage references into one inspectable assertion record without executing assertion, review, manifest, or runtime behavior. It is not a public package export.
 
+## Current internal object: Orchestration publication
+
+- `assertion_ref`: reference to the prepared assertion boundary.
+- `review_ref`: reference to the prepared review boundary.
+- `manifest_ref`: reference to the prepared manifest boundary.
+- `publication_ref`: reference key for this publication boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the assertion, review, and manifest references into one inspectable publication record without executing publication, assertion, review, manifest, or runtime behavior. It is not a public package export.
+
+## Current internal object: Orchestration release view
+
+- `publication_ref`: reference to the prepared publication boundary.
+- `assertion_ref`: reference to the prepared assertion boundary.
+- `review_ref`: reference to the prepared review boundary.
+- `release_view_ref`: reference key for this release-view boundary.
+
+This object is a neutral internal bridge contract only. It consolidates the publication, assertion, and review references into one inspectable release-view record without executing release, publication, assertion, review, or runtime behavior. It is not a public package export.
+
 ## Contract object: Run
 
 - `run_id`: unique identity for a run.
