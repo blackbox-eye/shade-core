@@ -12,8 +12,8 @@ This file records the third completed post-foundation 3-bundle cycle for `shade-
 
 ## Baseline at this checkpoint
 
-- Verification command: `python -m pytest -q`
-- pytest: 115 passed
+- Verification command: `python -m pytest`
+- python -m pytest: 115 passed
 - Baseline for future work: the `main` revision that contains this checkpoint document.
 
 ## Boundaries
