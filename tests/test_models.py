@@ -59,6 +59,70 @@ def test_model_instantiation_smoke() -> None:
     assert decision.decision == "needs_review"
 
 
+def test_self_model_retains_fields() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+
+    assert self_model.agent_id == "shade-v1"
+    assert self_model.role == "control"
+    assert self_model.state == "idle"
+
+
+def test_worker_registry_retains_entries() -> None:
+    registry = WorkerRegistry(
+        workers={
+            "control-worker": ("control", "active"),
+            "review-worker": ("review", "idle"),
+        },
+    )
+
+    assert registry.workers == {
+        "control-worker": ("control", "active"),
+        "review-worker": ("review", "idle"),
+    }
+
+
+def test_confidence_record_retains_fields() -> None:
+    confidence = ConfidenceRecord(
+        score=0.8,
+        source="local-review",
+        reason="Short and inspectable",
+        reference="ref-1",
+    )
+
+    assert confidence.score == 0.8
+    assert confidence.source == "local-review"
+    assert confidence.reason == "Short and inspectable"
+    assert confidence.reference == "ref-1"
+
+
+def test_meta_audit_event_retains_fields() -> None:
+    event = MetaAuditEvent(
+        event_type="contract_check",
+        message="OK",
+        severity="info",
+        reference="ref-1",
+        run_id="run-1",
+    )
+
+    assert event.event_type == "contract_check"
+    assert event.message == "OK"
+    assert event.severity == "info"
+    assert event.reference == "ref-1"
+    assert event.run_id == "run-1"
+
+
+def test_runtime_decision_retains_fields() -> None:
+    decision = RuntimeDecision(
+        decision="needs_review",
+        reason="Needs manual approval",
+        next_step="review",
+    )
+
+    assert decision.decision == "needs_review"
+    assert decision.reason == "Needs manual approval"
+    assert decision.next_step == "review"
+
+
 def test_artifact_handoff_retains_fields() -> None:
     handoff = ArtifactHandoff(
         artifact_ref="artifact-1",

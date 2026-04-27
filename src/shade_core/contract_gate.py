@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 from .models import (
     ArtifactHandoff,
+    ConfidenceRecord,
+    MetaAuditEvent,
     OrchestrationAudit,
     OrchestrationAssertion,
     OrchestrationClosure,
@@ -18,9 +20,12 @@ from .models import (
     OrchestrationReleaseView,
     OrchestrationReview,
     OrchestrationVerification,
+    RuntimeDecision,
+    SelfModel,
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerRegistry,
     WorkerResult,
     WorkerTask,
 )
@@ -66,6 +71,89 @@ def validate_state_contract(state: RunState) -> ContractGateResult:
         errors.append("source_lane is required")
     if not state.target_lane:
         errors.append("target_lane is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_self_model(self_model: SelfModel) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not self_model.agent_id:
+        errors.append("agent_id is required")
+    if not self_model.role:
+        errors.append("role is required")
+    if not self_model.state:
+        errors.append("state is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_registry(registry: WorkerRegistry) -> ContractGateResult:
+    errors: list[str] = []
+
+    for name, worker in registry.workers.items():
+        if not name:
+            errors.append("worker name is required")
+
+        if not isinstance(worker, tuple) or len(worker) != 2:
+            worker_name = name or "<unnamed>"
+            errors.append(
+                f"worker entry for {worker_name} must contain role and status",
+            )
+            continue
+
+        worker_role, status = worker
+        if not worker_role:
+            errors.append(f"worker role is required for {name or '<unnamed>'}")
+        if not status:
+            errors.append(f"worker status is required for {name or '<unnamed>'}")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_confidence_record(
+    confidence: ConfidenceRecord,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not confidence.source:
+        errors.append("source is required")
+    if not confidence.reason:
+        errors.append("reason is required")
+    if not confidence.reference:
+        errors.append("reference is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_meta_audit_event(event: MetaAuditEvent) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not event.event_type:
+        errors.append("event_type is required")
+    if not event.message:
+        errors.append("message is required")
+    if not event.severity:
+        errors.append("severity is required")
+    if not event.reference:
+        errors.append("reference is required")
+    if not event.run_id:
+        errors.append("run_id is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_runtime_decision(
+    decision: RuntimeDecision,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if decision.decision not in _DECISION_CLASSES:
+        errors.append("decision is invalid")
+    if not decision.reason:
+        errors.append("reason is required")
+    if not decision.next_step:
+        errors.append("next_step is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 

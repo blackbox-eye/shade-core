@@ -1,6 +1,16 @@
-from shade_core import RunState, validate_state_contract
+from shade_core import (
+    ConfidenceRecord,
+    MetaAuditEvent,
+    RunState,
+    RuntimeDecision,
+    SelfModel,
+    WorkerRegistry,
+    validate_state_contract,
+)
 from shade_core.contract_gate import (
     validate_artifact_handoff,
+    validate_confidence_record,
+    validate_meta_audit_event,
     validate_orchestration_assertion,
     validate_orchestration_audit,
     validate_orchestration_closure,
@@ -16,8 +26,11 @@ from shade_core.contract_gate import (
     validate_orchestration_review,
     validate_orchestration_verification,
     validate_run_transition,
+    validate_runtime_decision,
+    validate_self_model,
     validate_task_route,
     validate_task_transition,
+    validate_worker_registry,
     validate_worker_result,
     validate_worker_task,
 )
@@ -81,6 +94,156 @@ def test_validate_state_contract_fails_for_invalid_state() -> None:
         "worker_role is required",
         "artifact_ref is required",
         "source_lane is required",
+    )
+
+
+def test_validate_self_model_passes_for_valid_self_model() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+
+    result = validate_self_model(self_model)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_self_model_fails_for_invalid_self_model() -> None:
+    self_model = SelfModel(agent_id="", role="", state="")
+
+    result = validate_self_model(self_model)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "agent_id is required",
+        "role is required",
+        "state is required",
+    )
+
+
+def test_validate_worker_registry_passes_for_empty_registry() -> None:
+    registry = WorkerRegistry()
+
+    result = validate_worker_registry(registry)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_registry_fails_for_invalid_registry_entries() -> None:
+    registry = WorkerRegistry(
+        workers={
+            "": ("control", "active"),
+            "shape-bad": ("control",),
+            "role-bad": ("", "active"),
+            "status-bad": ("control", ""),
+        },
+    )
+
+    result = validate_worker_registry(registry)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "worker name is required",
+        "worker entry for shape-bad must contain role and status",
+        "worker role is required for role-bad",
+        "worker status is required for status-bad",
+    )
+
+
+def test_validate_confidence_record_passes_for_valid_confidence_record() -> None:
+    confidence = ConfidenceRecord(
+        score=0.9,
+        source="local",
+        reason="clear",
+        reference="ref-1",
+    )
+
+    result = validate_confidence_record(confidence)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_confidence_record_fails_for_invalid_confidence_record() -> None:
+    confidence = ConfidenceRecord(
+        score=0.9,
+        source="",
+        reason="",
+        reference="",
+    )
+
+    result = validate_confidence_record(confidence)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "source is required",
+        "reason is required",
+        "reference is required",
+    )
+
+
+def test_validate_meta_audit_event_passes_for_valid_meta_audit_event() -> None:
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accepted",
+        severity="info",
+        reference="ref-1",
+        run_id="run-1",
+    )
+
+    result = validate_meta_audit_event(event)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_meta_audit_event_fails_for_invalid_meta_audit_event() -> None:
+    event = MetaAuditEvent(
+        event_type="",
+        message="",
+        severity="",
+        reference="",
+        run_id="",
+    )
+
+    result = validate_meta_audit_event(event)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "event_type is required",
+        "message is required",
+        "severity is required",
+        "reference is required",
+        "run_id is required",
+    )
+
+
+def test_validate_runtime_decision_passes_for_valid_runtime_decision() -> None:
+    decision = RuntimeDecision(
+        decision="needs_review",
+        reason="needs inspection",
+        next_step="review",
+    )
+
+    result = validate_runtime_decision(decision)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_runtime_decision_fails_for_invalid_runtime_decision() -> None:
+    decision = RuntimeDecision(
+        decision="pause",
+        reason="",
+        next_step="",
+    )
+
+    result = validate_runtime_decision(decision)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "decision is invalid",
+        "reason is required",
+        "next_step is required",
     )
 
 
