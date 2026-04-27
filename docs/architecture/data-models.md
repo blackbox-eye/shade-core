@@ -179,7 +179,7 @@ This object is a neutral internal bridge contract only. It consolidates the revi
 - `manifest_ref`: reference to the prepared manifest boundary.
 - `publication_ref`: reference key for this publication boundary.
 
-This object is a neutral internal bridge contract only. It consolidates the assertion, review, and manifest references into one inspectable publication record without executing publication, assertion, review, or runtime behavior. It is not a public package export.
+This object is a neutral internal bridge contract only. It consolidates the assertion, review, and manifest references into one inspectable publication record without executing publication, assertion, review, manifest, or runtime behavior. It is not a public package export.
 
 ## Current internal object: Orchestration release view
 
