@@ -1,5 +1,8 @@
 from shade_core.contract_gate import ContractGateResult
-from shade_core.evaluation_gate import _run_runtime_evaluation_gate
+from shade_core.evaluation_gate import (
+    _aggregate_runtime_contract_result,
+    _run_runtime_evaluation_gate,
+)
 from shade_core import (
     EvaluationGateResult,
     MetaAuditEvent,
@@ -72,6 +75,58 @@ def test_evaluation_gate_passes_through_review_result() -> None:
         result="review",
         contract_valid=True,
         errors=(),
+    )
+
+
+def test_aggregate_runtime_contract_result_returns_valid_result_when_all_valid() -> None:
+    result = _aggregate_runtime_contract_result(
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+    )
+
+    assert result == ContractGateResult(is_valid=True, errors=())
+
+
+def test_aggregate_runtime_contract_result_preserves_stable_error_order() -> None:
+    result = _aggregate_runtime_contract_result(
+        ContractGateResult(is_valid=False, errors=("agent_id is required",)),
+        ContractGateResult(
+            is_valid=False,
+            errors=("worker name is required", "worker status is required for x"),
+        ),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=False, errors=("run_id is required",)),
+    )
+
+    assert result == ContractGateResult(
+        is_valid=False,
+        errors=(
+            "agent_id is required",
+            "worker name is required",
+            "worker status is required for x",
+            "run_id is required",
+        ),
+    )
+
+
+def test_aggregate_runtime_contract_result_returns_all_invalid_errors() -> None:
+    result = _aggregate_runtime_contract_result(
+        ContractGateResult(is_valid=False, errors=("agent_id is required",)),
+        ContractGateResult(is_valid=False, errors=("worker name is required",)),
+        ContractGateResult(is_valid=False, errors=("reference is required",)),
+        ContractGateResult(is_valid=False, errors=("run_id is required",)),
+    )
+
+    assert result == ContractGateResult(
+        is_valid=False,
+        errors=(
+            "agent_id is required",
+            "worker name is required",
+            "reference is required",
+            "run_id is required",
+        ),
     )
 
 
