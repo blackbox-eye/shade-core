@@ -26,6 +26,7 @@ from shade_core.contract_gate import (
     validate_orchestration_review,
     validate_orchestration_verification,
     validate_run_transition,
+    validate_runtime_evaluation_guard_verification_snapshot,
     validate_runtime_decision,
     validate_self_model,
     validate_task_route,
@@ -917,4 +918,245 @@ def test_validate_orchestration_release_view_fails_for_invalid_release_view() ->
         "assertion_ref is required",
         "review_ref is required",
         "release_view_ref is required",
+    )
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_passes_for_valid_snapshot() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": {
+                        "result": "pass",
+                        "contract_valid": True,
+                        "errors": (),
+                    },
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malformed_top_level_mapping() -> None:
+    result = validate_runtime_evaluation_guard_verification_snapshot("invalid")
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot must be a mapping",
+    )
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malformed_guard_result_mapping() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": {
+                        "result": "pass",
+                        "contract_valid": True,
+                        "errors": (),
+                    },
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": "invalid", "errors": 9},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": False,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "failed",
+        },
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot.prepared_fabric_guard.is_valid must be a bool",
+        "verification_snapshot.prepared_fabric_guard.errors must be a tuple, list, or None",
+    )
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malformed_summary_mapping() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": {
+                        "result": "pass",
+                        "contract_valid": True,
+                        "errors": (),
+                    },
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": "invalid",
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot.verification_summary must be a mapping",
+    )
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_inconsistent_summary_flags() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": {
+                        "result": "pass",
+                        "contract_valid": True,
+                        "errors": (),
+                    },
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": False,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "failed",
+        },
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot.verification_summary.runtime_evaluation_consistent must reflect aggregated contract, evaluation gate, and nested alignment semantics",
+        "verification_snapshot.verification_summary.verification_status must match the derived verification status",
+    )
+
+
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malformed_runtime_evaluation_nested_structure() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": "invalid",
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {
+            "is_valid": False,
+            "errors": (
+                "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate must be a mapping",
+            ),
+        },
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": False,
+            "runtime_evaluation_consistent": False,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": False,
+            "verification_status": "failed",
+        },
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot.runtime_evaluation.runtime_contract_integration.runtime_fabric.evaluation_gate must be a mapping",
     )

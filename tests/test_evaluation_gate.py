@@ -4,6 +4,7 @@ from shade_core.evaluation_gate import (
     _build_evaluation_gate_result_from_raw_result,
     _guard_evaluation_gate_result_from_raw_result,
     _run_runtime_evaluation_gate,
+    _summarize_evaluation_gate_alignment,
 )
 from shade_core import (
     EvaluationGateResult,
@@ -164,6 +165,69 @@ def test_guard_evaluation_gate_result_from_raw_result_reports_invalid_contract_d
         "invalid contracts must mark the evaluation gate result as contract-invalid",
         "invalid contracts must preserve contract errors in the evaluation gate result",
     )
+
+
+def test_summarize_evaluation_gate_alignment_returns_aligned_and_fail_closed_states() -> None:
+    assert _summarize_evaluation_gate_alignment(
+        ContractGateResult(is_valid=True, errors=()),
+        "pass",
+        EvaluationGateResult(result="pass", contract_valid=True, errors=()),
+    ) == {
+        "alignment": "aligned",
+        "raw_evaluation_matches_gate": True,
+        "contract_valid_matches_contract": True,
+        "errors_match_contract": True,
+    }
+    assert _summarize_evaluation_gate_alignment(
+        ContractGateResult(is_valid=True, errors=()),
+        "review",
+        EvaluationGateResult(result="review", contract_valid=True, errors=()),
+    ) == {
+        "alignment": "aligned",
+        "raw_evaluation_matches_gate": True,
+        "contract_valid_matches_contract": True,
+        "errors_match_contract": True,
+    }
+    assert _summarize_evaluation_gate_alignment(
+        ContractGateResult(is_valid=True, errors=()),
+        "fail",
+        EvaluationGateResult(result="fail", contract_valid=True, errors=()),
+    ) == {
+        "alignment": "aligned",
+        "raw_evaluation_matches_gate": True,
+        "contract_valid_matches_contract": True,
+        "errors_match_contract": True,
+    }
+    assert _summarize_evaluation_gate_alignment(
+        ContractGateResult(
+            is_valid=False,
+            errors=("run_id is required", "source_lane is required"),
+        ),
+        "pass",
+        EvaluationGateResult(
+            result="fail",
+            contract_valid=False,
+            errors=("run_id is required", "source_lane is required"),
+        ),
+    ) == {
+        "alignment": "fail_closed",
+        "raw_evaluation_matches_gate": False,
+        "contract_valid_matches_contract": True,
+        "errors_match_contract": True,
+    }
+
+
+def test_summarize_evaluation_gate_alignment_reports_drifted_gate_flags_and_errors() -> None:
+    assert _summarize_evaluation_gate_alignment(
+        ContractGateResult(is_valid=False, errors=("run_id is required",)),
+        "pass",
+        EvaluationGateResult(result="review", contract_valid=True, errors=()),
+    ) == {
+        "alignment": "drifted",
+        "raw_evaluation_matches_gate": False,
+        "contract_valid_matches_contract": False,
+        "errors_match_contract": False,
+    }
 
 
 def test_aggregate_runtime_contract_result_returns_valid_result_when_all_valid() -> None:

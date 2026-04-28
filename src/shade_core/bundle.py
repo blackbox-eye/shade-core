@@ -4,9 +4,11 @@ from dataclasses import dataclass
 from collections.abc import Mapping
 
 from .contract_gate import (
+    _summarize_runtime_evaluation_verification_snapshot,
     ContractGateResult,
     validate_confidence_record,
     validate_meta_audit_event,
+    validate_runtime_evaluation_guard_verification_snapshot,
     validate_self_model,
     validate_state_contract,
     validate_runtime_decision,
@@ -18,6 +20,7 @@ from .evaluation_gate import (
     _aggregate_runtime_contract_result,
     _build_evaluation_gate_result_from_raw_result,
     _guard_evaluation_gate_result_from_raw_result,
+    _summarize_evaluation_gate_alignment,
 )
 from .models import (
     ArtifactHandoff,
@@ -50,6 +53,8 @@ from .runtime_loop import audit_decision, decide
 from .state import RunState
 from .serialization import (
     _serialize_runtime_fabric_guard_result,
+    _serialize_runtime_fabric_verification_contract_result,
+    _serialize_runtime_fabric_verification_summary,
     serialize_artifact_handoff,
     _serialize_aggregated_runtime_contract_gate,
     serialize_evaluation_gate_result,
@@ -272,6 +277,43 @@ def _run_runtime_evaluation_fabric_guards(
     }
 
 
+def _build_runtime_evaluation_guard_verification_contract(
+    verification_snapshot: Mapping[str, object],
+) -> Mapping[str, object]:
+    return _serialize_runtime_fabric_verification_contract_result(
+        validate_runtime_evaluation_guard_verification_snapshot(
+            verification_snapshot,
+        ).errors,
+    )
+
+
+def _complete_runtime_evaluation_guard_verification_snapshot(
+    runtime_evaluation_snapshot: Mapping[str, object],
+    prepared_fabric_guard: Mapping[str, object],
+    serialized_snapshot_guard: Mapping[str, object],
+) -> Mapping[str, object]:
+    verification_summary = _serialize_runtime_fabric_verification_summary(
+        _summarize_runtime_evaluation_verification_snapshot(
+            runtime_evaluation_snapshot,
+            prepared_fabric_guard,
+            serialized_snapshot_guard,
+        ),
+    )
+    verification_snapshot = {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": prepared_fabric_guard,
+        "serialized_snapshot_guard": serialized_snapshot_guard,
+        "verification_summary": verification_summary,
+    }
+
+    return {
+        **verification_snapshot,
+        "verification_contract": _build_runtime_evaluation_guard_verification_contract(
+            verification_snapshot,
+        ),
+    }
+
+
 def _guard_runtime_evaluation_fabric_snapshot(
     snapshot: Mapping[str, object],
 ) -> tuple[str, ...]:
@@ -485,15 +527,11 @@ def _build_runtime_evaluation_guard_verification_snapshot(
     prepared_fabric_guard_errors: tuple[str, ...],
     serialized_snapshot_guard_errors: tuple[str, ...],
 ) -> Mapping[str, object]:
-    return {
-        "runtime_evaluation": runtime_evaluation_snapshot,
-        "prepared_fabric_guard": _serialize_runtime_fabric_guard_result(
-            prepared_fabric_guard_errors,
-        ),
-        "serialized_snapshot_guard": _serialize_runtime_fabric_guard_result(
-            serialized_snapshot_guard_errors,
-        ),
-    }
+    return _complete_runtime_evaluation_guard_verification_snapshot(
+        runtime_evaluation_snapshot,
+        _serialize_runtime_fabric_guard_result(prepared_fabric_guard_errors),
+        _serialize_runtime_fabric_guard_result(serialized_snapshot_guard_errors),
+    )
 
 
 def build_bundle(

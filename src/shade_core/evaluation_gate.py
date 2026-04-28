@@ -37,18 +37,23 @@ def _guard_evaluation_gate_result_from_raw_result(
     raw_result: EvaluationResult,
     evaluation_gate_result: EvaluationGateResult,
 ) -> tuple[str, ...]:
+    alignment_summary = _summarize_evaluation_gate_alignment(
+        contract_result,
+        raw_result,
+        evaluation_gate_result,
+    )
     errors: list[str] = []
 
     if contract_result.is_valid:
-        if evaluation_gate_result.result != raw_result:
+        if not alignment_summary["raw_evaluation_matches_gate"]:
             errors.append(
                 "valid contracts must keep the evaluation gate result aligned with the raw result",
             )
-        if evaluation_gate_result.contract_valid is not True:
+        if not alignment_summary["contract_valid_matches_contract"]:
             errors.append(
                 "valid contracts must mark the evaluation gate result as contract-valid",
             )
-        if evaluation_gate_result.errors != ():
+        if not alignment_summary["errors_match_contract"]:
             errors.append(
                 "valid contracts must keep evaluation gate errors empty",
             )
@@ -57,16 +62,53 @@ def _guard_evaluation_gate_result_from_raw_result(
             errors.append(
                 "invalid contracts must force the evaluation gate result to fail",
             )
-        if evaluation_gate_result.contract_valid is not False:
+        if not alignment_summary["contract_valid_matches_contract"]:
             errors.append(
                 "invalid contracts must mark the evaluation gate result as contract-invalid",
             )
-        if evaluation_gate_result.errors != contract_result.errors:
+        if not alignment_summary["errors_match_contract"]:
             errors.append(
                 "invalid contracts must preserve contract errors in the evaluation gate result",
             )
 
     return tuple(errors)
+
+
+def _summarize_evaluation_gate_alignment(
+    contract_result: ContractGateResult,
+    raw_result: EvaluationResult,
+    evaluation_gate_result: EvaluationGateResult,
+) -> dict[str, object]:
+    raw_evaluation_matches_gate = evaluation_gate_result.result == raw_result
+    contract_valid_matches_contract = (
+        evaluation_gate_result.contract_valid is contract_result.is_valid
+    )
+    expected_errors = () if contract_result.is_valid else contract_result.errors
+    errors_match_contract = evaluation_gate_result.errors == expected_errors
+
+    if contract_result.is_valid:
+        alignment = (
+            "aligned"
+            if raw_evaluation_matches_gate
+            and contract_valid_matches_contract
+            and errors_match_contract
+            else "drifted"
+        )
+    else:
+        alignment = (
+            "fail_closed"
+            if evaluation_gate_result.result == "fail"
+            and contract_valid_matches_contract
+            and errors_match_contract
+            else "drifted"
+        )
+
+    return {
+        "alignment": alignment,
+        "raw_evaluation_matches_gate": raw_evaluation_matches_gate,
+        "contract_valid_matches_contract": contract_valid_matches_contract,
+        "errors_match_contract": errors_match_contract,
+    }
 
 
 def run_evaluation_gate(

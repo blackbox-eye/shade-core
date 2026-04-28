@@ -22,7 +22,9 @@ from shade_core import (  # noqa: E402
 )
 from shade_core.bundle import _build_audit_closure_snapshot  # noqa: E402
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
+from shade_core.bundle import _build_runtime_evaluation_guard_verification_contract  # noqa: E402
 from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
+from shade_core.bundle import _complete_runtime_evaluation_guard_verification_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_evaluation_guard_verification_snapshot  # noqa: E402
 from shade_core.bundle import _guard_prepared_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _guard_runtime_evaluation_fabric_snapshot  # noqa: E402
@@ -1002,6 +1004,67 @@ def test_build_runtime_evaluation_guard_verification_snapshot_accepts_valid_runt
         "runtime_evaluation": runtime_evaluation_snapshot,
         "prepared_fabric_guard": {"is_valid": True, "errors": ()},
         "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+        "verification_contract": {"is_valid": True, "errors": ()},
+    }
+    assert verification_snapshot["runtime_evaluation"] == {
+        "runtime_contract_integration": {
+            "contract_gate": {
+                "self_model": {"is_valid": True, "errors": ()},
+                "worker_registry": {"is_valid": True, "errors": ()},
+                "confidence_record": {"is_valid": True, "errors": ()},
+                "state_contract": {"is_valid": True, "errors": ()},
+            },
+            "runtime_fabric": {
+                "run_state": {
+                    "run_id": "run-1",
+                    "worker_role": "control",
+                    "decision_class": "accept",
+                    "verification_state": "verified",
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "artifact_handoff": {
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "decision": {
+                    "decision": "accept",
+                    "reason": "Confidence 0.90 meets threshold",
+                    "next_step": "continue",
+                },
+                "audit_event": {
+                    "event_type": "runtime_decision",
+                    "message": "accept: Confidence 0.90 meets threshold",
+                    "severity": "info",
+                    "reference": "ref-accept",
+                    "run_id": "shade-v1",
+                },
+                "evaluation_gate": {
+                    "result": "pass",
+                    "contract_valid": True,
+                    "errors": (),
+                },
+            },
+        },
+        "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+        "raw_evaluation": {"result": "pass"},
+        "evaluation_gate": {
+            "result": "pass",
+            "contract_valid": True,
+            "errors": (),
+        },
     }
 
 
@@ -1032,6 +1095,17 @@ def test_build_runtime_evaluation_guard_verification_snapshot_returns_review_pat
         "runtime_evaluation": runtime_evaluation_snapshot,
         "prepared_fabric_guard": {"is_valid": True, "errors": ()},
         "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+        "verification_contract": {"is_valid": True, "errors": ()},
     }
 
 
@@ -1062,6 +1136,17 @@ def test_build_runtime_evaluation_guard_verification_snapshot_returns_reject_pat
         "runtime_evaluation": runtime_evaluation_snapshot,
         "prepared_fabric_guard": {"is_valid": True, "errors": ()},
         "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+        "verification_contract": {"is_valid": True, "errors": ()},
     }
 
 
@@ -1092,6 +1177,17 @@ def test_build_runtime_evaluation_guard_verification_snapshot_preserves_invalid_
         "runtime_evaluation": runtime_evaluation_snapshot,
         "prepared_fabric_guard": {"is_valid": True, "errors": ()},
         "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": False,
+            "evaluation_gate_alignment": "fail_closed",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+        "verification_contract": {"is_valid": True, "errors": ()},
     }
     assert verification_snapshot["runtime_evaluation"]["raw_evaluation"] == {
         "result": "pass",
@@ -1103,7 +1199,7 @@ def test_build_runtime_evaluation_guard_verification_snapshot_preserves_invalid_
     }
 
 
-def test_build_runtime_evaluation_guard_verification_snapshot_reports_malformed_serialized_snapshot() -> None:
+def test_build_runtime_evaluation_guard_verification_snapshot_reports_malformed_runtime_evaluation_snapshot() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
     registry.register(name="control-worker", role="control", status="active")
@@ -1156,6 +1252,24 @@ def test_build_runtime_evaluation_guard_verification_snapshot_reports_malformed_
                 "snapshot.aggregated_contract_gate must equal the aggregation implied by nested contract_gate entries",
             ),
         },
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": False,
+            "runtime_evaluation_consistent": False,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": False,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "failed",
+        },
+        "verification_contract": {
+            "is_valid": False,
+            "errors": (
+                "verification_snapshot.runtime_evaluation.runtime_contract_integration.contract_gate.self_model must be a mapping",
+                "verification_snapshot.runtime_evaluation.runtime_contract_integration.contract_gate.confidence_record must be a mapping",
+                "verification_snapshot.runtime_evaluation.runtime_contract_integration.contract_gate.state_contract must be a mapping",
+            ),
+        },
     }
 
 
@@ -1186,6 +1300,17 @@ def test_build_runtime_evaluation_guard_verification_snapshot_preserves_mixed_in
         "runtime_evaluation": runtime_evaluation_snapshot,
         "prepared_fabric_guard": {"is_valid": True, "errors": ()},
         "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": False,
+            "evaluation_gate_alignment": "fail_closed",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "verified",
+        },
+        "verification_contract": {"is_valid": True, "errors": ()},
     }
     assert verification_snapshot["runtime_evaluation"][
         "aggregated_contract_gate"
@@ -1196,6 +1321,91 @@ def test_build_runtime_evaluation_guard_verification_snapshot_preserves_mixed_in
             "reference is required",
             "run_id is required",
             "source_lane is required",
+        ),
+    }
+
+
+def test_complete_runtime_evaluation_guard_verification_snapshot_reports_malformed_nested_guard_result_mapping() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-guard-shape")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _complete_runtime_evaluation_guard_verification_snapshot(
+        runtime_evaluation_snapshot,
+        {"is_valid": "invalid", "errors": 9},
+        {"is_valid": True, "errors": ()},
+    ) == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": "invalid", "errors": 9},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": False,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": True,
+            "verification_status": "failed",
+        },
+        "verification_contract": {
+            "is_valid": False,
+            "errors": (
+                "verification_snapshot.prepared_fabric_guard.is_valid must be a bool",
+                "verification_snapshot.prepared_fabric_guard.errors must be a tuple, list, or None",
+            ),
+        },
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_contract_reports_malformed_verification_snapshot() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-summary-drift")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    _, verification_snapshot = _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    malformed_verification_snapshot = dict(verification_snapshot)
+    malformed_verification_snapshot["verification_summary"] = dict(
+        verification_snapshot["verification_summary"],
+        verification_status="failed",
+    )
+
+    assert _build_runtime_evaluation_guard_verification_contract(
+        malformed_verification_snapshot,
+    ) == {
+        "is_valid": False,
+        "errors": (
+            "verification_snapshot.verification_summary.verification_status must match the derived verification status",
         ),
     }
 
