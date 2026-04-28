@@ -24,6 +24,7 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Evaluation gate snapshot  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for evaluation gate results    | `tests/test_bundle.py`          |
 | Bundle output             | `src/shade_core/bundle.py`          | Implemented, internal module and re-exported through the root package | `tests/test_bundle.py`          |
 | Runtime fabric snapshot   | `src/shade_core/bundle.py`          | Implemented as one internal helper for a consolidated runtime view    | `tests/test_bundle.py`          |
+| Runtime integration gate  | `src/shade_core/bundle.py`          | Implemented as one internal helper composing runtime contract validation and runtime fabric snapshot | `tests/test_bundle.py`          |
 | Worker task contract      | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Worker result contract    | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Task route contract       | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
