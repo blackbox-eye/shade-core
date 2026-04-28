@@ -64,6 +64,59 @@ def test_evaluate_uses_strictest_result_on_conflict() -> None:
     assert evaluate(decision, event) == "review"
 
 
+def test_evaluate_matches_expected_result_matrix() -> None:
+    scenarios = (
+        (
+            RuntimeDecision(
+                decision="accept",
+                reason="ok",
+                next_step="continue",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="accept",
+                severity="info",
+                reference="ref-pass-matrix",
+                run_id="run-1",
+            ),
+            "pass",
+        ),
+        (
+            RuntimeDecision(
+                decision="needs_review",
+                reason="check",
+                next_step="review",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="warning",
+                severity="warning",
+                reference="ref-review-matrix",
+                run_id="run-1",
+            ),
+            "review",
+        ),
+        (
+            RuntimeDecision(
+                decision="reject",
+                reason="stop",
+                next_step="stop",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="error",
+                severity="error",
+                reference="ref-fail-matrix",
+                run_id="run-1",
+            ),
+            "fail",
+        ),
+    )
+
+    for decision, event, expected_result in scenarios:
+        assert evaluate(decision, event) == expected_result
+
+
 def test_evaluate_is_independent_of_contract_validity_context() -> None:
     contract_result = ContractGateResult(
         is_valid=False,

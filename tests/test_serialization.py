@@ -31,6 +31,7 @@ from shade_core.models import (
     WorkerTask,
 )
 from shade_core.serialization import (
+    _serialize_aggregated_runtime_contract_gate,
     serialize_artifact_handoff,
     serialize_contract_gate_result,
     serialize_evaluation_gate_result,
@@ -165,6 +166,52 @@ def test_serialize_runtime_contract_gate() -> None:
             "is_valid": False,
             "errors": ("run_id is required", "source_lane is required"),
         },
+    }
+
+
+def test_serialize_aggregated_runtime_contract_gate_returns_valid_result() -> None:
+    contract_gate = {
+        "self_model": {"is_valid": True, "errors": ()},
+        "worker_registry": {"is_valid": True, "errors": ()},
+        "confidence_record": {"is_valid": True, "errors": ()},
+        "state_contract": {"is_valid": True, "errors": ()},
+    }
+
+    assert _serialize_aggregated_runtime_contract_gate(contract_gate) == {
+        "is_valid": True,
+        "errors": (),
+    }
+
+
+def test_serialize_aggregated_runtime_contract_gate_preserves_error_order() -> None:
+    contract_gate = {
+        "self_model": {
+            "is_valid": False,
+            "errors": ("agent_id is required",),
+        },
+        "worker_registry": {
+            "is_valid": False,
+            "errors": ("worker name is required",),
+        },
+        "confidence_record": {
+            "is_valid": False,
+            "errors": ("reference is required",),
+        },
+        "state_contract": {
+            "is_valid": False,
+            "errors": ("run_id is required", "source_lane is required"),
+        },
+    }
+
+    assert _serialize_aggregated_runtime_contract_gate(contract_gate) == {
+        "is_valid": False,
+        "errors": (
+            "agent_id is required",
+            "worker name is required",
+            "reference is required",
+            "run_id is required",
+            "source_lane is required",
+        ),
     }
 
 

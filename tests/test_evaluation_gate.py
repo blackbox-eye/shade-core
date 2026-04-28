@@ -1,6 +1,7 @@
 from shade_core.contract_gate import ContractGateResult
 from shade_core.evaluation_gate import (
     _aggregate_runtime_contract_result,
+    _build_evaluation_gate_result_from_raw_result,
     _run_runtime_evaluation_gate,
 )
 from shade_core import (
@@ -76,6 +77,64 @@ def test_evaluation_gate_passes_through_review_result() -> None:
         result="review",
         contract_valid=True,
         errors=(),
+    )
+
+
+def test_build_evaluation_gate_result_from_raw_result_preserves_valid_result() -> None:
+    assert _build_evaluation_gate_result_from_raw_result(
+        ContractGateResult(is_valid=True, errors=()),
+        "review",
+    ) == EvaluationGateResult(
+        result="review",
+        contract_valid=True,
+        errors=(),
+    )
+
+
+def test_build_evaluation_gate_result_from_raw_result_fails_closed_for_invalid_contract() -> None:
+    assert _build_evaluation_gate_result_from_raw_result(
+        ContractGateResult(
+            is_valid=False,
+            errors=("run_id is required", "source_lane is required"),
+        ),
+        "pass",
+    ) == EvaluationGateResult(
+        result="fail",
+        contract_valid=False,
+        errors=("run_id is required", "source_lane is required"),
+    )
+
+
+def test_run_evaluation_gate_matches_internal_raw_result_builder() -> None:
+    valid_contract_result = ContractGateResult(is_valid=True, errors=())
+    invalid_contract_result = ContractGateResult(
+        is_valid=False,
+        errors=("run_id is required",),
+    )
+    decision = RuntimeDecision(decision="accept", reason="ok", next_step="continue")
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accept",
+        severity="info",
+        reference="ref-compare",
+        run_id="run-1",
+    )
+
+    assert run_evaluation_gate(
+        valid_contract_result,
+        decision,
+        event,
+    ) == _build_evaluation_gate_result_from_raw_result(
+        valid_contract_result,
+        evaluate(decision, event),
+    )
+    assert run_evaluation_gate(
+        invalid_contract_result,
+        decision,
+        event,
+    ) == _build_evaluation_gate_result_from_raw_result(
+        invalid_contract_result,
+        "fail",
     )
 
 

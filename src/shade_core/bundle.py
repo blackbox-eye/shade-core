@@ -6,14 +6,17 @@ from collections.abc import Mapping
 from .contract_gate import (
     ContractGateResult,
     validate_confidence_record,
+    validate_meta_audit_event,
     validate_self_model,
     validate_state_contract,
+    validate_runtime_decision,
     validate_worker_registry,
 )
 from .evaluation import EvaluationResult, evaluate
 from .evaluation_gate import (
     EvaluationGateResult,
     _aggregate_runtime_contract_result,
+    _build_evaluation_gate_result_from_raw_result,
 )
 from .models import (
     ArtifactHandoff,
@@ -46,7 +49,7 @@ from .runtime_loop import audit_decision, decide
 from .state import RunState
 from .serialization import (
     serialize_artifact_handoff,
-    serialize_contract_gate_result,
+    _serialize_aggregated_runtime_contract_gate,
     serialize_evaluation_gate_result,
     serialize_evaluation_result,
     serialize_meta_audit_event,
@@ -120,25 +123,26 @@ def _serialize_runtime_evaluation_fabric_fragments(
     state: RunState,
     prepared_fabric: _PreparedRuntimeEvaluationFabric,
 ) -> Mapping[str, object]:
+    serialized_contract_gate = serialize_runtime_contract_gate(
+        prepared_fabric.self_model_result,
+        prepared_fabric.worker_registry_result,
+        prepared_fabric.confidence_record_result,
+        prepared_fabric.state_contract_result,
+    )
     serialized_evaluation_gate = serialize_evaluation_gate_result(
         prepared_fabric.evaluation_gate_result,
     )
 
     return {
-        "contract_gate": serialize_runtime_contract_gate(
-            prepared_fabric.self_model_result,
-            prepared_fabric.worker_registry_result,
-            prepared_fabric.confidence_record_result,
-            prepared_fabric.state_contract_result,
-        ),
+        "contract_gate": serialized_contract_gate,
         "runtime_fabric": _build_runtime_fabric_snapshot(
             state,
             prepared_fabric.decision,
             prepared_fabric.audit_event,
             serialized_evaluation_gate,
         ),
-        "aggregated_contract_gate": serialize_contract_gate_result(
-            prepared_fabric.aggregated_contract_result,
+        "aggregated_contract_gate": _serialize_aggregated_runtime_contract_gate(
+            serialized_contract_gate,
         ),
         "raw_evaluation": serialize_evaluation_result(
             prepared_fabric.raw_evaluation_result,
@@ -166,18 +170,10 @@ def _prepare_runtime_evaluation_fabric(
     decision = decide(self_model, registry, confidence)
     audit_event = audit_decision(self_model, decision, confidence)
     raw_evaluation_result = evaluate(decision, audit_event)
-    if aggregated_contract_result.is_valid:
-        evaluation_gate_result = EvaluationGateResult(
-            result=raw_evaluation_result,
-            contract_valid=True,
-            errors=(),
-        )
-    else:
-        evaluation_gate_result = EvaluationGateResult(
-            result="fail",
-            contract_valid=False,
-            errors=aggregated_contract_result.errors,
-        )
+    evaluation_gate_result = _build_evaluation_gate_result_from_raw_result(
+        aggregated_contract_result,
+        raw_evaluation_result,
+    )
 
     return _PreparedRuntimeEvaluationFabric(
         self_model_result=self_model_result,
@@ -190,6 +186,221 @@ def _prepare_runtime_evaluation_fabric(
         raw_evaluation_result=raw_evaluation_result,
         evaluation_gate_result=evaluation_gate_result,
     )
+
+
+def _guard_prepared_runtime_evaluation_fabric(
+    prepared_fabric: _PreparedRuntimeEvaluationFabric,
+) -> tuple[str, ...]:
+    errors: list[str] = []
+    audit_event_inputs_are_valid = (
+        prepared_fabric.self_model_result.is_valid
+        and prepared_fabric.confidence_record_result.is_valid
+    )
+
+    if not validate_runtime_decision(prepared_fabric.decision).is_valid:
+        errors.append(
+            "prepared_fabric.decision must satisfy the runtime decision contract",
+        )
+    if (
+        audit_event_inputs_are_valid
+        and not validate_meta_audit_event(prepared_fabric.audit_event).is_valid
+    ):
+        errors.append(
+            "prepared_fabric.audit_event must satisfy the meta audit contract",
+        )
+
+    expected_aggregated_contract_result = _aggregate_runtime_contract_result(
+        prepared_fabric.self_model_result,
+        prepared_fabric.worker_registry_result,
+        prepared_fabric.confidence_record_result,
+        prepared_fabric.state_contract_result,
+    )
+    if prepared_fabric.aggregated_contract_result != expected_aggregated_contract_result:
+        errors.append(
+            "prepared_fabric.aggregated_contract_result must equal the aggregated component contract results",
+        )
+
+    expected_evaluation_gate_result = _build_evaluation_gate_result_from_raw_result(
+        prepared_fabric.aggregated_contract_result,
+        prepared_fabric.raw_evaluation_result,
+    )
+    if prepared_fabric.evaluation_gate_result != expected_evaluation_gate_result:
+        errors.append(
+            "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        )
+
+    if prepared_fabric.aggregated_contract_result.is_valid:
+        if (
+            prepared_fabric.raw_evaluation_result
+            != prepared_fabric.evaluation_gate_result.result
+        ):
+            errors.append(
+                "prepared_fabric.valid contracts must keep raw and gated evaluation results aligned",
+            )
+    else:
+        if prepared_fabric.evaluation_gate_result.result != "fail":
+            errors.append(
+                "prepared_fabric.invalid contracts must force the gated evaluation result to fail",
+            )
+        if (
+            prepared_fabric.evaluation_gate_result.errors
+            != prepared_fabric.aggregated_contract_result.errors
+        ):
+            errors.append(
+                "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
+            )
+
+    return tuple(errors)
+
+
+def _guard_runtime_evaluation_fabric_snapshot(
+    snapshot: Mapping[str, object],
+) -> tuple[str, ...]:
+    errors: list[str] = []
+    expected_contract_gate_keys = (
+        "self_model",
+        "worker_registry",
+        "confidence_record",
+        "state_contract",
+    )
+
+    def _normalize_errors_value(
+        value: object,
+        path: str,
+    ) -> tuple[object, ...]:
+        if isinstance(value, tuple):
+            return value
+        if isinstance(value, list):
+            return tuple(value)
+        if value is None:
+            return ()
+
+        errors.append(f"{path} must be a tuple, list, or None")
+        return ()
+
+    runtime_contract_integration = snapshot.get("runtime_contract_integration")
+    if not isinstance(runtime_contract_integration, Mapping):
+        return (
+            "snapshot.runtime_contract_integration must be a mapping",
+        )
+
+    contract_gate = runtime_contract_integration.get("contract_gate")
+    if not isinstance(contract_gate, Mapping):
+        errors.append(
+            "snapshot.runtime_contract_integration.contract_gate must be a mapping",
+        )
+        contract_gate = {}
+
+    sanitized_contract_gate: dict[str, dict[str, object]] = {}
+    for key in expected_contract_gate_keys:
+        nested_entry = contract_gate.get(key)
+        if not isinstance(nested_entry, Mapping):
+            errors.append(
+                f"snapshot.runtime_contract_integration.contract_gate.{key} must be a mapping",
+            )
+            sanitized_contract_gate[key] = {}
+            continue
+
+        sanitized_nested_entry = dict(nested_entry)
+        sanitized_nested_entry["errors"] = _normalize_errors_value(
+            sanitized_nested_entry.get("errors"),
+            f"snapshot.runtime_contract_integration.contract_gate.{key}.errors",
+        )
+        sanitized_contract_gate[key] = sanitized_nested_entry
+
+    runtime_fabric = runtime_contract_integration.get("runtime_fabric")
+    if not isinstance(runtime_fabric, Mapping):
+        errors.append(
+            "snapshot.runtime_contract_integration.runtime_fabric must be a mapping",
+        )
+        runtime_fabric = {}
+
+    aggregated_contract_gate = snapshot.get("aggregated_contract_gate")
+    if not isinstance(aggregated_contract_gate, Mapping):
+        errors.append("snapshot.aggregated_contract_gate must be a mapping")
+        aggregated_contract_gate = {}
+    else:
+        aggregated_contract_gate = dict(aggregated_contract_gate)
+
+    raw_evaluation = snapshot.get("raw_evaluation")
+    if not isinstance(raw_evaluation, Mapping):
+        errors.append("snapshot.raw_evaluation must be a mapping")
+        raw_evaluation = {}
+
+    evaluation_gate = snapshot.get("evaluation_gate")
+    if not isinstance(evaluation_gate, Mapping):
+        errors.append("snapshot.evaluation_gate must be a mapping")
+        evaluation_gate = {}
+    else:
+        evaluation_gate = dict(evaluation_gate)
+
+    nested_evaluation_gate = runtime_fabric.get("evaluation_gate")
+    if not isinstance(nested_evaluation_gate, Mapping):
+        errors.append(
+            "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate must be a mapping",
+        )
+        nested_evaluation_gate = {}
+    else:
+        nested_evaluation_gate = dict(nested_evaluation_gate)
+
+    aggregated_contract_gate["errors"] = _normalize_errors_value(
+        aggregated_contract_gate.get("errors"),
+        "snapshot.aggregated_contract_gate.errors",
+    )
+    evaluation_gate["errors"] = _normalize_errors_value(
+        evaluation_gate.get("errors"),
+        "snapshot.evaluation_gate.errors",
+    )
+    nested_evaluation_gate["errors"] = _normalize_errors_value(
+        nested_evaluation_gate.get("errors"),
+        "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate.errors",
+    )
+
+    if nested_evaluation_gate != evaluation_gate:
+        errors.append(
+            "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate must equal snapshot.evaluation_gate",
+        )
+
+    expected_aggregated_contract_gate = _serialize_aggregated_runtime_contract_gate(
+        sanitized_contract_gate,
+    )
+    if aggregated_contract_gate != expected_aggregated_contract_gate:
+        errors.append(
+            "snapshot.aggregated_contract_gate must equal the aggregation implied by nested contract_gate entries",
+        )
+
+    aggregated_is_valid = aggregated_contract_gate.get("is_valid")
+    evaluation_gate_errors = evaluation_gate.get("errors", ())
+    aggregated_errors = aggregated_contract_gate.get("errors", ())
+
+    if aggregated_is_valid is True:
+        if raw_evaluation.get("result") != evaluation_gate.get("result"):
+            errors.append(
+                "snapshot.valid contracts must keep raw_evaluation.result aligned with evaluation_gate.result",
+            )
+        if evaluation_gate.get("contract_valid") is not True:
+            errors.append(
+                "snapshot.valid contracts must mark evaluation_gate.contract_valid as true",
+            )
+        if evaluation_gate_errors != ():
+            errors.append(
+                "snapshot.valid contracts must keep evaluation_gate.errors empty",
+            )
+    elif aggregated_is_valid is False:
+        if evaluation_gate.get("result") != "fail":
+            errors.append(
+                "snapshot.invalid contracts must force evaluation_gate.result to fail",
+            )
+        if evaluation_gate.get("contract_valid") is not False:
+            errors.append(
+                "snapshot.invalid contracts must mark evaluation_gate.contract_valid as false",
+            )
+        if evaluation_gate_errors != aggregated_errors:
+            errors.append(
+                "snapshot.invalid contracts must preserve aggregated_contract_gate.errors in evaluation_gate.errors",
+            )
+
+    return tuple(errors)
 
 
 def _build_runtime_contract_integration_snapshot(

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from .contract_gate import ContractGateResult
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
@@ -97,6 +99,30 @@ def serialize_runtime_contract_gate(
         ),
         "state_contract": serialize_contract_gate_result(
             state_contract_result,
+        ),
+    }
+
+
+def _serialize_aggregated_runtime_contract_gate(
+    contract_gate: Mapping[str, Mapping[str, object]],
+) -> dict[str, object]:
+    ordered_keys = (
+        "self_model",
+        "worker_registry",
+        "confidence_record",
+        "state_contract",
+    )
+
+    return {
+        "is_valid": all(
+            contract_gate.get(key, {}).get("is_valid") is True
+            for key in ordered_keys
+        ),
+        "errors": tuple(
+            error
+            for key in ordered_keys
+            for error in contract_gate.get(key, {}).get("errors", ())
+            if isinstance(error, str)
         ),
     }
 
