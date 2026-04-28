@@ -56,13 +56,13 @@ from shade_core.serialization import (
 def test_serialize_runtime_decision() -> None:
     decision = RuntimeDecision(
         decision="accept",
-        reason="clear",
+        reason="Confidence 0.90 meets threshold",
         next_step="continue",
     )
 
     assert serialize_runtime_decision(decision) == {
         "decision": "accept",
-        "reason": "clear",
+        "reason": "Confidence 0.90 meets threshold",
         "next_step": "continue",
     }
 
@@ -106,7 +106,7 @@ def test_serialize_artifact_handoff() -> None:
 def test_serialize_meta_audit_event() -> None:
     event = MetaAuditEvent(
         event_type="runtime_decision",
-        message="accept: clear",
+        message="accept: Confidence 0.90 meets threshold",
         severity="info",
         reference="ref-1",
         run_id="run-1",
@@ -114,7 +114,7 @@ def test_serialize_meta_audit_event() -> None:
 
     assert serialize_meta_audit_event(event) == {
         "event_type": "runtime_decision",
-        "message": "accept: clear",
+        "message": "accept: Confidence 0.90 meets threshold",
         "severity": "info",
         "reference": "ref-1",
         "run_id": "run-1",
