@@ -20,7 +20,6 @@ from .evaluation_gate import (
     _aggregate_runtime_contract_result,
     _build_evaluation_gate_result_from_raw_result,
     _guard_evaluation_gate_result_from_raw_result,
-    _summarize_evaluation_gate_alignment,
 )
 from .models import (
     ArtifactHandoff,

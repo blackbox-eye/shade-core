@@ -412,7 +412,7 @@ def _collect_runtime_verification_evaluation_gate_errors(
 
 
 def validate_runtime_evaluation_guard_verification_snapshot(
-    snapshot: Mapping[str, object],
+    snapshot: object,
 ) -> ContractGateResult:
     if not isinstance(snapshot, Mapping):
         return ContractGateResult(
@@ -555,10 +555,10 @@ def validate_runtime_evaluation_guard_verification_snapshot(
                 "verification_snapshot.verification_summary.evaluation_gate_alignment must match the runtime evaluation gate alignment"
             ),
             "aggregated_contract_gate_aligned": (
-                "verification_snapshot.verification_summary.aggregated_contract_gate_aligned must match verification_snapshot.runtime_evaluation aggregated contract alignment"
+                "verification_snapshot.verification_summary.aggregated_contract_gate_aligned must match verification_snapshot.runtime_evaluation.aggregated_contract_gate"
             ),
             "nested_evaluation_gate_aligned": (
-                "verification_snapshot.verification_summary.nested_evaluation_gate_aligned must match verification_snapshot.runtime_evaluation evaluation gate alignment"
+                "verification_snapshot.verification_summary.nested_evaluation_gate_aligned must match verification_snapshot.runtime_evaluation.evaluation_gate == verification_snapshot.evaluation_gate"
             ),
             "verification_status": (
                 "verification_snapshot.verification_summary.verification_status must match the derived verification status"

@@ -1113,6 +1113,55 @@ def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_incon
     )
 
 
+def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_rephrased_alignment_messages() -> None:
+    snapshot = {
+        "runtime_evaluation": {
+            "runtime_contract_integration": {
+                "contract_gate": {
+                    "self_model": {"is_valid": True, "errors": ()},
+                    "worker_registry": {"is_valid": True, "errors": ()},
+                    "confidence_record": {"is_valid": True, "errors": ()},
+                    "state_contract": {"is_valid": True, "errors": ()},
+                },
+                "runtime_fabric": {
+                    "evaluation_gate": {
+                        "result": "pass",
+                        "contract_valid": True,
+                        "errors": (),
+                    },
+                },
+            },
+            "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+            "raw_evaluation": {"result": "pass"},
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+        "verification_summary": {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": True,
+            "runtime_contract_valid": True,
+            "evaluation_gate_alignment": "aligned",
+            "aggregated_contract_gate_aligned": False,
+            "nested_evaluation_gate_aligned": False,
+            "verification_status": "verified",
+        },
+    }
+
+    result = validate_runtime_evaluation_guard_verification_snapshot(snapshot)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "verification_snapshot.verification_summary.aggregated_contract_gate_aligned must match verification_snapshot.runtime_evaluation.aggregated_contract_gate",
+        "verification_snapshot.verification_summary.nested_evaluation_gate_aligned must match verification_snapshot.runtime_evaluation.evaluation_gate == verification_snapshot.evaluation_gate",
+    )
+
+
 def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malformed_runtime_evaluation_nested_structure() -> None:
     snapshot = {
         "runtime_evaluation": {
