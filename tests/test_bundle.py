@@ -23,6 +23,7 @@ from shade_core import (  # noqa: E402
 from shade_core.bundle import _build_audit_closure_snapshot  # noqa: E402
 from shade_core.bundle import _build_checkpoint_junction_snapshot  # noqa: E402
 from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
+from shade_core.bundle import _build_runtime_evaluation_guard_verification_snapshot  # noqa: E402
 from shade_core.bundle import _guard_prepared_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _guard_runtime_evaluation_fabric_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
@@ -31,6 +32,7 @@ from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: 
 from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
+from shade_core.bundle import _run_runtime_evaluation_fabric_guards  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -54,6 +56,37 @@ from shade_core.models import (  # noqa: E402
     WorkerResult,
     WorkerTask,
 )
+
+
+def _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+    self_model: SelfModel,
+    registry: WorkerRegistry,
+    confidence: ConfidenceRecord,
+    state: RunState,
+) -> tuple[dict[str, object], dict[str, object]]:
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    runtime_evaluation_snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    guard_results = _run_runtime_evaluation_fabric_guards(
+        prepared_fabric,
+        runtime_evaluation_snapshot,
+    )
+    verification_snapshot = _build_runtime_evaluation_guard_verification_snapshot(
+        runtime_evaluation_snapshot,
+        guard_results["prepared_fabric_guard"],
+        guard_results["serialized_snapshot_guard"],
+    )
+
+    return runtime_evaluation_snapshot, verification_snapshot
 
 
 def test_build_bundle_returns_expected_structure() -> None:
@@ -942,6 +975,231 @@ def test_build_runtime_evaluation_gate_integration_snapshot_serializes_shared_fr
     ] == snapshot["evaluation_gate"]
 
 
+def test_build_runtime_evaluation_guard_verification_snapshot_accepts_valid_runtime_inputs() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-accept")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot, verification_snapshot = (
+        _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+    )
+
+    assert verification_snapshot == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_snapshot_returns_review_path() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.4, "local", "unclear", "ref-review")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="needs_review",
+        verification_state="pending",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot, verification_snapshot = (
+        _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+    )
+
+    assert verification_snapshot == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_snapshot_returns_reject_path() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="analysis-worker", role="analysis", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-reject")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="reject",
+        verification_state="pending",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot, verification_snapshot = (
+        _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+    )
+
+    assert verification_snapshot == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_snapshot_preserves_invalid_contract_divergence() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-invalid")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot, verification_snapshot = (
+        _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+    )
+
+    assert verification_snapshot == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+    }
+    assert verification_snapshot["runtime_evaluation"]["raw_evaluation"] == {
+        "result": "pass",
+    }
+    assert verification_snapshot["runtime_evaluation"]["evaluation_gate"] == {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": ("run_id is required", "source_lane is required"),
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_snapshot_reports_malformed_serialized_snapshot() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-malformed")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    runtime_evaluation_snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    runtime_evaluation_snapshot["runtime_contract_integration"]["contract_gate"] = {
+        "self_model": 7,
+        "worker_registry": {"is_valid": True, "errors": ()},
+        "confidence_record": "invalid",
+        "state_contract": None,
+    }
+    guard_results = _run_runtime_evaluation_fabric_guards(
+        prepared_fabric,
+        runtime_evaluation_snapshot,
+    )
+
+    assert _build_runtime_evaluation_guard_verification_snapshot(
+        runtime_evaluation_snapshot,
+        guard_results["prepared_fabric_guard"],
+        guard_results["serialized_snapshot_guard"],
+    ) == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {
+            "is_valid": False,
+            "errors": (
+                "snapshot.runtime_contract_integration.contract_gate.self_model must be a mapping",
+                "snapshot.runtime_contract_integration.contract_gate.confidence_record must be a mapping",
+                "snapshot.runtime_contract_integration.contract_gate.state_contract must be a mapping",
+                "snapshot.aggregated_contract_gate must equal the aggregation implied by nested contract_gate entries",
+            ),
+        },
+    }
+
+
+def test_build_runtime_evaluation_guard_verification_snapshot_preserves_mixed_invalid_error_order() -> None:
+    self_model = SelfModel(agent_id="", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    runtime_evaluation_snapshot, verification_snapshot = (
+        _build_runtime_evaluation_guard_verification_for_runtime_inputs(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+    )
+
+    assert verification_snapshot == {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": {"is_valid": True, "errors": ()},
+        "serialized_snapshot_guard": {"is_valid": True, "errors": ()},
+    }
+    assert verification_snapshot["runtime_evaluation"][
+        "aggregated_contract_gate"
+    ] == {
+        "is_valid": False,
+        "errors": (
+            "agent_id is required",
+            "reference is required",
+            "run_id is required",
+            "source_lane is required",
+        ),
+    }
+
+
 def test_guard_prepared_runtime_evaluation_fabric_returns_no_errors_for_consistent_paths() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     scenarios = (
@@ -1051,6 +1309,7 @@ def test_guard_prepared_runtime_evaluation_fabric_detects_mutated_contract_align
         "prepared_fabric.aggregated_contract_result must equal the aggregated component contract results",
         "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
         "prepared_fabric.invalid contracts must force the gated evaluation result to fail",
+        "prepared_fabric.evaluation_gate_result guard error: invalid contracts must mark the evaluation gate result as contract-invalid",
         "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
     )
 
@@ -1092,6 +1351,111 @@ def test_guard_prepared_runtime_evaluation_fabric_detects_invalid_decision_and_a
     ) == (
         "prepared_fabric.decision must satisfy the runtime decision contract",
         "prepared_fabric.audit_event must satisfy the meta audit contract",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_valid_contract_contract_valid_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-contract-valid")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                contract_valid=False,
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: valid contracts must mark the evaluation gate result as contract-valid",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_valid_contract_errors_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-gate-errors")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                errors=("unexpected error",),
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: valid contracts must keep evaluation gate errors empty",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_invalid_contract_contract_valid_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                contract_valid=True,
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: invalid contracts must mark the evaluation gate result as contract-invalid",
     )
 
 

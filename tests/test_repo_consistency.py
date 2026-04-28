@@ -82,6 +82,17 @@ def test_traceability_includes_runtime_fabric_consistency_guards() -> None:
     )
 
 
+def test_traceability_includes_runtime_evaluation_guard_verification() -> None:
+    traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
+
+    assert _traceability_has_row(
+        traceability_text,
+        "Runtime evaluation guard verification",
+        "src/shade_core/bundle.py",
+        "tests/test_bundle.py",
+    )
+
+
 def test_traceability_row_match_does_not_require_trailing_whitespace() -> None:
     traceability_text = (
         "| Runtime fabric consistency guards | `src/shade_core/bundle.py` | "
