@@ -1,6 +1,9 @@
 from pathlib import Path
 import sys
 
+import shade_core.bundle as bundle_module
+import shade_core.evaluation_gate as evaluation_gate_module
+
 
 src_path = Path(__file__).resolve().parents[1] / "src"
 if str(src_path) not in sys.path:
@@ -149,6 +152,93 @@ def test_build_runtime_fabric_snapshot_returns_expected_structure() -> None:
             "errors": (),
         },
     }
+
+
+def test_prepare_runtime_evaluation_fabric_evaluates_once_and_reuses_raw_result(
+    monkeypatch,
+) -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-accept")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    call_counts = {"bundle": 0, "gate": 0}
+    original_bundle_evaluate = bundle_module.evaluate
+    original_gate_evaluate = evaluation_gate_module.evaluate
+
+    def counted_bundle_evaluate(decision, event):
+        call_counts["bundle"] += 1
+        return original_bundle_evaluate(decision, event)
+
+    def counted_gate_evaluate(decision, event):
+        call_counts["gate"] += 1
+        return original_gate_evaluate(decision, event)
+
+    monkeypatch.setattr(bundle_module, "evaluate", counted_bundle_evaluate)
+    monkeypatch.setattr(
+        evaluation_gate_module,
+        "evaluate",
+        counted_gate_evaluate,
+    )
+
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert call_counts == {"bundle": 1, "gate": 0}
+    assert prepared_fabric.aggregated_contract_result.is_valid is True
+    assert prepared_fabric.raw_evaluation_result == "pass"
+    assert prepared_fabric.evaluation_gate_result == EvaluationGateResult(
+        result="pass",
+        contract_valid=True,
+        errors=(),
+    )
+
+
+def test_prepare_runtime_evaluation_fabric_returns_fail_gate_for_invalid_contract() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-invalid")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert prepared_fabric.aggregated_contract_result.is_valid is False
+    assert prepared_fabric.aggregated_contract_result.errors == (
+        "run_id is required",
+        "source_lane is required",
+    )
+    assert prepared_fabric.raw_evaluation_result == "pass"
+    assert prepared_fabric.evaluation_gate_result == EvaluationGateResult(
+        result="fail",
+        contract_valid=False,
+        errors=("run_id is required", "source_lane is required"),
+    )
 
 
 def test_build_runtime_contract_integration_snapshot_accepts_valid_runtime_inputs() -> None:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from collections.abc import Mapping
 
 from .contract_gate import (
+    ContractGateResult,
     validate_confidence_record,
     validate_self_model,
     validate_state_contract,
@@ -12,7 +14,6 @@ from .evaluation import EvaluationResult, evaluate
 from .evaluation_gate import (
     EvaluationGateResult,
     _aggregate_runtime_contract_result,
-    run_evaluation_gate,
 )
 from .models import (
     ArtifactHandoff,
@@ -73,6 +74,19 @@ from .serialization import (
 )
 
 
+@dataclass(slots=True)
+class _PreparedRuntimeEvaluationFabric:
+    self_model_result: ContractGateResult
+    worker_registry_result: ContractGateResult
+    confidence_record_result: ContractGateResult
+    state_contract_result: ContractGateResult
+    aggregated_contract_result: ContractGateResult
+    decision: RuntimeDecision
+    audit_event: MetaAuditEvent
+    raw_evaluation_result: EvaluationResult
+    evaluation_gate_result: EvaluationGateResult
+
+
 def _build_runtime_fabric_snapshot(
     state: RunState,
     decision: RuntimeDecision,
@@ -101,7 +115,7 @@ def _prepare_runtime_evaluation_fabric(
     registry: WorkerRegistry,
     confidence: ConfidenceRecord,
     state: RunState,
-) -> Mapping[str, object]:
+) -> _PreparedRuntimeEvaluationFabric:
     self_model_result = validate_self_model(self_model)
     worker_registry_result = validate_worker_registry(registry)
     confidence_record_result = validate_confidence_record(confidence)
@@ -115,55 +129,56 @@ def _prepare_runtime_evaluation_fabric(
     decision = decide(self_model, registry, confidence)
     audit_event = audit_decision(self_model, decision, confidence)
     raw_evaluation_result = evaluate(decision, audit_event)
-    evaluation_gate_result = run_evaluation_gate(
-        aggregated_contract_result,
-        decision,
-        audit_event,
-    )
+    if aggregated_contract_result.is_valid:
+        evaluation_gate_result = EvaluationGateResult(
+            result=raw_evaluation_result,
+            contract_valid=True,
+            errors=(),
+        )
+    else:
+        evaluation_gate_result = EvaluationGateResult(
+            result="fail",
+            contract_valid=False,
+            errors=aggregated_contract_result.errors,
+        )
 
-    return {
-        "self_model_result": self_model_result,
-        "worker_registry_result": worker_registry_result,
-        "confidence_record_result": confidence_record_result,
-        "state_contract_result": state_contract_result,
-        "aggregated_contract_result": aggregated_contract_result,
-        "decision": decision,
-        "audit_event": audit_event,
-        "raw_evaluation_result": raw_evaluation_result,
-        "evaluation_gate_result": evaluation_gate_result,
-    }
+    return _PreparedRuntimeEvaluationFabric(
+        self_model_result=self_model_result,
+        worker_registry_result=worker_registry_result,
+        confidence_record_result=confidence_record_result,
+        state_contract_result=state_contract_result,
+        aggregated_contract_result=aggregated_contract_result,
+        decision=decision,
+        audit_event=audit_event,
+        raw_evaluation_result=raw_evaluation_result,
+        evaluation_gate_result=evaluation_gate_result,
+    )
 
 
 def _build_runtime_contract_integration_snapshot(
     state: RunState,
-    prepared_fabric: Mapping[str, object],
+    prepared_fabric: _PreparedRuntimeEvaluationFabric,
 ) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
-    self_model_result = prepared_fabric["self_model_result"]
-    worker_registry_result = prepared_fabric["worker_registry_result"]
-    confidence_record_result = prepared_fabric["confidence_record_result"]
-    state_contract_result = prepared_fabric["state_contract_result"]
-    decision = prepared_fabric["decision"]
-    audit_event = prepared_fabric["audit_event"]
-    evaluation_gate_result = prepared_fabric["evaluation_gate_result"]
-
     return {
         "contract_gate": {
-            "self_model": serialize_contract_gate_result(self_model_result),
+            "self_model": serialize_contract_gate_result(
+                prepared_fabric.self_model_result,
+            ),
             "worker_registry": serialize_contract_gate_result(
-                worker_registry_result,
+                prepared_fabric.worker_registry_result,
             ),
             "confidence_record": serialize_contract_gate_result(
-                confidence_record_result,
+                prepared_fabric.confidence_record_result,
             ),
             "state_contract": serialize_contract_gate_result(
-                state_contract_result,
+                prepared_fabric.state_contract_result,
             ),
         },
         "runtime_fabric": _build_runtime_fabric_snapshot(
             state,
-            decision,
-            audit_event,
-            evaluation_gate_result,
+            prepared_fabric.decision,
+            prepared_fabric.audit_event,
+            prepared_fabric.evaluation_gate_result,
         ),
     }
 
@@ -180,9 +195,6 @@ def _build_runtime_evaluation_gate_integration_snapshot(
         confidence,
         state,
     )
-    aggregated_contract_result = prepared_fabric["aggregated_contract_result"]
-    raw_evaluation_result = prepared_fabric["raw_evaluation_result"]
-    evaluation_gate_result = prepared_fabric["evaluation_gate_result"]
 
     return {
         "runtime_contract_integration": _build_runtime_contract_integration_snapshot(
@@ -190,11 +202,13 @@ def _build_runtime_evaluation_gate_integration_snapshot(
             prepared_fabric,
         ),
         "aggregated_contract_gate": serialize_contract_gate_result(
-            aggregated_contract_result,
+            prepared_fabric.aggregated_contract_result,
         ),
-        "raw_evaluation": serialize_evaluation_result(raw_evaluation_result),
+        "raw_evaluation": serialize_evaluation_result(
+            prepared_fabric.raw_evaluation_result,
+        ),
         "evaluation_gate": serialize_evaluation_gate_result(
-            evaluation_gate_result,
+            prepared_fabric.evaluation_gate_result,
         ),
     }
 
