@@ -29,6 +29,7 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Runtime integration gate  | `src/shade_core/bundle.py`          | Implemented as one internal helper composing runtime contract validation and runtime fabric snapshot | `tests/test_bundle.py`          |
 | Runtime evaluation fabric prep | `src/shade_core/bundle.py`     | Implemented as one internal helper preparing runtime validation, evaluation, and gate values once | `tests/test_bundle.py`          |
 | Runtime evaluation fabric serialization | `src/shade_core/bundle.py` | Implemented as one internal helper serializing shared runtime evaluation fragments once for nested and top-level snapshot reuse | `tests/test_bundle.py`          |
+| Runtime fabric consistency guards | `src/shade_core/bundle.py` | Implemented as internal helpers validating prepared and serialized runtime/evaluation fabric invariants without changing snapshot output | `tests/test_bundle.py`          |
 | Runtime evaluation gate integration | `src/shade_core/bundle.py` | Implemented as one internal helper composing runtime integration, evaluation, and evaluation gate output | `tests/test_bundle.py`          |
 | Worker task contract      | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Worker result contract    | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |

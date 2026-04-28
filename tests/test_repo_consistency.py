@@ -57,6 +57,12 @@ def test_traceability_paths_exist() -> None:
                 assert resolved.is_file()
 
 
+def test_traceability_includes_runtime_fabric_consistency_guards() -> None:
+    traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
+
+    assert "| Runtime fabric consistency guards " in traceability_text
+
+
 def test_docs_index_files_exist() -> None:
     for path in INDEX_PATHS:
         assert path.is_file()

@@ -14,10 +14,9 @@ class EvaluationGateResult:
     errors: tuple[str, ...]
 
 
-def run_evaluation_gate(
+def _build_evaluation_gate_result_from_raw_result(
     contract_result: ContractGateResult,
-    decision: RuntimeDecision,
-    event: MetaAuditEvent,
+    raw_result: EvaluationResult,
 ) -> EvaluationGateResult:
     if not contract_result.is_valid:
         return EvaluationGateResult(
@@ -27,9 +26,26 @@ def run_evaluation_gate(
         )
 
     return EvaluationGateResult(
-        result=evaluate(decision, event),
+        result=raw_result,
         contract_valid=True,
         errors=(),
+    )
+
+
+def run_evaluation_gate(
+    contract_result: ContractGateResult,
+    decision: RuntimeDecision,
+    event: MetaAuditEvent,
+) -> EvaluationGateResult:
+    if not contract_result.is_valid:
+        return _build_evaluation_gate_result_from_raw_result(
+            contract_result,
+            "fail",
+        )
+
+    return _build_evaluation_gate_result_from_raw_result(
+        contract_result,
+        evaluate(decision, event),
     )
 
 
