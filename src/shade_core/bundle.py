@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from .contract_gate import (
+    ContractGateResult,
     validate_confidence_record,
     validate_self_model,
     validate_state_contract,
@@ -98,14 +99,27 @@ def _build_runtime_contract_integration_snapshot(
     confidence: ConfidenceRecord,
     state: RunState,
     evaluation_gate_result: EvaluationGateResult,
+    *,
+    self_model_result: ContractGateResult | None = None,
+    worker_registry_result: ContractGateResult | None = None,
+    confidence_record_result: ContractGateResult | None = None,
+    state_contract_result: ContractGateResult | None = None,
+    decision: RuntimeDecision | None = None,
+    audit_event: MetaAuditEvent | None = None,
 ) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
-    self_model_result = validate_self_model(self_model)
-    worker_registry_result = validate_worker_registry(registry)
-    confidence_record_result = validate_confidence_record(confidence)
-    state_contract_result = validate_state_contract(state)
+    if self_model_result is None:
+        self_model_result = validate_self_model(self_model)
+    if worker_registry_result is None:
+        worker_registry_result = validate_worker_registry(registry)
+    if confidence_record_result is None:
+        confidence_record_result = validate_confidence_record(confidence)
+    if state_contract_result is None:
+        state_contract_result = validate_state_contract(state)
 
-    decision = decide(self_model, registry, confidence)
-    audit_event = audit_decision(self_model, decision, confidence)
+    if decision is None:
+        decision = decide(self_model, registry, confidence)
+    if audit_event is None:
+        audit_event = audit_decision(self_model, decision, confidence)
 
     return {
         "contract_gate": {
@@ -142,7 +156,6 @@ def _build_runtime_evaluation_gate_integration_snapshot(
 
     decision = decide(self_model, registry, confidence)
     audit_event = audit_decision(self_model, decision, confidence)
-    evaluation_result = evaluate(decision, audit_event)
     evaluation_gate_result = _run_runtime_evaluation_gate(
         self_model_result,
         worker_registry_result,
@@ -150,6 +163,11 @@ def _build_runtime_evaluation_gate_integration_snapshot(
         state_contract_result,
         decision,
         audit_event,
+    )
+    evaluation_result = (
+        evaluation_gate_result.result
+        if evaluation_gate_result.contract_valid
+        else evaluate(decision, audit_event)
     )
 
     return {
@@ -159,6 +177,12 @@ def _build_runtime_evaluation_gate_integration_snapshot(
             confidence,
             state,
             evaluation_gate_result,
+            self_model_result=self_model_result,
+            worker_registry_result=worker_registry_result,
+            confidence_record_result=confidence_record_result,
+            state_contract_result=state_contract_result,
+            decision=decision,
+            audit_event=audit_event,
         ),
         "evaluation": serialize_evaluation_result(evaluation_result),
         "evaluation_gate": serialize_evaluation_gate_result(
@@ -223,9 +247,7 @@ def _build_verification_outcome_snapshot(
         "orchestration_verification": serialize_orchestration_verification(
             verification,
         ),
-        "orchestration_outcome": serialize_orchestration_outcome(
-            outcome,
-        ),
+        "orchestration_outcome": serialize_orchestration_outcome(outcome),
     }
 
 
@@ -237,9 +259,7 @@ def _build_evidence_gate_snapshot(
         "orchestration_evidence": serialize_orchestration_evidence(
             evidence,
         ),
-        "orchestration_gate": serialize_orchestration_gate(
-            gate,
-        ),
+        "orchestration_gate": serialize_orchestration_gate(gate),
     }
 
 
@@ -248,12 +268,8 @@ def _build_audit_closure_snapshot(
     closure: OrchestrationClosure,
 ) -> Mapping[str, Mapping[str, str]]:
     return {
-        "orchestration_audit": serialize_orchestration_audit(
-            audit,
-        ),
-        "orchestration_closure": serialize_orchestration_closure(
-            closure,
-        ),
+        "orchestration_audit": serialize_orchestration_audit(audit),
+        "orchestration_closure": serialize_orchestration_closure(closure),
     }
 
 
@@ -265,9 +281,7 @@ def _build_lineage_manifest_snapshot(
         "orchestration_lineage": serialize_orchestration_lineage(
             lineage,
         ),
-        "orchestration_manifest": serialize_orchestration_manifest(
-            manifest,
-        ),
+        "orchestration_manifest": serialize_orchestration_manifest(manifest),
     }
 
 
@@ -276,9 +290,7 @@ def _build_review_assertion_snapshot(
     assertion: OrchestrationAssertion,
 ) -> Mapping[str, Mapping[str, str]]:
     return {
-        "orchestration_review": serialize_orchestration_review(
-            review,
-        ),
+        "orchestration_review": serialize_orchestration_review(review),
         "orchestration_assertion": serialize_orchestration_assertion(
             assertion,
         ),
