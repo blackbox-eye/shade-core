@@ -1,5 +1,6 @@
+from shade_core.contract_gate import ContractGateResult
+from shade_core.evaluation_gate import _run_runtime_evaluation_gate
 from shade_core import (
-    ContractGateResult,
     EvaluationGateResult,
     MetaAuditEvent,
     RuntimeDecision,
@@ -71,4 +72,124 @@ def test_evaluation_gate_passes_through_review_result() -> None:
         result="review",
         contract_valid=True,
         errors=(),
+    )
+
+
+def test_run_runtime_evaluation_gate_accepts_valid_runtime_contracts() -> None:
+    decision = RuntimeDecision(
+        decision="accept",
+        reason="Confidence 0.90 meets threshold",
+        next_step="continue",
+    )
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accept: Confidence 0.90 meets threshold",
+        severity="info",
+        reference="ref-accept",
+        run_id="shade-v1",
+    )
+
+    result = _run_runtime_evaluation_gate(
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        decision,
+        event,
+    )
+
+    assert result == EvaluationGateResult(
+        result="pass",
+        contract_valid=True,
+        errors=(),
+    )
+
+
+def test_run_runtime_evaluation_gate_returns_review_for_needs_review_path() -> None:
+    decision = RuntimeDecision(
+        decision="needs_review",
+        reason="Confidence 0.40 requires review",
+        next_step="review",
+    )
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="needs_review: Confidence 0.40 requires review",
+        severity="warning",
+        reference="ref-review",
+        run_id="shade-v1",
+    )
+
+    result = _run_runtime_evaluation_gate(
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        decision,
+        event,
+    )
+
+    assert result == EvaluationGateResult(
+        result="review",
+        contract_valid=True,
+        errors=(),
+    )
+
+
+def test_run_runtime_evaluation_gate_returns_fail_for_reject_path() -> None:
+    decision = RuntimeDecision(
+        decision="reject",
+        reason="No active worker for control",
+        next_step="stop",
+    )
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="reject: No active worker for control",
+        severity="error",
+        reference="ref-reject",
+        run_id="shade-v1",
+    )
+
+    result = _run_runtime_evaluation_gate(
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        decision,
+        event,
+    )
+
+    assert result == EvaluationGateResult(
+        result="fail",
+        contract_valid=True,
+        errors=(),
+    )
+
+
+def test_run_runtime_evaluation_gate_fails_for_invalid_contracts() -> None:
+    decision = RuntimeDecision(
+        decision="accept",
+        reason="Confidence 0.90 meets threshold",
+        next_step="continue",
+    )
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accept: Confidence 0.90 meets threshold",
+        severity="info",
+        reference="ref-invalid",
+        run_id="shade-v1",
+    )
+
+    result = _run_runtime_evaluation_gate(
+        ContractGateResult(is_valid=False, errors=("agent_id is required",)),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=False, errors=("run_id is required",)),
+        decision,
+        event,
+    )
+
+    assert result == EvaluationGateResult(
+        result="fail",
+        contract_valid=False,
+        errors=("agent_id is required", "run_id is required"),
     )
