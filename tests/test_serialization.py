@@ -32,6 +32,7 @@ from shade_core.models import (
 )
 from shade_core.serialization import (
     _serialize_aggregated_runtime_contract_gate,
+    _serialize_runtime_fabric_guard_result,
     serialize_artifact_handoff,
     serialize_contract_gate_result,
     serialize_evaluation_gate_result,
@@ -212,6 +213,22 @@ def test_serialize_aggregated_runtime_contract_gate_preserves_error_order() -> N
             "run_id is required",
             "source_lane is required",
         ),
+    }
+
+
+def test_serialize_runtime_fabric_guard_result_returns_valid_result() -> None:
+    assert _serialize_runtime_fabric_guard_result(()) == {
+        "is_valid": True,
+        "errors": (),
+    }
+
+
+def test_serialize_runtime_fabric_guard_result_normalizes_error_order() -> None:
+    assert _serialize_runtime_fabric_guard_result(
+        ["prepared error", "snapshot error"],
+    ) == {
+        "is_valid": False,
+        "errors": ("prepared error", "snapshot error"),
     }
 
 

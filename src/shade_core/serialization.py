@@ -127,6 +127,17 @@ def _serialize_aggregated_runtime_contract_gate(
     }
 
 
+def _serialize_runtime_fabric_guard_result(
+    errors: tuple[str, ...] | list[str],
+) -> dict[str, object]:
+    normalized_errors = tuple(errors)
+
+    return {
+        "is_valid": not normalized_errors,
+        "errors": normalized_errors,
+    }
+
+
 def serialize_evaluation_gate_result(
     result: EvaluationGateResult,
 ) -> dict[str, object]:

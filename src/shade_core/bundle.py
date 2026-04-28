@@ -17,6 +17,7 @@ from .evaluation_gate import (
     EvaluationGateResult,
     _aggregate_runtime_contract_result,
     _build_evaluation_gate_result_from_raw_result,
+    _guard_evaluation_gate_result_from_raw_result,
 )
 from .models import (
     ArtifactHandoff,
@@ -48,6 +49,7 @@ from .models import (
 from .runtime_loop import audit_decision, decide
 from .state import RunState
 from .serialization import (
+    _serialize_runtime_fabric_guard_result,
     serialize_artifact_handoff,
     _serialize_aggregated_runtime_contract_gate,
     serialize_evaluation_gate_result,
@@ -220,37 +222,50 @@ def _guard_prepared_runtime_evaluation_fabric(
             "prepared_fabric.aggregated_contract_result must equal the aggregated component contract results",
         )
 
-    expected_evaluation_gate_result = _build_evaluation_gate_result_from_raw_result(
+    gate_errors = _guard_evaluation_gate_result_from_raw_result(
         prepared_fabric.aggregated_contract_result,
         prepared_fabric.raw_evaluation_result,
+        prepared_fabric.evaluation_gate_result,
     )
-    if prepared_fabric.evaluation_gate_result != expected_evaluation_gate_result:
+    if gate_errors:
         errors.append(
             "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
         )
-
-    if prepared_fabric.aggregated_contract_result.is_valid:
-        if (
-            prepared_fabric.raw_evaluation_result
-            != prepared_fabric.evaluation_gate_result.result
-        ):
-            errors.append(
-                "prepared_fabric.valid contracts must keep raw and gated evaluation results aligned",
-            )
-    else:
-        if prepared_fabric.evaluation_gate_result.result != "fail":
-            errors.append(
-                "prepared_fabric.invalid contracts must force the gated evaluation result to fail",
-            )
-        if (
-            prepared_fabric.evaluation_gate_result.errors
-            != prepared_fabric.aggregated_contract_result.errors
-        ):
-            errors.append(
-                "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
-            )
+        for gate_error in gate_errors:
+            if gate_error == (
+                "valid contracts must keep the evaluation gate result aligned with the raw result"
+            ):
+                errors.append(
+                    "prepared_fabric.valid contracts must keep raw and gated evaluation results aligned",
+                )
+            elif gate_error == (
+                "invalid contracts must force the evaluation gate result to fail"
+            ):
+                errors.append(
+                    "prepared_fabric.invalid contracts must force the gated evaluation result to fail",
+                )
+            elif gate_error == (
+                "invalid contracts must preserve contract errors in the evaluation gate result"
+            ):
+                errors.append(
+                    "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
+                )
 
     return tuple(errors)
+
+
+def _run_runtime_evaluation_fabric_guards(
+    prepared_fabric: _PreparedRuntimeEvaluationFabric,
+    runtime_evaluation_snapshot: Mapping[str, object],
+) -> Mapping[str, tuple[str, ...]]:
+    return {
+        "prepared_fabric_guard": _guard_prepared_runtime_evaluation_fabric(
+            prepared_fabric,
+        ),
+        "serialized_snapshot_guard": _guard_runtime_evaluation_fabric_snapshot(
+            runtime_evaluation_snapshot,
+        ),
+    }
 
 
 def _guard_runtime_evaluation_fabric_snapshot(
@@ -458,6 +473,22 @@ def _build_runtime_evaluation_gate_integration_snapshot(
         ],
         "raw_evaluation": serialized_fragments["raw_evaluation"],
         "evaluation_gate": serialized_fragments["evaluation_gate"],
+    }
+
+
+def _build_runtime_evaluation_guard_verification_snapshot(
+    runtime_evaluation_snapshot: Mapping[str, object],
+    prepared_fabric_guard_errors: tuple[str, ...],
+    serialized_snapshot_guard_errors: tuple[str, ...],
+) -> Mapping[str, object]:
+    return {
+        "runtime_evaluation": runtime_evaluation_snapshot,
+        "prepared_fabric_guard": _serialize_runtime_fabric_guard_result(
+            prepared_fabric_guard_errors,
+        ),
+        "serialized_snapshot_guard": _serialize_runtime_fabric_guard_result(
+            serialized_snapshot_guard_errors,
+        ),
     }
 
 

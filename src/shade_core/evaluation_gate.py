@@ -32,6 +32,43 @@ def _build_evaluation_gate_result_from_raw_result(
     )
 
 
+def _guard_evaluation_gate_result_from_raw_result(
+    contract_result: ContractGateResult,
+    raw_result: EvaluationResult,
+    evaluation_gate_result: EvaluationGateResult,
+) -> tuple[str, ...]:
+    errors: list[str] = []
+
+    if contract_result.is_valid:
+        if evaluation_gate_result.result != raw_result:
+            errors.append(
+                "valid contracts must keep the evaluation gate result aligned with the raw result",
+            )
+        if evaluation_gate_result.contract_valid is not True:
+            errors.append(
+                "valid contracts must mark the evaluation gate result as contract-valid",
+            )
+        if evaluation_gate_result.errors != ():
+            errors.append(
+                "valid contracts must keep evaluation gate errors empty",
+            )
+    else:
+        if evaluation_gate_result.result != "fail":
+            errors.append(
+                "invalid contracts must force the evaluation gate result to fail",
+            )
+        if evaluation_gate_result.contract_valid is not False:
+            errors.append(
+                "invalid contracts must mark the evaluation gate result as contract-invalid",
+            )
+        if evaluation_gate_result.errors != contract_result.errors:
+            errors.append(
+                "invalid contracts must preserve contract errors in the evaluation gate result",
+            )
+
+    return tuple(errors)
+
+
 def run_evaluation_gate(
     contract_result: ContractGateResult,
     decision: RuntimeDecision,

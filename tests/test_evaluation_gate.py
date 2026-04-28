@@ -2,6 +2,7 @@ from shade_core.contract_gate import ContractGateResult
 from shade_core.evaluation_gate import (
     _aggregate_runtime_contract_result,
     _build_evaluation_gate_result_from_raw_result,
+    _guard_evaluation_gate_result_from_raw_result,
     _run_runtime_evaluation_gate,
 )
 from shade_core import (
@@ -135,6 +136,33 @@ def test_run_evaluation_gate_matches_internal_raw_result_builder() -> None:
     ) == _build_evaluation_gate_result_from_raw_result(
         invalid_contract_result,
         "fail",
+    )
+
+
+def test_guard_evaluation_gate_result_from_raw_result_returns_no_errors_for_consistent_result() -> None:
+    contract_result = ContractGateResult(is_valid=True, errors=())
+
+    assert _guard_evaluation_gate_result_from_raw_result(
+        contract_result,
+        "review",
+        EvaluationGateResult(result="review", contract_valid=True, errors=()),
+    ) == ()
+
+
+def test_guard_evaluation_gate_result_from_raw_result_reports_invalid_contract_drift() -> None:
+    contract_result = ContractGateResult(
+        is_valid=False,
+        errors=("run_id is required",),
+    )
+
+    assert _guard_evaluation_gate_result_from_raw_result(
+        contract_result,
+        "pass",
+        EvaluationGateResult(result="review", contract_valid=True, errors=()),
+    ) == (
+        "invalid contracts must force the evaluation gate result to fail",
+        "invalid contracts must mark the evaluation gate result as contract-invalid",
+        "invalid contracts must preserve contract errors in the evaluation gate result",
     )
 
 
