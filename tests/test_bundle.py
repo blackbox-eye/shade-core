@@ -7,10 +7,13 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 from shade_core import (  # noqa: E402
+    ConfidenceRecord,
     EvaluationGateResult,
     MetaAuditEvent,
     RunState,
     RuntimeDecision,
+    SelfModel,
+    WorkerRegistry,
     build_bundle,
 )
 from shade_core.bundle import _build_audit_closure_snapshot  # noqa: E402
@@ -19,6 +22,7 @@ from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
+from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -141,6 +145,144 @@ def test_build_runtime_fabric_snapshot_returns_expected_structure() -> None:
             "result": "pass",
             "contract_valid": True,
             "errors": (),
+        },
+    }
+
+
+def test_build_runtime_contract_integration_snapshot_accepts_valid_runtime_inputs() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-accept")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    evaluation_gate_result = EvaluationGateResult(
+        result="pass",
+        contract_valid=True,
+        errors=(),
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+        evaluation_gate_result,
+    ) == {
+        "contract_gate": {
+            "self_model": {"is_valid": True, "errors": ()},
+            "worker_registry": {"is_valid": True, "errors": ()},
+            "confidence_record": {"is_valid": True, "errors": ()},
+            "state_contract": {"is_valid": True, "errors": ()},
+        },
+        "runtime_fabric": {
+            "run_state": {
+                "run_id": "run-1",
+                "worker_role": "control",
+                "decision_class": "accept",
+                "verification_state": "verified",
+                "artifact_ref": "artifact-1",
+                "source_lane": "analysis-lane",
+                "target_lane": "review-lane",
+            },
+            "artifact_handoff": {
+                "artifact_ref": "artifact-1",
+                "source_lane": "analysis-lane",
+                "target_lane": "review-lane",
+            },
+            "decision": {
+                "decision": "accept",
+                "reason": "Confidence 0.90 meets threshold",
+                "next_step": "continue",
+            },
+            "audit_event": {
+                "event_type": "runtime_decision",
+                "message": "accept: Confidence 0.90 meets threshold",
+                "severity": "info",
+                "reference": "ref-accept",
+                "run_id": "shade-v1",
+            },
+            "evaluation_gate": {
+                "result": "pass",
+                "contract_valid": True,
+                "errors": (),
+            },
+        },
+    }
+
+
+def test_build_runtime_contract_integration_snapshot_rejects_without_active_worker() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="analysis-worker", role="analysis", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-reject")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="reject",
+        verification_state="pending",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    evaluation_gate_result = EvaluationGateResult(
+        result="review",
+        contract_valid=True,
+        errors=(),
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+        evaluation_gate_result,
+    ) == {
+        "contract_gate": {
+            "self_model": {"is_valid": True, "errors": ()},
+            "worker_registry": {"is_valid": True, "errors": ()},
+            "confidence_record": {"is_valid": True, "errors": ()},
+            "state_contract": {"is_valid": True, "errors": ()},
+        },
+        "runtime_fabric": {
+            "run_state": {
+                "run_id": "run-1",
+                "worker_role": "control",
+                "decision_class": "reject",
+                "verification_state": "pending",
+                "artifact_ref": "artifact-1",
+                "source_lane": "analysis-lane",
+                "target_lane": "review-lane",
+            },
+            "artifact_handoff": {
+                "artifact_ref": "artifact-1",
+                "source_lane": "analysis-lane",
+                "target_lane": "review-lane",
+            },
+            "decision": {
+                "decision": "reject",
+                "reason": "No active worker for control",
+                "next_step": "stop",
+            },
+            "audit_event": {
+                "event_type": "runtime_decision",
+                "message": "reject: No active worker for control",
+                "severity": "error",
+                "reference": "ref-reject",
+                "run_id": "shade-v1",
+            },
+            "evaluation_gate": {
+                "result": "review",
+                "contract_valid": True,
+                "errors": (),
+            },
         },
     }
 
