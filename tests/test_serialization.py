@@ -1,3 +1,5 @@
+from shade_core.contract_gate import ContractGateResult
+from shade_core.evaluation_gate import EvaluationGateResult
 from shade_core import (  # noqa: E402
     MetaAuditEvent,
     RunState,
@@ -30,6 +32,8 @@ from shade_core.models import (
 )
 from shade_core.serialization import (
     serialize_artifact_handoff,
+    serialize_contract_gate_result,
+    serialize_evaluation_gate_result,
     serialize_orchestration_assertion,
     serialize_orchestration_audit,
     serialize_orchestration_closure,
@@ -123,6 +127,32 @@ def test_serialize_meta_audit_event() -> None:
 
 def test_serialize_evaluation_result() -> None:
     assert serialize_evaluation_result("review") == {"result": "review"}
+
+
+def test_serialize_contract_gate_result() -> None:
+    result = ContractGateResult(
+        is_valid=False,
+        errors=("run_id is required",),
+    )
+
+    assert serialize_contract_gate_result(result) == {
+        "is_valid": False,
+        "errors": ("run_id is required",),
+    }
+
+
+def test_serialize_evaluation_gate_result() -> None:
+    result = EvaluationGateResult(
+        result="review",
+        contract_valid=True,
+        errors=(),
+    )
+
+    assert serialize_evaluation_gate_result(result) == {
+        "result": "review",
+        "contract_valid": True,
+        "errors": (),
+    }
 
 
 def test_serialize_worker_task() -> None:

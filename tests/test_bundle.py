@@ -23,6 +23,7 @@ from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
+from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -283,6 +284,293 @@ def test_build_runtime_contract_integration_snapshot_rejects_without_active_work
                 "contract_valid": True,
                 "errors": (),
             },
+        },
+    }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_accepts_valid_runtime_inputs() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-accept")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    ) == {
+        "runtime_contract_integration": {
+            "contract_gate": {
+                "self_model": {"is_valid": True, "errors": ()},
+                "worker_registry": {"is_valid": True, "errors": ()},
+                "confidence_record": {"is_valid": True, "errors": ()},
+                "state_contract": {"is_valid": True, "errors": ()},
+            },
+            "runtime_fabric": {
+                "run_state": {
+                    "run_id": "run-1",
+                    "worker_role": "control",
+                    "decision_class": "accept",
+                    "verification_state": "verified",
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "artifact_handoff": {
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "decision": {
+                    "decision": "accept",
+                    "reason": "Confidence 0.90 meets threshold",
+                    "next_step": "continue",
+                },
+                "audit_event": {
+                    "event_type": "runtime_decision",
+                    "message": "accept: Confidence 0.90 meets threshold",
+                    "severity": "info",
+                    "reference": "ref-accept",
+                    "run_id": "shade-v1",
+                },
+                "evaluation_gate": {
+                    "result": "pass",
+                    "contract_valid": True,
+                    "errors": (),
+                },
+            },
+        },
+        "evaluation": {"result": "pass"},
+        "evaluation_gate": {
+            "result": "pass",
+            "contract_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_returns_review_path() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.4, "local", "unclear", "ref-review")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="needs_review",
+        verification_state="pending",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    ) == {
+        "runtime_contract_integration": {
+            "contract_gate": {
+                "self_model": {"is_valid": True, "errors": ()},
+                "worker_registry": {"is_valid": True, "errors": ()},
+                "confidence_record": {"is_valid": True, "errors": ()},
+                "state_contract": {"is_valid": True, "errors": ()},
+            },
+            "runtime_fabric": {
+                "run_state": {
+                    "run_id": "run-1",
+                    "worker_role": "control",
+                    "decision_class": "needs_review",
+                    "verification_state": "pending",
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "artifact_handoff": {
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "decision": {
+                    "decision": "needs_review",
+                    "reason": "Confidence 0.40 requires review",
+                    "next_step": "review",
+                },
+                "audit_event": {
+                    "event_type": "runtime_decision",
+                    "message": "needs_review: Confidence 0.40 requires review",
+                    "severity": "warning",
+                    "reference": "ref-review",
+                    "run_id": "shade-v1",
+                },
+                "evaluation_gate": {
+                    "result": "review",
+                    "contract_valid": True,
+                    "errors": (),
+                },
+            },
+        },
+        "evaluation": {"result": "review"},
+        "evaluation_gate": {
+            "result": "review",
+            "contract_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_returns_reject_path() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="analysis-worker", role="analysis", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-reject")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="reject",
+        verification_state="pending",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    ) == {
+        "runtime_contract_integration": {
+            "contract_gate": {
+                "self_model": {"is_valid": True, "errors": ()},
+                "worker_registry": {"is_valid": True, "errors": ()},
+                "confidence_record": {"is_valid": True, "errors": ()},
+                "state_contract": {"is_valid": True, "errors": ()},
+            },
+            "runtime_fabric": {
+                "run_state": {
+                    "run_id": "run-1",
+                    "worker_role": "control",
+                    "decision_class": "reject",
+                    "verification_state": "pending",
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "artifact_handoff": {
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "analysis-lane",
+                    "target_lane": "review-lane",
+                },
+                "decision": {
+                    "decision": "reject",
+                    "reason": "No active worker for control",
+                    "next_step": "stop",
+                },
+                "audit_event": {
+                    "event_type": "runtime_decision",
+                    "message": "reject: No active worker for control",
+                    "severity": "error",
+                    "reference": "ref-reject",
+                    "run_id": "shade-v1",
+                },
+                "evaluation_gate": {
+                    "result": "fail",
+                    "contract_valid": True,
+                    "errors": (),
+                },
+            },
+        },
+        "evaluation": {"result": "fail"},
+        "evaluation_gate": {
+            "result": "fail",
+            "contract_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_fails_for_invalid_contract() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-invalid")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+
+    assert _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    ) == {
+        "runtime_contract_integration": {
+            "contract_gate": {
+                "self_model": {"is_valid": True, "errors": ()},
+                "worker_registry": {"is_valid": True, "errors": ()},
+                "confidence_record": {"is_valid": True, "errors": ()},
+                "state_contract": {
+                    "is_valid": False,
+                    "errors": ("run_id is required", "source_lane is required"),
+                },
+            },
+            "runtime_fabric": {
+                "run_state": {
+                    "run_id": "",
+                    "worker_role": "control",
+                    "decision_class": "accept",
+                    "verification_state": "verified",
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "",
+                    "target_lane": "review-lane",
+                },
+                "artifact_handoff": {
+                    "artifact_ref": "artifact-1",
+                    "source_lane": "",
+                    "target_lane": "review-lane",
+                },
+                "decision": {
+                    "decision": "accept",
+                    "reason": "Confidence 0.90 meets threshold",
+                    "next_step": "continue",
+                },
+                "audit_event": {
+                    "event_type": "runtime_decision",
+                    "message": "accept: Confidence 0.90 meets threshold",
+                    "severity": "info",
+                    "reference": "ref-invalid",
+                    "run_id": "shade-v1",
+                },
+                "evaluation_gate": {
+                    "result": "fail",
+                    "contract_valid": False,
+                    "errors": ("run_id is required", "source_lane is required"),
+                },
+            },
+        },
+        "evaluation": {"result": "pass"},
+        "evaluation_gate": {
+            "result": "fail",
+            "contract_valid": False,
+            "errors": ("run_id is required", "source_lane is required"),
         },
     }
 

@@ -8,8 +8,8 @@ from .contract_gate import (
     validate_state_contract,
     validate_worker_registry,
 )
-from .evaluation import EvaluationResult
-from .evaluation_gate import EvaluationGateResult
+from .evaluation import EvaluationResult, evaluate
+from .evaluation_gate import EvaluationGateResult, _run_runtime_evaluation_gate
 from .models import (
     ArtifactHandoff,
     ConfidenceRecord,
@@ -41,6 +41,7 @@ from .runtime_loop import audit_decision, decide
 from .state import RunState
 from .serialization import (
     serialize_artifact_handoff,
+    serialize_contract_gate_result,
     serialize_evaluation_gate_result,
     serialize_evaluation_result,
     serialize_meta_audit_event,
@@ -108,27 +109,59 @@ def _build_runtime_contract_integration_snapshot(
 
     return {
         "contract_gate": {
-            "self_model": {
-                "is_valid": self_model_result.is_valid,
-                "errors": self_model_result.errors,
-            },
-            "worker_registry": {
-                "is_valid": worker_registry_result.is_valid,
-                "errors": worker_registry_result.errors,
-            },
-            "confidence_record": {
-                "is_valid": confidence_record_result.is_valid,
-                "errors": confidence_record_result.errors,
-            },
-            "state_contract": {
-                "is_valid": state_contract_result.is_valid,
-                "errors": state_contract_result.errors,
-            },
+            "self_model": serialize_contract_gate_result(self_model_result),
+            "worker_registry": serialize_contract_gate_result(
+                worker_registry_result,
+            ),
+            "confidence_record": serialize_contract_gate_result(
+                confidence_record_result,
+            ),
+            "state_contract": serialize_contract_gate_result(
+                state_contract_result,
+            ),
         },
         "runtime_fabric": _build_runtime_fabric_snapshot(
             state,
             decision,
             audit_event,
+            evaluation_gate_result,
+        ),
+    }
+
+
+def _build_runtime_evaluation_gate_integration_snapshot(
+    self_model: SelfModel,
+    registry: WorkerRegistry,
+    confidence: ConfidenceRecord,
+    state: RunState,
+) -> Mapping[str, object]:
+    self_model_result = validate_self_model(self_model)
+    worker_registry_result = validate_worker_registry(registry)
+    confidence_record_result = validate_confidence_record(confidence)
+    state_contract_result = validate_state_contract(state)
+
+    decision = decide(self_model, registry, confidence)
+    audit_event = audit_decision(self_model, decision, confidence)
+    evaluation_result = evaluate(decision, audit_event)
+    evaluation_gate_result = _run_runtime_evaluation_gate(
+        self_model_result,
+        worker_registry_result,
+        confidence_record_result,
+        state_contract_result,
+        decision,
+        audit_event,
+    )
+
+    return {
+        "runtime_contract_integration": _build_runtime_contract_integration_snapshot(
+            self_model,
+            registry,
+            confidence,
+            state,
+            evaluation_gate_result,
+        ),
+        "evaluation": serialize_evaluation_result(evaluation_result),
+        "evaluation_gate": serialize_evaluation_gate_result(
             evaluation_gate_result,
         ),
     }

@@ -18,13 +18,16 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Runtime decision slice    | `src/shade_core/runtime_loop.py`    | Implemented, internal module and re-exported through the root package | `tests/test_runtime_loop.py`    |
 | Evaluation                | `src/shade_core/evaluation.py`      | Implemented, internal module and re-exported through the root package | `tests/test_evaluation.py`      |
 | Evaluation gate           | `src/shade_core/evaluation_gate.py` | Implemented, internal module and re-exported through the root package | `tests/test_evaluation_gate.py` |
+| Runtime gate aggregation  | `src/shade_core/evaluation_gate.py` | Implemented as one internal helper aggregating runtime contract results before evaluation gate execution | `tests/test_evaluation_gate.py` |
 | Serialization             | `src/shade_core/serialization.py`   | Implemented, internal module and re-exported through the root package | `tests/test_serialization.py`   |
+| Contract gate serialization | `src/shade_core/serialization.py` | Implemented as one internal serializer for contract gate results      | `tests/test_serialization.py`   |
 | Handoff serialization     | `src/shade_core/serialization.py`   | Implemented as one internal serializer for the neutral handoff fields | `tests/test_serialization.py`   |
 | State serialization       | `src/shade_core/serialization.py`   | Implemented as one internal serializer for current run state          | `tests/test_bundle.py`          |
 | Evaluation gate snapshot  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for evaluation gate results    | `tests/test_bundle.py`          |
 | Bundle output             | `src/shade_core/bundle.py`          | Implemented, internal module and re-exported through the root package | `tests/test_bundle.py`          |
 | Runtime fabric snapshot   | `src/shade_core/bundle.py`          | Implemented as one internal helper for a consolidated runtime view    | `tests/test_bundle.py`          |
 | Runtime integration gate  | `src/shade_core/bundle.py`          | Implemented as one internal helper composing runtime contract validation and runtime fabric snapshot | `tests/test_bundle.py`          |
+| Runtime evaluation gate integration | `src/shade_core/bundle.py` | Implemented as one internal helper composing runtime integration, evaluation, and evaluation gate output | `tests/test_bundle.py`          |
 | Worker task contract      | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Worker result contract    | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |
 | Task route contract       | `src/shade_core/models.py`          | Implemented as one internal typed boundary object; not re-exported    | `tests/test_models.py`          |

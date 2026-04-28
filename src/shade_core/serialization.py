@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .contract_gate import ContractGateResult
 from .evaluation import EvaluationResult
 from .evaluation_gate import EvaluationGateResult
 from .models import (
@@ -69,6 +70,15 @@ def serialize_meta_audit_event(event: MetaAuditEvent) -> dict[str, str]:
 
 def serialize_evaluation_result(result: EvaluationResult) -> dict[str, str]:
     return {"result": result}
+
+
+def serialize_contract_gate_result(
+    result: ContractGateResult,
+) -> dict[str, object]:
+    return {
+        "is_valid": result.is_valid,
+        "errors": result.errors,
+    }
 
 
 def serialize_evaluation_gate_result(
