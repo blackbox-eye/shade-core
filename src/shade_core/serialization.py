@@ -127,7 +127,7 @@ def _serialize_aggregated_runtime_contract_gate(
     }
 
 
-def _serialize_runtime_fabric_guard_result(
+def _serialize_runtime_fabric_contract_result(
     errors: tuple[str, ...] | list[str],
 ) -> dict[str, object]:
     normalized_errors = tuple(errors)
@@ -135,6 +135,54 @@ def _serialize_runtime_fabric_guard_result(
     return {
         "is_valid": not normalized_errors,
         "errors": normalized_errors,
+    }
+
+
+def _serialize_runtime_fabric_guard_result(
+    errors: tuple[str, ...] | list[str],
+) -> dict[str, object]:
+    return _serialize_runtime_fabric_contract_result(errors)
+
+
+def _serialize_runtime_fabric_verification_contract_result(
+    errors: tuple[str, ...] | list[str],
+) -> dict[str, object]:
+    return _serialize_runtime_fabric_contract_result(errors)
+
+
+def _serialize_runtime_fabric_verification_summary(
+    summary: Mapping[str, object],
+) -> dict[str, object]:
+    evaluation_gate_alignment = summary.get("evaluation_gate_alignment")
+    if evaluation_gate_alignment not in {"aligned", "fail_closed", "drifted"}:
+        evaluation_gate_alignment = "drifted"
+
+    verification_status = summary.get("verification_status")
+    if verification_status not in {"verified", "failed"}:
+        verification_status = "failed"
+
+    return {
+        "prepared_fabric_guard_valid": summary.get("prepared_fabric_guard_valid")
+        is True,
+        "serialized_snapshot_guard_valid": summary.get(
+            "serialized_snapshot_guard_valid",
+        )
+        is True,
+        "runtime_evaluation_consistent": summary.get(
+            "runtime_evaluation_consistent",
+        )
+        is True,
+        "runtime_contract_valid": summary.get("runtime_contract_valid") is True,
+        "evaluation_gate_alignment": evaluation_gate_alignment,
+        "aggregated_contract_gate_aligned": summary.get(
+            "aggregated_contract_gate_aligned",
+        )
+        is True,
+        "nested_evaluation_gate_aligned": summary.get(
+            "nested_evaluation_gate_aligned",
+        )
+        is True,
+        "verification_status": verification_status,
     }
 
 

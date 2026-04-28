@@ -33,6 +33,8 @@ from shade_core.models import (
 from shade_core.serialization import (
     _serialize_aggregated_runtime_contract_gate,
     _serialize_runtime_fabric_guard_result,
+    _serialize_runtime_fabric_verification_contract_result,
+    _serialize_runtime_fabric_verification_summary,
     serialize_artifact_handoff,
     serialize_contract_gate_result,
     serialize_evaluation_gate_result,
@@ -229,6 +231,43 @@ def test_serialize_runtime_fabric_guard_result_normalizes_error_order() -> None:
     ) == {
         "is_valid": False,
         "errors": ("prepared error", "snapshot error"),
+    }
+
+
+def test_serialize_runtime_fabric_verification_summary_returns_expected_shape() -> None:
+    assert _serialize_runtime_fabric_verification_summary(
+        {
+            "prepared_fabric_guard_valid": True,
+            "serialized_snapshot_guard_valid": True,
+            "runtime_evaluation_consistent": False,
+            "runtime_contract_valid": False,
+            "evaluation_gate_alignment": "fail_closed",
+            "aggregated_contract_gate_aligned": True,
+            "nested_evaluation_gate_aligned": False,
+            "verification_status": "failed",
+        },
+    ) == {
+        "prepared_fabric_guard_valid": True,
+        "serialized_snapshot_guard_valid": True,
+        "runtime_evaluation_consistent": False,
+        "runtime_contract_valid": False,
+        "evaluation_gate_alignment": "fail_closed",
+        "aggregated_contract_gate_aligned": True,
+        "nested_evaluation_gate_aligned": False,
+        "verification_status": "failed",
+    }
+
+
+def test_serialize_runtime_fabric_verification_contract_result_normalizes_errors() -> None:
+    assert _serialize_runtime_fabric_verification_contract_result(()) == {
+        "is_valid": True,
+        "errors": (),
+    }
+    assert _serialize_runtime_fabric_verification_contract_result(
+        ["summary mismatch", "guard mapping malformed"],
+    ) == {
+        "is_valid": False,
+        "errors": ("summary mismatch", "guard mapping malformed"),
     }
 
 
