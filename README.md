@@ -7,7 +7,7 @@ It combines a small inspectable Python package with tests and repo-facing docume
 
 - The repository currently ships a minimal Python contract core under `src/shade_core/`, repository tests under `tests/`, and supporting architecture, governance, QA, onboarding, and release documentation under `docs/`.
 - The implemented Python surface is intentionally narrow and reviewable; it does not claim full runtime orchestration or production integration.
-- The current baseline after Cycle 5 Bundle 3 is `157 passed` from `python -m pytest`.
+- The current baseline after post-foundation cycle 5 is `157 passed` from `python -m pytest`.
 - The broader V1 architecture documents remain target-boundary references beyond the currently implemented runtime slice.
 
 ## Current Python core
@@ -15,7 +15,7 @@ It combines a small inspectable Python package with tests and repo-facing docume
 - Contract models: internal typed dataclasses define the current runtime and orchestration-facing contract boundaries.
 - Run state: one internal run-state contract supports runtime/evaluation snapshot assembly.
 - Contract validation: contract-gate validators check current runtime inputs and state contracts.
-- Runtime decision slice: the implemented decision path produces deterministic accept, needs-review, and reject decisions plus audit events.
+- Runtime decision slice: the implemented decision path produces deterministic accept, needs_review, and reject decisions plus audit events.
 - Evaluation: raw evaluation derives a result from the runtime decision and audit severity.
 - Evaluation gate: contract-aware gating keeps valid raw evaluation results and fails closed when contract inputs are invalid.
 - Serialization: internal serializers convert current contracts and results into plain inspectable dictionaries.
@@ -41,7 +41,7 @@ It combines a small inspectable Python package with tests and repo-facing docume
 
 ## Local validation
 
-- `python -m pytest -q`
+- `python -m pytest`
 
 ## Working mode
 
