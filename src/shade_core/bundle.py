@@ -250,6 +250,10 @@ def _guard_prepared_runtime_evaluation_fabric(
                 errors.append(
                     "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
                 )
+            else:
+                errors.append(
+                    f"prepared_fabric.evaluation_gate_result guard error: {gate_error}",
+                )
 
     return tuple(errors)
 

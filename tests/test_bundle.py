@@ -1309,6 +1309,7 @@ def test_guard_prepared_runtime_evaluation_fabric_detects_mutated_contract_align
         "prepared_fabric.aggregated_contract_result must equal the aggregated component contract results",
         "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
         "prepared_fabric.invalid contracts must force the gated evaluation result to fail",
+        "prepared_fabric.evaluation_gate_result guard error: invalid contracts must mark the evaluation gate result as contract-invalid",
         "prepared_fabric.invalid contracts must preserve aggregated contract errors in the gated evaluation result",
     )
 
@@ -1350,6 +1351,111 @@ def test_guard_prepared_runtime_evaluation_fabric_detects_invalid_decision_and_a
     ) == (
         "prepared_fabric.decision must satisfy the runtime decision contract",
         "prepared_fabric.audit_event must satisfy the meta audit contract",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_valid_contract_contract_valid_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-contract-valid")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                contract_valid=False,
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: valid contracts must mark the evaluation gate result as contract-valid",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_valid_contract_errors_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-gate-errors")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                errors=("unexpected error",),
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: valid contracts must keep evaluation gate errors empty",
+    )
+
+
+def test_guard_prepared_runtime_evaluation_fabric_preserves_invalid_contract_contract_valid_guard_error() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert _guard_prepared_runtime_evaluation_fabric(
+        replace(
+            prepared_fabric,
+            evaluation_gate_result=replace(
+                prepared_fabric.evaluation_gate_result,
+                contract_valid=True,
+            ),
+        ),
+    ) == (
+        "prepared_fabric.evaluation_gate_result must match the aggregated contract result and raw evaluation result",
+        "prepared_fabric.evaluation_gate_result guard error: invalid contracts must mark the evaluation gate result as contract-invalid",
     )
 
 
