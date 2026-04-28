@@ -81,6 +81,26 @@ def serialize_contract_gate_result(
     }
 
 
+def serialize_runtime_contract_gate(
+    self_model_result: ContractGateResult,
+    worker_registry_result: ContractGateResult,
+    confidence_record_result: ContractGateResult,
+    state_contract_result: ContractGateResult,
+) -> dict[str, dict[str, object]]:
+    return {
+        "self_model": serialize_contract_gate_result(self_model_result),
+        "worker_registry": serialize_contract_gate_result(
+            worker_registry_result,
+        ),
+        "confidence_record": serialize_contract_gate_result(
+            confidence_record_result,
+        ),
+        "state_contract": serialize_contract_gate_result(
+            state_contract_result,
+        ),
+    }
+
+
 def serialize_evaluation_gate_result(
     result: EvaluationGateResult,
 ) -> dict[str, object]:
