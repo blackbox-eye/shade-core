@@ -12,6 +12,8 @@
 - Six foundation build bundles have been completed and merged to `main`; `main` passes the baseline `python -m pytest` check.
 - The first completed post-foundation 3-bundle cycle has been merged to `main`.
 - The second completed post-foundation 3-bundle cycle has been merged to `main`.
+- The third completed post-foundation 3-bundle cycle has been merged to `main`.
+- The fourth completed post-foundation 3-bundle cycle has been merged to `main`.
 
 ## Checkpoint
 
@@ -22,6 +24,8 @@ The first completed post-foundation 3-bundle cycle is recorded in `docs/releases
 The second completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-2.md`.
 
 The third completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-3.md`.
+
+The fourth completed post-foundation 3-bundle cycle is recorded in `docs/releases/checkpoint-post-foundation-cycle-4.md`.
 
 ## Constraints
 
