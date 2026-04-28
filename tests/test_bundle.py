@@ -375,6 +375,85 @@ def test_build_runtime_contract_integration_snapshot_rejects_without_active_work
     }
 
 
+def test_build_runtime_contract_integration_snapshot_skips_top_level_serializers(
+    monkeypatch,
+) -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-minimal")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    captured = {"evaluation_gate_arg": None}
+
+    def fail_aggregated_serializer(*_args, **_kwargs):
+        raise AssertionError("aggregated contract gate should not serialize")
+
+    def fail_raw_evaluation_serializer(*_args, **_kwargs):
+        raise AssertionError("raw evaluation should not serialize")
+
+    def fail_top_level_evaluation_gate_serializer(*_args, **_kwargs):
+        raise AssertionError("top-level evaluation gate should not serialize")
+
+    def fake_runtime_contract_gate(*_args, **_kwargs):
+        return {"contract_gate": "sentinel"}
+
+    def fake_runtime_fabric(state_arg, decision_arg, audit_event_arg, evaluation_gate_arg):
+        captured["evaluation_gate_arg"] = evaluation_gate_arg
+        assert state_arg is state
+        assert decision_arg is prepared_fabric.decision
+        assert audit_event_arg is prepared_fabric.audit_event
+        return {"runtime_fabric": "sentinel"}
+
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_contract_gate_result",
+        fail_aggregated_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_evaluation_result",
+        fail_raw_evaluation_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_evaluation_gate_result",
+        fail_top_level_evaluation_gate_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_runtime_contract_gate",
+        fake_runtime_contract_gate,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "_build_runtime_fabric_snapshot",
+        fake_runtime_fabric,
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        state,
+        prepared_fabric,
+    ) == {
+        "contract_gate": {"contract_gate": "sentinel"},
+        "runtime_fabric": {"runtime_fabric": "sentinel"},
+    }
+    assert captured["evaluation_gate_arg"] is prepared_fabric.evaluation_gate_result
+
+
 def test_build_runtime_evaluation_gate_integration_snapshot_accepts_valid_runtime_inputs() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
@@ -667,6 +746,197 @@ def test_build_runtime_evaluation_gate_integration_snapshot_fails_for_invalid_co
             "errors": ("run_id is required", "source_lane is required"),
         },
     }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_keeps_valid_results_in_sync() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    valid_scenarios = (
+        (
+            ("control-worker", "control", "active"),
+            ConfidenceRecord(0.9, "local", "clear", "ref-pass"),
+            RunState(
+                run_id="run-pass",
+                worker_role="control",
+                decision_class="accept",
+                verification_state="verified",
+                artifact_ref="artifact-1",
+                source_lane="analysis-lane",
+                target_lane="review-lane",
+            ),
+            "pass",
+        ),
+        (
+            ("control-worker", "control", "active"),
+            ConfidenceRecord(0.4, "local", "unclear", "ref-review"),
+            RunState(
+                run_id="run-review",
+                worker_role="control",
+                decision_class="needs_review",
+                verification_state="pending",
+                artifact_ref="artifact-1",
+                source_lane="analysis-lane",
+                target_lane="review-lane",
+            ),
+            "review",
+        ),
+        (
+            ("analysis-worker", "analysis", "active"),
+            ConfidenceRecord(0.9, "local", "clear", "ref-fail"),
+            RunState(
+                run_id="run-fail",
+                worker_role="control",
+                decision_class="reject",
+                verification_state="pending",
+                artifact_ref="artifact-1",
+                source_lane="analysis-lane",
+                target_lane="review-lane",
+            ),
+            "fail",
+        ),
+    )
+
+    for worker_entry, confidence, state, expected_result in valid_scenarios:
+        registry = WorkerRegistry()
+        registry.register(
+            name=worker_entry[0],
+            role=worker_entry[1],
+            status=worker_entry[2],
+        )
+
+        snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+            self_model,
+            registry,
+            confidence,
+            state,
+        )
+
+        assert snapshot["aggregated_contract_gate"] == {
+            "is_valid": True,
+            "errors": (),
+        }
+        assert snapshot["runtime_contract_integration"]["runtime_fabric"][
+            "evaluation_gate"
+        ] == snapshot["evaluation_gate"]
+        assert snapshot["raw_evaluation"]["result"] == expected_result
+        assert snapshot["evaluation_gate"]["result"] == expected_result
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_uses_stable_invalid_aggregation() -> None:
+    self_model = SelfModel(agent_id="", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+
+    snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    nested_contract_gate = snapshot["runtime_contract_integration"][
+        "contract_gate"
+    ]
+
+    assert snapshot["runtime_contract_integration"]["runtime_fabric"][
+        "evaluation_gate"
+    ] == snapshot["evaluation_gate"]
+    assert snapshot["aggregated_contract_gate"] == {
+        "is_valid": False,
+        "errors": (
+            *nested_contract_gate["self_model"]["errors"],
+            *nested_contract_gate["worker_registry"]["errors"],
+            *nested_contract_gate["confidence_record"]["errors"],
+            *nested_contract_gate["state_contract"]["errors"],
+        ),
+    }
+    assert snapshot["aggregated_contract_gate"]["errors"] == (
+        "agent_id is required",
+        "reference is required",
+        "run_id is required",
+        "source_lane is required",
+    )
+    assert snapshot["raw_evaluation"] == {"result": "pass"}
+    assert snapshot["evaluation_gate"] == {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": (
+            "agent_id is required",
+            "reference is required",
+            "run_id is required",
+            "source_lane is required",
+        ),
+    }
+
+
+def test_build_runtime_evaluation_gate_integration_snapshot_serializes_shared_fragments_once(
+    monkeypatch,
+) -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-once")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    call_counts = {"evaluation_gate": 0, "contract_gate": 0}
+    original_evaluation_gate_serializer = bundle_module.serialize_evaluation_gate_result
+    original_contract_gate_serializer = bundle_module.serialize_runtime_contract_gate
+
+    def counted_evaluation_gate_serializer(result):
+        call_counts["evaluation_gate"] += 1
+        return original_evaluation_gate_serializer(result)
+
+    def counted_contract_gate_serializer(
+        self_model_result,
+        worker_registry_result,
+        confidence_record_result,
+        state_contract_result,
+    ):
+        call_counts["contract_gate"] += 1
+        return original_contract_gate_serializer(
+            self_model_result,
+            worker_registry_result,
+            confidence_record_result,
+            state_contract_result,
+        )
+
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_evaluation_gate_result",
+        counted_evaluation_gate_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_runtime_contract_gate",
+        counted_contract_gate_serializer,
+    )
+
+    snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+
+    assert call_counts == {"evaluation_gate": 1, "contract_gate": 1}
+    assert snapshot["runtime_contract_integration"]["runtime_fabric"][
+        "evaluation_gate"
+    ] == snapshot["evaluation_gate"]
 
 
 def test_build_orchestration_contract_snapshot_returns_expected_structure() -> None:

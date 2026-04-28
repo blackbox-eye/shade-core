@@ -7,6 +7,7 @@ from shade_core import (
     EvaluationGateResult,
     MetaAuditEvent,
     RuntimeDecision,
+    evaluate,
     run_evaluation_gate,
 )
 
@@ -218,6 +219,67 @@ def test_run_runtime_evaluation_gate_returns_fail_for_reject_path() -> None:
         contract_valid=True,
         errors=(),
     )
+
+
+def test_run_runtime_evaluation_gate_matches_raw_evaluate_for_valid_contracts() -> None:
+    valid_scenarios = (
+        (
+            RuntimeDecision(
+                decision="accept",
+                reason="Confidence 0.90 meets threshold",
+                next_step="continue",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="accept: Confidence 0.90 meets threshold",
+                severity="info",
+                reference="ref-pass",
+                run_id="shade-v1",
+            ),
+        ),
+        (
+            RuntimeDecision(
+                decision="needs_review",
+                reason="Confidence 0.40 requires review",
+                next_step="review",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="needs_review: Confidence 0.40 requires review",
+                severity="warning",
+                reference="ref-review",
+                run_id="shade-v1",
+            ),
+        ),
+        (
+            RuntimeDecision(
+                decision="reject",
+                reason="No active worker for control",
+                next_step="stop",
+            ),
+            MetaAuditEvent(
+                event_type="runtime_decision",
+                message="reject: No active worker for control",
+                severity="error",
+                reference="ref-reject",
+                run_id="shade-v1",
+            ),
+        ),
+    )
+
+    for decision, event in valid_scenarios:
+        result = _run_runtime_evaluation_gate(
+            ContractGateResult(is_valid=True, errors=()),
+            ContractGateResult(is_valid=True, errors=()),
+            ContractGateResult(is_valid=True, errors=()),
+            ContractGateResult(is_valid=True, errors=()),
+            decision,
+            event,
+        )
+
+        assert result.result == evaluate(decision, event)
+        assert result.contract_valid is True
+        assert result.errors == ()
 
 
 def test_run_runtime_evaluation_gate_fails_for_invalid_contracts() -> None:

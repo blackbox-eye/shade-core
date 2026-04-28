@@ -66,6 +66,7 @@ from .serialization import (
     serialize_orchestration_verification,
     serialize_run_state,
     serialize_run_transition,
+    serialize_runtime_contract_gate,
     serialize_runtime_decision,
     serialize_task_route,
     serialize_task_transition,
@@ -91,8 +92,15 @@ def _build_runtime_fabric_snapshot(
     state: RunState,
     decision: RuntimeDecision,
     audit_event: MetaAuditEvent,
-    evaluation_gate_result: EvaluationGateResult,
+    evaluation_gate_result: EvaluationGateResult | Mapping[str, object],
 ) -> Mapping[str, Mapping[str, object]]:
+    if isinstance(evaluation_gate_result, EvaluationGateResult):
+        serialized_evaluation_gate = serialize_evaluation_gate_result(
+            evaluation_gate_result,
+        )
+    else:
+        serialized_evaluation_gate = dict(evaluation_gate_result)
+
     handoff = ArtifactHandoff(
         artifact_ref=state.artifact_ref,
         source_lane=state.source_lane,
@@ -104,9 +112,38 @@ def _build_runtime_fabric_snapshot(
         "artifact_handoff": serialize_artifact_handoff(handoff),
         "decision": serialize_runtime_decision(decision),
         "audit_event": serialize_meta_audit_event(audit_event),
-        "evaluation_gate": serialize_evaluation_gate_result(
-            evaluation_gate_result,
+        "evaluation_gate": serialized_evaluation_gate,
+    }
+
+
+def _serialize_runtime_evaluation_fabric_fragments(
+    state: RunState,
+    prepared_fabric: _PreparedRuntimeEvaluationFabric,
+) -> Mapping[str, object]:
+    serialized_evaluation_gate = serialize_evaluation_gate_result(
+        prepared_fabric.evaluation_gate_result,
+    )
+
+    return {
+        "contract_gate": serialize_runtime_contract_gate(
+            prepared_fabric.self_model_result,
+            prepared_fabric.worker_registry_result,
+            prepared_fabric.confidence_record_result,
+            prepared_fabric.state_contract_result,
         ),
+        "runtime_fabric": _build_runtime_fabric_snapshot(
+            state,
+            prepared_fabric.decision,
+            prepared_fabric.audit_event,
+            serialized_evaluation_gate,
+        ),
+        "aggregated_contract_gate": serialize_contract_gate_result(
+            prepared_fabric.aggregated_contract_result,
+        ),
+        "raw_evaluation": serialize_evaluation_result(
+            prepared_fabric.raw_evaluation_result,
+        ),
+        "evaluation_gate": serialized_evaluation_gate,
     }
 
 
@@ -158,28 +195,27 @@ def _prepare_runtime_evaluation_fabric(
 def _build_runtime_contract_integration_snapshot(
     state: RunState,
     prepared_fabric: _PreparedRuntimeEvaluationFabric,
+    serialized_fragments: Mapping[str, object] | None = None,
 ) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
-    return {
-        "contract_gate": {
-            "self_model": serialize_contract_gate_result(
+    if serialized_fragments is None:
+        return {
+            "contract_gate": serialize_runtime_contract_gate(
                 prepared_fabric.self_model_result,
-            ),
-            "worker_registry": serialize_contract_gate_result(
                 prepared_fabric.worker_registry_result,
-            ),
-            "confidence_record": serialize_contract_gate_result(
                 prepared_fabric.confidence_record_result,
-            ),
-            "state_contract": serialize_contract_gate_result(
                 prepared_fabric.state_contract_result,
             ),
-        },
-        "runtime_fabric": _build_runtime_fabric_snapshot(
-            state,
-            prepared_fabric.decision,
-            prepared_fabric.audit_event,
-            prepared_fabric.evaluation_gate_result,
-        ),
+            "runtime_fabric": _build_runtime_fabric_snapshot(
+                state,
+                prepared_fabric.decision,
+                prepared_fabric.audit_event,
+                prepared_fabric.evaluation_gate_result,
+            ),
+        }
+
+    return {
+        "contract_gate": serialized_fragments["contract_gate"],
+        "runtime_fabric": serialized_fragments["runtime_fabric"],
     }
 
 
@@ -195,21 +231,22 @@ def _build_runtime_evaluation_gate_integration_snapshot(
         confidence,
         state,
     )
+    serialized_fragments = _serialize_runtime_evaluation_fabric_fragments(
+        state,
+        prepared_fabric,
+    )
 
     return {
         "runtime_contract_integration": _build_runtime_contract_integration_snapshot(
             state,
             prepared_fabric,
+            serialized_fragments,
         ),
-        "aggregated_contract_gate": serialize_contract_gate_result(
-            prepared_fabric.aggregated_contract_result,
-        ),
-        "raw_evaluation": serialize_evaluation_result(
-            prepared_fabric.raw_evaluation_result,
-        ),
-        "evaluation_gate": serialize_evaluation_gate_result(
-            prepared_fabric.evaluation_gate_result,
-        ),
+        "aggregated_contract_gate": serialized_fragments[
+            "aggregated_contract_gate"
+        ],
+        "raw_evaluation": serialized_fragments["raw_evaluation"],
+        "evaluation_gate": serialized_fragments["evaluation_gate"],
     }
 
 

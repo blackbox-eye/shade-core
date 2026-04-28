@@ -49,6 +49,7 @@ from shade_core.serialization import (
     serialize_orchestration_review,
     serialize_orchestration_verification,
     serialize_run_state,
+    serialize_runtime_contract_gate,
     serialize_run_transition,
     serialize_task_route,
     serialize_task_transition,
@@ -138,6 +139,32 @@ def test_serialize_contract_gate_result() -> None:
     assert serialize_contract_gate_result(result) == {
         "is_valid": False,
         "errors": ("run_id is required", "source_lane is required"),
+    }
+
+
+def test_serialize_runtime_contract_gate() -> None:
+    assert serialize_runtime_contract_gate(
+        ContractGateResult(is_valid=False, errors=("agent_id is required",)),
+        ContractGateResult(is_valid=True, errors=()),
+        ContractGateResult(is_valid=False, errors=("reference is required",)),
+        ContractGateResult(
+            is_valid=False,
+            errors=("run_id is required", "source_lane is required"),
+        ),
+    ) == {
+        "self_model": {
+            "is_valid": False,
+            "errors": ("agent_id is required",),
+        },
+        "worker_registry": {"is_valid": True, "errors": ()},
+        "confidence_record": {
+            "is_valid": False,
+            "errors": ("reference is required",),
+        },
+        "state_contract": {
+            "is_valid": False,
+            "errors": ("run_id is required", "source_lane is required"),
+        },
     }
 
 
