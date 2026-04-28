@@ -19,20 +19,20 @@ def decide(
     if not _has_active_worker(registry, self_model.role):
         return RuntimeDecision(
             decision="reject",
-            reason=f"Ingen aktiv worker for {self_model.role}",
+            reason=f"No active worker for {self_model.role}",
             next_step="stop",
         )
 
     if confidence.score >= CONFIDENCE_THRESHOLD:
         return RuntimeDecision(
             decision="accept",
-            reason=f"Confidence {confidence.score:.2f} er høj nok",
+            reason=f"Confidence {confidence.score:.2f} meets threshold",
             next_step="continue",
         )
 
     return RuntimeDecision(
         decision="needs_review",
-        reason=f"Confidence {confidence.score:.2f} kræver review",
+        reason=f"Confidence {confidence.score:.2f} requires review",
         next_step="review",
     )
 

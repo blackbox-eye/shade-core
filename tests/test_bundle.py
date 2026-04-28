@@ -47,12 +47,12 @@ from shade_core.models import (  # noqa: E402
 def test_build_bundle_returns_expected_structure() -> None:
     decision = RuntimeDecision(
         decision="accept",
-        reason="clear",
+        reason="Confidence 0.90 meets threshold",
         next_step="continue",
     )
     event = MetaAuditEvent(
         event_type="runtime_decision",
-        message="accept: clear",
+        message="accept: Confidence 0.90 meets threshold",
         severity="info",
         reference="ref-1",
         run_id="run-1",
@@ -61,12 +61,12 @@ def test_build_bundle_returns_expected_structure() -> None:
     assert build_bundle(decision, event, "pass") == {
         "decision": {
             "decision": "accept",
-            "reason": "clear",
+            "reason": "Confidence 0.90 meets threshold",
             "next_step": "continue",
         },
         "audit_event": {
             "event_type": "runtime_decision",
-            "message": "accept: clear",
+            "message": "accept: Confidence 0.90 meets threshold",
             "severity": "info",
             "reference": "ref-1",
             "run_id": "run-1",
@@ -89,12 +89,12 @@ def test_build_runtime_fabric_snapshot_returns_expected_structure() -> None:
     )
     decision = RuntimeDecision(
         decision="accept",
-        reason="clear",
+        reason="Confidence 0.90 meets threshold",
         next_step="continue",
     )
     event = MetaAuditEvent(
         event_type="runtime_decision",
-        message="accept: clear",
+        message="accept: Confidence 0.90 meets threshold",
         severity="info",
         reference="ref-1",
         run_id="run-1",
@@ -127,12 +127,12 @@ def test_build_runtime_fabric_snapshot_returns_expected_structure() -> None:
         },
         "decision": {
             "decision": "accept",
-            "reason": "clear",
+            "reason": "Confidence 0.90 meets threshold",
             "next_step": "continue",
         },
         "audit_event": {
             "event_type": "runtime_decision",
-            "message": "accept: clear",
+            "message": "accept: Confidence 0.90 meets threshold",
             "severity": "info",
             "reference": "ref-1",
             "run_id": "run-1",
