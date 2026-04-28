@@ -1,5 +1,6 @@
 from shade_core import (  # noqa: E402
     MetaAuditEvent,
+    RunState,
     RuntimeDecision,
     serialize_evaluation_result,
     serialize_meta_audit_event,
@@ -43,6 +44,7 @@ from shade_core.serialization import (
     serialize_orchestration_release_view,
     serialize_orchestration_review,
     serialize_orchestration_verification,
+    serialize_run_state,
     serialize_run_transition,
     serialize_task_route,
     serialize_task_transition,
@@ -62,6 +64,28 @@ def test_serialize_runtime_decision() -> None:
         "decision": "accept",
         "reason": "clear",
         "next_step": "continue",
+    }
+
+
+def test_serialize_run_state() -> None:
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+
+    assert serialize_run_state(state) == {
+        "run_id": "run-1",
+        "worker_role": "control",
+        "decision_class": "accept",
+        "verification_state": "verified",
+        "artifact_ref": "artifact-1",
+        "source_lane": "analysis-lane",
+        "target_lane": "review-lane",
     }
 
 
