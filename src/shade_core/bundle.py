@@ -50,7 +50,6 @@ from .state import RunState
 from .serialization import (
     serialize_artifact_handoff,
     _serialize_aggregated_runtime_contract_gate,
-    serialize_contract_gate_result,
     serialize_evaluation_gate_result,
     serialize_evaluation_result,
     serialize_meta_audit_event,
@@ -258,6 +257,26 @@ def _guard_runtime_evaluation_fabric_snapshot(
     snapshot: Mapping[str, object],
 ) -> tuple[str, ...]:
     errors: list[str] = []
+    expected_contract_gate_keys = (
+        "self_model",
+        "worker_registry",
+        "confidence_record",
+        "state_contract",
+    )
+
+    def _normalize_errors_value(
+        value: object,
+        path: str,
+    ) -> tuple[object, ...]:
+        if isinstance(value, tuple):
+            return value
+        if isinstance(value, list):
+            return tuple(value)
+        if value is None:
+            return ()
+
+        errors.append(f"{path} must be a tuple, list, or None")
+        return ()
 
     runtime_contract_integration = snapshot.get("runtime_contract_integration")
     if not isinstance(runtime_contract_integration, Mapping):
@@ -272,6 +291,23 @@ def _guard_runtime_evaluation_fabric_snapshot(
         )
         contract_gate = {}
 
+    sanitized_contract_gate: dict[str, dict[str, object]] = {}
+    for key in expected_contract_gate_keys:
+        nested_entry = contract_gate.get(key)
+        if not isinstance(nested_entry, Mapping):
+            errors.append(
+                f"snapshot.runtime_contract_integration.contract_gate.{key} must be a mapping",
+            )
+            sanitized_contract_gate[key] = {}
+            continue
+
+        sanitized_nested_entry = dict(nested_entry)
+        sanitized_nested_entry["errors"] = _normalize_errors_value(
+            sanitized_nested_entry.get("errors"),
+            f"snapshot.runtime_contract_integration.contract_gate.{key}.errors",
+        )
+        sanitized_contract_gate[key] = sanitized_nested_entry
+
     runtime_fabric = runtime_contract_integration.get("runtime_fabric")
     if not isinstance(runtime_fabric, Mapping):
         errors.append(
@@ -283,6 +319,8 @@ def _guard_runtime_evaluation_fabric_snapshot(
     if not isinstance(aggregated_contract_gate, Mapping):
         errors.append("snapshot.aggregated_contract_gate must be a mapping")
         aggregated_contract_gate = {}
+    else:
+        aggregated_contract_gate = dict(aggregated_contract_gate)
 
     raw_evaluation = snapshot.get("raw_evaluation")
     if not isinstance(raw_evaluation, Mapping):
@@ -293,6 +331,8 @@ def _guard_runtime_evaluation_fabric_snapshot(
     if not isinstance(evaluation_gate, Mapping):
         errors.append("snapshot.evaluation_gate must be a mapping")
         evaluation_gate = {}
+    else:
+        evaluation_gate = dict(evaluation_gate)
 
     nested_evaluation_gate = runtime_fabric.get("evaluation_gate")
     if not isinstance(nested_evaluation_gate, Mapping):
@@ -300,6 +340,21 @@ def _guard_runtime_evaluation_fabric_snapshot(
             "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate must be a mapping",
         )
         nested_evaluation_gate = {}
+    else:
+        nested_evaluation_gate = dict(nested_evaluation_gate)
+
+    aggregated_contract_gate["errors"] = _normalize_errors_value(
+        aggregated_contract_gate.get("errors"),
+        "snapshot.aggregated_contract_gate.errors",
+    )
+    evaluation_gate["errors"] = _normalize_errors_value(
+        evaluation_gate.get("errors"),
+        "snapshot.evaluation_gate.errors",
+    )
+    nested_evaluation_gate["errors"] = _normalize_errors_value(
+        nested_evaluation_gate.get("errors"),
+        "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate.errors",
+    )
 
     if nested_evaluation_gate != evaluation_gate:
         errors.append(
@@ -307,7 +362,7 @@ def _guard_runtime_evaluation_fabric_snapshot(
         )
 
     expected_aggregated_contract_gate = _serialize_aggregated_runtime_contract_gate(
-        contract_gate,
+        sanitized_contract_gate,
     )
     if aggregated_contract_gate != expected_aggregated_contract_gate:
         errors.append(
@@ -315,12 +370,8 @@ def _guard_runtime_evaluation_fabric_snapshot(
         )
 
     aggregated_is_valid = aggregated_contract_gate.get("is_valid")
-    evaluation_gate_errors = evaluation_gate.get("errors")
-    if not isinstance(evaluation_gate_errors, tuple):
-        evaluation_gate_errors = ()
-    aggregated_errors = aggregated_contract_gate.get("errors")
-    if not isinstance(aggregated_errors, tuple):
-        aggregated_errors = ()
+    evaluation_gate_errors = evaluation_gate.get("errors", ())
+    aggregated_errors = aggregated_contract_gate.get("errors", ())
 
     if aggregated_is_valid is True:
         if raw_evaluation.get("result") != evaluation_gate.get("result"):

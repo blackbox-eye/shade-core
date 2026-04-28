@@ -423,7 +423,7 @@ def test_build_runtime_contract_integration_snapshot_skips_top_level_serializers
 
     monkeypatch.setattr(
         bundle_module,
-        "serialize_contract_gate_result",
+        "_serialize_aggregated_runtime_contract_gate",
         fail_aggregated_serializer,
     )
     monkeypatch.setattr(
@@ -1220,6 +1220,123 @@ def test_guard_runtime_evaluation_fabric_snapshot_reports_mapping_errors_without
         {"runtime_contract_integration": "invalid"},
     ) == (
         "snapshot.runtime_contract_integration must be a mapping",
+    )
+
+
+def test_guard_runtime_evaluation_fabric_snapshot_handles_malformed_nested_contract_gate_entries() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-malformed")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    snapshot["runtime_contract_integration"]["contract_gate"] = {
+        "self_model": 7,
+        "worker_registry": {"is_valid": True, "errors": ()},
+        "confidence_record": "invalid",
+        "state_contract": None,
+    }
+
+    assert _guard_runtime_evaluation_fabric_snapshot(snapshot) == (
+        "snapshot.runtime_contract_integration.contract_gate.self_model must be a mapping",
+        "snapshot.runtime_contract_integration.contract_gate.confidence_record must be a mapping",
+        "snapshot.runtime_contract_integration.contract_gate.state_contract must be a mapping",
+        "snapshot.aggregated_contract_gate must equal the aggregation implied by nested contract_gate entries",
+    )
+
+
+def test_guard_runtime_evaluation_fabric_snapshot_compares_list_errors_by_content() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-list")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    list_errors = ["run_id is required", "source_lane is required"]
+    snapshot["aggregated_contract_gate"] = {
+        "is_valid": False,
+        "errors": list_errors,
+    }
+    snapshot["evaluation_gate"] = {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": list_errors,
+    }
+    snapshot["runtime_contract_integration"]["runtime_fabric"]["evaluation_gate"] = {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": ["run_id is required", "source_lane is required"],
+    }
+
+    assert _guard_runtime_evaluation_fabric_snapshot(snapshot) == ()
+
+
+def test_guard_runtime_evaluation_fabric_snapshot_reports_invalid_non_sequence_errors() -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "")
+    state = RunState(
+        run_id="",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="",
+        target_lane="review-lane",
+    )
+    snapshot = _build_runtime_evaluation_gate_integration_snapshot(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    snapshot["aggregated_contract_gate"] = {
+        "is_valid": False,
+        "errors": 7,
+    }
+    snapshot["evaluation_gate"] = {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": 9,
+    }
+    snapshot["runtime_contract_integration"]["runtime_fabric"]["evaluation_gate"] = {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": 9,
+    }
+
+    assert _guard_runtime_evaluation_fabric_snapshot(snapshot) == (
+        "snapshot.aggregated_contract_gate.errors must be a tuple, list, or None",
+        "snapshot.evaluation_gate.errors must be a tuple, list, or None",
+        "snapshot.runtime_contract_integration.runtime_fabric.evaluation_gate.errors must be a tuple, list, or None",
+        "snapshot.aggregated_contract_gate must equal the aggregation implied by nested contract_gate entries",
     )
 
 

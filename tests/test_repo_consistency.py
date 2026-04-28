@@ -18,6 +18,20 @@ INDEX_PATHS = (
 IGNORE_TOKENS = {"No current code file", "None"}
 
 
+def _traceability_has_row(
+    traceability_text: str,
+    capability: str,
+    code_path: str,
+    test_path: str,
+) -> bool:
+    pattern = re.compile(
+        rf"^\|\s*{re.escape(capability)}\s*\|\s*`{re.escape(code_path)}`\s*\|.*\|\s*`{re.escape(test_path)}`\s*\|\s*$",
+        re.MULTILINE,
+    )
+
+    return pattern.search(traceability_text) is not None
+
+
 def test_pr_baseline_workflow_has_expected_tokens() -> None:
     assert WORKFLOW_PATH.is_file()
 
@@ -60,7 +74,26 @@ def test_traceability_paths_exist() -> None:
 def test_traceability_includes_runtime_fabric_consistency_guards() -> None:
     traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
 
-    assert "| Runtime fabric consistency guards " in traceability_text
+    assert _traceability_has_row(
+        traceability_text,
+        "Runtime fabric consistency guards",
+        "src/shade_core/bundle.py",
+        "tests/test_bundle.py",
+    )
+
+
+def test_traceability_row_match_does_not_require_trailing_whitespace() -> None:
+    traceability_text = (
+        "| Runtime fabric consistency guards | `src/shade_core/bundle.py` | "
+        "Implemented as internal helpers validating prepared and serialized runtime/evaluation fabric invariants without changing snapshot output | `tests/test_bundle.py` |\n"
+    )
+
+    assert _traceability_has_row(
+        traceability_text,
+        "Runtime fabric consistency guards",
+        "src/shade_core/bundle.py",
+        "tests/test_bundle.py",
+    )
 
 
 def test_docs_index_files_exist() -> None:
