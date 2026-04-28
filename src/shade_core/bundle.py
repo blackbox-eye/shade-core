@@ -198,10 +198,20 @@ def _build_runtime_contract_integration_snapshot(
     serialized_fragments: Mapping[str, object] | None = None,
 ) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
     if serialized_fragments is None:
-        serialized_fragments = _serialize_runtime_evaluation_fabric_fragments(
-            state,
-            prepared_fabric,
-        )
+        return {
+            "contract_gate": serialize_runtime_contract_gate(
+                prepared_fabric.self_model_result,
+                prepared_fabric.worker_registry_result,
+                prepared_fabric.confidence_record_result,
+                prepared_fabric.state_contract_result,
+            ),
+            "runtime_fabric": _build_runtime_fabric_snapshot(
+                state,
+                prepared_fabric.decision,
+                prepared_fabric.audit_event,
+                prepared_fabric.evaluation_gate_result,
+            ),
+        }
 
     return {
         "contract_gate": serialized_fragments["contract_gate"],

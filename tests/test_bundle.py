@@ -375,6 +375,85 @@ def test_build_runtime_contract_integration_snapshot_rejects_without_active_work
     }
 
 
+def test_build_runtime_contract_integration_snapshot_skips_top_level_serializers(
+    monkeypatch,
+) -> None:
+    self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
+    registry = WorkerRegistry()
+    registry.register(name="control-worker", role="control", status="active")
+    confidence = ConfidenceRecord(0.9, "local", "clear", "ref-minimal")
+    state = RunState(
+        run_id="run-1",
+        worker_role="control",
+        decision_class="accept",
+        verification_state="verified",
+        artifact_ref="artifact-1",
+        source_lane="analysis-lane",
+        target_lane="review-lane",
+    )
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
+    )
+    captured = {"evaluation_gate_arg": None}
+
+    def fail_aggregated_serializer(*_args, **_kwargs):
+        raise AssertionError("aggregated contract gate should not serialize")
+
+    def fail_raw_evaluation_serializer(*_args, **_kwargs):
+        raise AssertionError("raw evaluation should not serialize")
+
+    def fail_top_level_evaluation_gate_serializer(*_args, **_kwargs):
+        raise AssertionError("top-level evaluation gate should not serialize")
+
+    def fake_runtime_contract_gate(*_args, **_kwargs):
+        return {"contract_gate": "sentinel"}
+
+    def fake_runtime_fabric(state_arg, decision_arg, audit_event_arg, evaluation_gate_arg):
+        captured["evaluation_gate_arg"] = evaluation_gate_arg
+        assert state_arg is state
+        assert decision_arg is prepared_fabric.decision
+        assert audit_event_arg is prepared_fabric.audit_event
+        return {"runtime_fabric": "sentinel"}
+
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_contract_gate_result",
+        fail_aggregated_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_evaluation_result",
+        fail_raw_evaluation_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_evaluation_gate_result",
+        fail_top_level_evaluation_gate_serializer,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "serialize_runtime_contract_gate",
+        fake_runtime_contract_gate,
+    )
+    monkeypatch.setattr(
+        bundle_module,
+        "_build_runtime_fabric_snapshot",
+        fake_runtime_fabric,
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        state,
+        prepared_fabric,
+    ) == {
+        "contract_gate": {"contract_gate": "sentinel"},
+        "runtime_fabric": {"runtime_fabric": "sentinel"},
+    }
+    assert captured["evaluation_gate_arg"] is prepared_fabric.evaluation_gate_result
+
+
 def test_build_runtime_evaluation_gate_integration_snapshot_accepts_valid_runtime_inputs() -> None:
     self_model = SelfModel(agent_id="shade-v1", role="control", state="idle")
     registry = WorkerRegistry()
