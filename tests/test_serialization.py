@@ -132,12 +132,12 @@ def test_serialize_evaluation_result() -> None:
 def test_serialize_contract_gate_result() -> None:
     result = ContractGateResult(
         is_valid=False,
-        errors=("run_id is required",),
+        errors=("run_id is required", "source_lane is required"),
     )
 
     assert serialize_contract_gate_result(result) == {
         "is_valid": False,
-        "errors": ("run_id is required",),
+        "errors": ("run_id is required", "source_lane is required"),
     }
 
 
@@ -152,6 +152,20 @@ def test_serialize_evaluation_gate_result() -> None:
         "result": "review",
         "contract_valid": True,
         "errors": (),
+    }
+
+
+def test_serialize_evaluation_gate_result_with_multi_error_gate_failure() -> None:
+    result = EvaluationGateResult(
+        result="fail",
+        contract_valid=False,
+        errors=("run_id is required", "source_lane is required"),
+    )
+
+    assert serialize_evaluation_gate_result(result) == {
+        "result": "fail",
+        "contract_valid": False,
+        "errors": ("run_id is required", "source_lane is required"),
     }
 
 

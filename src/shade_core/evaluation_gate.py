@@ -33,6 +33,29 @@ def run_evaluation_gate(
     )
 
 
+def _aggregate_runtime_contract_result(
+    self_model_result: ContractGateResult,
+    worker_registry_result: ContractGateResult,
+    confidence_record_result: ContractGateResult,
+    state_contract_result: ContractGateResult,
+) -> ContractGateResult:
+    contract_results = (
+        self_model_result,
+        worker_registry_result,
+        confidence_record_result,
+        state_contract_result,
+    )
+
+    return ContractGateResult(
+        is_valid=all(result.is_valid for result in contract_results),
+        errors=tuple(
+            error
+            for result in contract_results
+            for error in result.errors
+        ),
+    )
+
+
 def _run_runtime_evaluation_gate(
     self_model_result: ContractGateResult,
     worker_registry_result: ContractGateResult,
@@ -41,19 +64,11 @@ def _run_runtime_evaluation_gate(
     decision: RuntimeDecision,
     event: MetaAuditEvent,
 ) -> EvaluationGateResult:
-    contract_results = (
+    aggregated_contract_result = _aggregate_runtime_contract_result(
         self_model_result,
         worker_registry_result,
         confidence_record_result,
         state_contract_result,
-    )
-    aggregated_contract_result = ContractGateResult(
-        is_valid=all(result.is_valid for result in contract_results),
-        errors=tuple(
-            error
-            for result in contract_results
-            for error in result.errors
-        ),
     )
 
     return run_evaluation_gate(aggregated_contract_result, decision, event)

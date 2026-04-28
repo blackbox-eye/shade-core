@@ -3,14 +3,17 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from .contract_gate import (
-    ContractGateResult,
     validate_confidence_record,
     validate_self_model,
     validate_state_contract,
     validate_worker_registry,
 )
 from .evaluation import EvaluationResult, evaluate
-from .evaluation_gate import EvaluationGateResult, _run_runtime_evaluation_gate
+from .evaluation_gate import (
+    EvaluationGateResult,
+    _aggregate_runtime_contract_result,
+    run_evaluation_gate,
+)
 from .models import (
     ArtifactHandoff,
     ConfidenceRecord,
@@ -93,33 +96,55 @@ def _build_runtime_fabric_snapshot(
     }
 
 
-def _build_runtime_contract_integration_snapshot(
+def _prepare_runtime_evaluation_fabric(
     self_model: SelfModel,
     registry: WorkerRegistry,
     confidence: ConfidenceRecord,
     state: RunState,
-    evaluation_gate_result: EvaluationGateResult,
-    *,
-    self_model_result: ContractGateResult | None = None,
-    worker_registry_result: ContractGateResult | None = None,
-    confidence_record_result: ContractGateResult | None = None,
-    state_contract_result: ContractGateResult | None = None,
-    decision: RuntimeDecision | None = None,
-    audit_event: MetaAuditEvent | None = None,
-) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
-    if self_model_result is None:
-        self_model_result = validate_self_model(self_model)
-    if worker_registry_result is None:
-        worker_registry_result = validate_worker_registry(registry)
-    if confidence_record_result is None:
-        confidence_record_result = validate_confidence_record(confidence)
-    if state_contract_result is None:
-        state_contract_result = validate_state_contract(state)
+) -> Mapping[str, object]:
+    self_model_result = validate_self_model(self_model)
+    worker_registry_result = validate_worker_registry(registry)
+    confidence_record_result = validate_confidence_record(confidence)
+    state_contract_result = validate_state_contract(state)
+    aggregated_contract_result = _aggregate_runtime_contract_result(
+        self_model_result,
+        worker_registry_result,
+        confidence_record_result,
+        state_contract_result,
+    )
+    decision = decide(self_model, registry, confidence)
+    audit_event = audit_decision(self_model, decision, confidence)
+    raw_evaluation_result = evaluate(decision, audit_event)
+    evaluation_gate_result = run_evaluation_gate(
+        aggregated_contract_result,
+        decision,
+        audit_event,
+    )
 
-    if decision is None:
-        decision = decide(self_model, registry, confidence)
-    if audit_event is None:
-        audit_event = audit_decision(self_model, decision, confidence)
+    return {
+        "self_model_result": self_model_result,
+        "worker_registry_result": worker_registry_result,
+        "confidence_record_result": confidence_record_result,
+        "state_contract_result": state_contract_result,
+        "aggregated_contract_result": aggregated_contract_result,
+        "decision": decision,
+        "audit_event": audit_event,
+        "raw_evaluation_result": raw_evaluation_result,
+        "evaluation_gate_result": evaluation_gate_result,
+    }
+
+
+def _build_runtime_contract_integration_snapshot(
+    state: RunState,
+    prepared_fabric: Mapping[str, object],
+) -> Mapping[str, Mapping[str, Mapping[str, object]]]:
+    self_model_result = prepared_fabric["self_model_result"]
+    worker_registry_result = prepared_fabric["worker_registry_result"]
+    confidence_record_result = prepared_fabric["confidence_record_result"]
+    state_contract_result = prepared_fabric["state_contract_result"]
+    decision = prepared_fabric["decision"]
+    audit_event = prepared_fabric["audit_event"]
+    evaluation_gate_result = prepared_fabric["evaluation_gate_result"]
 
     return {
         "contract_gate": {
@@ -149,42 +174,25 @@ def _build_runtime_evaluation_gate_integration_snapshot(
     confidence: ConfidenceRecord,
     state: RunState,
 ) -> Mapping[str, object]:
-    self_model_result = validate_self_model(self_model)
-    worker_registry_result = validate_worker_registry(registry)
-    confidence_record_result = validate_confidence_record(confidence)
-    state_contract_result = validate_state_contract(state)
-
-    decision = decide(self_model, registry, confidence)
-    audit_event = audit_decision(self_model, decision, confidence)
-    evaluation_gate_result = _run_runtime_evaluation_gate(
-        self_model_result,
-        worker_registry_result,
-        confidence_record_result,
-        state_contract_result,
-        decision,
-        audit_event,
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
+        self_model,
+        registry,
+        confidence,
+        state,
     )
-    evaluation_result = (
-        evaluation_gate_result.result
-        if evaluation_gate_result.contract_valid
-        else evaluate(decision, audit_event)
-    )
+    aggregated_contract_result = prepared_fabric["aggregated_contract_result"]
+    raw_evaluation_result = prepared_fabric["raw_evaluation_result"]
+    evaluation_gate_result = prepared_fabric["evaluation_gate_result"]
 
     return {
         "runtime_contract_integration": _build_runtime_contract_integration_snapshot(
-            self_model,
-            registry,
-            confidence,
             state,
-            evaluation_gate_result,
-            self_model_result=self_model_result,
-            worker_registry_result=worker_registry_result,
-            confidence_record_result=confidence_record_result,
-            state_contract_result=state_contract_result,
-            decision=decision,
-            audit_event=audit_event,
+            prepared_fabric,
         ),
-        "evaluation": serialize_evaluation_result(evaluation_result),
+        "aggregated_contract_gate": serialize_contract_gate_result(
+            aggregated_contract_result,
+        ),
+        "raw_evaluation": serialize_evaluation_result(raw_evaluation_result),
         "evaluation_gate": serialize_evaluation_gate_result(
             evaluation_gate_result,
         ),

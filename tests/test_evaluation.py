@@ -1,6 +1,11 @@
 import pytest
 
-from shade_core import MetaAuditEvent, RuntimeDecision, evaluate  # noqa: E402
+from shade_core import (  # noqa: E402
+    ContractGateResult,
+    MetaAuditEvent,
+    RuntimeDecision,
+    evaluate,
+)
 
 
 def test_evaluate_pass() -> None:
@@ -57,6 +62,28 @@ def test_evaluate_uses_strictest_result_on_conflict() -> None:
     )
 
     assert evaluate(decision, event) == "review"
+
+
+def test_evaluate_is_independent_of_contract_validity_context() -> None:
+    contract_result = ContractGateResult(
+        is_valid=False,
+        errors=("run_id is required",),
+    )
+    decision = RuntimeDecision(
+        decision="accept",
+        reason="Confidence 0.90 meets threshold",
+        next_step="continue",
+    )
+    event = MetaAuditEvent(
+        event_type="runtime_decision",
+        message="accept: Confidence 0.90 meets threshold",
+        severity="info",
+        reference="ref-independent",
+        run_id="run-1",
+    )
+
+    assert contract_result.is_valid is False
+    assert evaluate(decision, event) == "pass"
 
 
 def test_evaluate_raises_for_unknown_severity() -> None:

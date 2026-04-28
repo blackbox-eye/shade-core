@@ -22,6 +22,7 @@ from shade_core.bundle import _build_evidence_gate_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
+from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
@@ -164,18 +165,16 @@ def test_build_runtime_contract_integration_snapshot_accepts_valid_runtime_input
         source_lane="analysis-lane",
         target_lane="review-lane",
     )
-    evaluation_gate_result = EvaluationGateResult(
-        result="pass",
-        contract_valid=True,
-        errors=(),
-    )
-
-    assert _build_runtime_contract_integration_snapshot(
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
         self_model,
         registry,
         confidence,
         state,
-        evaluation_gate_result,
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        state,
+        prepared_fabric,
     ) == {
         "contract_gate": {
             "self_model": {"is_valid": True, "errors": ()},
@@ -233,18 +232,16 @@ def test_build_runtime_contract_integration_snapshot_rejects_without_active_work
         source_lane="analysis-lane",
         target_lane="review-lane",
     )
-    evaluation_gate_result = EvaluationGateResult(
-        result="review",
-        contract_valid=True,
-        errors=(),
-    )
-
-    assert _build_runtime_contract_integration_snapshot(
+    prepared_fabric = _prepare_runtime_evaluation_fabric(
         self_model,
         registry,
         confidence,
         state,
-        evaluation_gate_result,
+    )
+
+    assert _build_runtime_contract_integration_snapshot(
+        state,
+        prepared_fabric,
     ) == {
         "contract_gate": {
             "self_model": {"is_valid": True, "errors": ()},
@@ -280,7 +277,7 @@ def test_build_runtime_contract_integration_snapshot_rejects_without_active_work
                 "run_id": "shade-v1",
             },
             "evaluation_gate": {
-                "result": "review",
+                    "result": "fail",
                 "contract_valid": True,
                 "errors": (),
             },
@@ -350,7 +347,8 @@ def test_build_runtime_evaluation_gate_integration_snapshot_accepts_valid_runtim
                 },
             },
         },
-        "evaluation": {"result": "pass"},
+        "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+        "raw_evaluation": {"result": "pass"},
         "evaluation_gate": {
             "result": "pass",
             "contract_valid": True,
@@ -421,7 +419,8 @@ def test_build_runtime_evaluation_gate_integration_snapshot_returns_review_path(
                 },
             },
         },
-        "evaluation": {"result": "review"},
+        "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+        "raw_evaluation": {"result": "review"},
         "evaluation_gate": {
             "result": "review",
             "contract_valid": True,
@@ -492,7 +491,8 @@ def test_build_runtime_evaluation_gate_integration_snapshot_returns_reject_path(
                 },
             },
         },
-        "evaluation": {"result": "fail"},
+        "aggregated_contract_gate": {"is_valid": True, "errors": ()},
+        "raw_evaluation": {"result": "fail"},
         "evaluation_gate": {
             "result": "fail",
             "contract_valid": True,
@@ -566,7 +566,11 @@ def test_build_runtime_evaluation_gate_integration_snapshot_fails_for_invalid_co
                 },
             },
         },
-        "evaluation": {"result": "pass"},
+        "aggregated_contract_gate": {
+            "is_valid": False,
+            "errors": ("run_id is required", "source_lane is required"),
+        },
+        "raw_evaluation": {"result": "pass"},
         "evaluation_gate": {
             "result": "fail",
             "contract_valid": False,
