@@ -18,10 +18,23 @@ This guide covers only local working mode in VS Code and PowerShell.
 - Use [Copilot instructions](../../.github/copilot-instructions.md) when asking Copilot to implement a bundle.
 - Use one feature branch per cohesive bundle.
 - Keep Copilot work inside the locked scope and repository hard bounds.
+- Create the feature branch.
+- Make scoped changes in VS Code.
+- Run the validation bundle.
+- Review the diff.
+- Stage allowed files only.
+- Commit with signing.
+- Push and create the PR.
 
 ```powershell
 git switch -c feature/<short-name>
-git add .
+git diff --stat
+git diff -- <relevant-path>
+python -m pytest -q
+git status -sb
+git add <allowed-paths>
+git diff --cached --stat
+git diff --cached -- <relevant-path>
 git commit -S -m "Short message"
 git push -u origin feature/<short-name>
 gh pr create --base main --title "<title>" --body "<body>"
@@ -29,7 +42,7 @@ gh pr create --base main --title "<title>" --body "<body>"
 
 - Make changes locally in VS Code after the scope is locked.
 - Use PowerShell for Git commands.
-- Use the SOP validation bundle before `git add` and commit.
+- Use the SOP validation bundle and review the diff before staging allowed files and commit.
 - Use GitHub CLI for PR creation when authenticated.
 - Use the PR template fields for bundle type, changed files, micro-PR justification when used, and validation.
 - If GitHub CLI cannot request Copilot review, create the PR with CLI and request Copilot in the GitHub UI.

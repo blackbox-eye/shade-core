@@ -8,7 +8,7 @@ Describe briefly why the change is made.
 
 ## Scope
 
-- Bundle type: _docs | code | release | cleanup | hotfix | other_
+- Bundle type: _docs | test | code | release | cleanup | hotfix | other_
 - Required changes in this bundle: _fill in 2-4 related items_
 - Included: _fill in_
 - Out of scope: _fill in_

@@ -45,15 +45,18 @@ git status -sb
 ## Push and PR creation with body file
 
 - Use the PR template fields in the body file.
+- Write the temporary body file outside the repo root or remove it immediately after PR creation.
 - If GitHub CLI cannot request Copilot review, request Copilot in the GitHub UI after PR creation.
 
 ```powershell
+$prBodyFile = Join-Path $env:TEMP "shade-core-pr-body.md"
+
 @'
 Purpose:
 - <why>
 
 Scope:
-- Bundle type: <docs|test|code|governance|checkpoint|review-fix|other>
+- Bundle type: <docs|test|code|release|cleanup|hotfix|other>
 - Required changes in this bundle: <2-4 items>
 - Included: <in scope>
 - Out of scope: <out of scope>
@@ -63,10 +66,11 @@ Scope:
 Validation:
 - Command: python -m pytest -q
 - Result: <result>
-'@ | Set-Content -Path .\pr-body.md
+'@ | Set-Content -Path $prBodyFile
 
 git push -u origin feature/<short-name>
-gh pr create --base main --title "<title>" --body-file .\pr-body.md
+gh pr create --base main --title "<title>" --body-file $prBodyFile
+Remove-Item $prBodyFile -ErrorAction SilentlyContinue
 ```
 
 ## Post-merge sync and cleanup
