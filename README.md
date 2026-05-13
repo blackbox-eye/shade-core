@@ -8,7 +8,7 @@ The repository is not a production runtime, does not deploy anything, and does n
 
 - The repository currently ships a minimal Python contract core under `src/shade_core/`, repository tests under `tests/`, and supporting architecture, governance, QA, onboarding, and release documentation under `docs/`.
 - The implemented Python surface is intentionally narrow and reviewable; it does not claim full runtime orchestration, deploy infrastructure, or production integration.
-- The current baseline after post-foundation cycle 6 is `202 passed` from `python -m pytest`.
+- The current baseline after post-foundation cycle 7 is `204 passed` from `python -m pytest -q`.
 - The broader V1 architecture documents remain target-boundary references beyond the currently implemented runtime slice.
 
 ## Current Python core
@@ -67,5 +67,6 @@ The repository is not a production runtime, does not deploy anything, and does n
 - Post-foundation cycle 4: [docs/releases/checkpoint-post-foundation-cycle-4.md](docs/releases/checkpoint-post-foundation-cycle-4.md)
 - Post-foundation cycle 5: [docs/releases/checkpoint-post-foundation-cycle-5.md](docs/releases/checkpoint-post-foundation-cycle-5.md)
 - Post-foundation cycle 6: [docs/releases/checkpoint-post-foundation-cycle-6.md](docs/releases/checkpoint-post-foundation-cycle-6.md)
+- Post-foundation cycle 7: [docs/releases/checkpoint-post-foundation-cycle-7.md](docs/releases/checkpoint-post-foundation-cycle-7.md)
 
-Current checkpoint: [docs/releases/checkpoint-post-foundation-cycle-6.md](docs/releases/checkpoint-post-foundation-cycle-6.md)
+Current checkpoint: [docs/releases/checkpoint-post-foundation-cycle-7.md](docs/releases/checkpoint-post-foundation-cycle-7.md)
