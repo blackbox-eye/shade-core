@@ -93,7 +93,18 @@ def test_traceability_includes_runtime_evaluation_guard_verification() -> None:
     )
 
 
-def test_traceability_includes_runtime_evaluation_verification_summary_and_contract() -> None:
+def test_traceability_includes_runtime_evaluation_fabric_serialization() -> None:
+    traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
+
+    assert _traceability_has_row(
+        traceability_text,
+        "Runtime evaluation fabric serialization",
+        "src/shade_core/bundle.py",
+        "tests/test_bundle.py",
+    )
+
+
+def test_traceability_includes_runtime_evaluation_verification_summary() -> None:
     traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
 
     assert _traceability_has_row(
@@ -102,6 +113,11 @@ def test_traceability_includes_runtime_evaluation_verification_summary_and_contr
         "src/shade_core/bundle.py",
         "tests/test_bundle.py",
     )
+
+
+def test_traceability_includes_runtime_evaluation_verification_contract() -> None:
+    traceability_text = TRACEABILITY_PATH.read_text(encoding="utf-8")
+
     assert _traceability_has_row(
         traceability_text,
         "Runtime evaluation verification contract",
