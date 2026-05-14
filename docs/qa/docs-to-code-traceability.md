@@ -44,6 +44,15 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Worker result serial.     | `src/shade_core/serialization.py`   | Implemented as one internal serializer for worker result fields       | `tests/test_serialization.py`   |
 | Task route serialization  | `src/shade_core/serialization.py`   | Implemented as one internal serializer for task route fields          | `tests/test_serialization.py`   |
 | Orchestration contract snapshot | `src/shade_core/bundle.py`    | Implemented as one internal helper for task/result/route view         | `tests/test_bundle.py`          |
+| Worker orchestration plan contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`        |
+| Worker orchestration step contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`        |
+| Worker orchestration handoff contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`      |
+| Worker orchestration status contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`       |
+| Worker orchestration summary contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`      |
+| Worker orchestration review contract | `src/shade_core/models.py` | Implemented as one internal typed contract-prep object; not re-exported | `tests/test_models.py`       |
+| Worker orchestration validation | `src/shade_core/contract_gate.py` | Implemented as internal validators for worker-orchestration contract-prep fields, including stable status checks | `tests/test_contract_gate.py` |
+| Worker orchestration serialization | `src/shade_core/serialization.py` | Implemented as internal serializers for worker-orchestration contract-prep fields | `tests/test_serialization.py` |
+| Worker orchestration prep snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper composing the worker-orchestration plan/step/handoff/status/summary/review view | `tests/test_bundle.py` |
 | Orchestration checkpoint contract | `src/shade_core/models.py`   | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
 | Orchestration junction contract | `src/shade_core/models.py`    | Implemented as one internal typed bridge object; not re-exported      | `tests/test_models.py`          |
 | Orchestration checkpoint validation | `src/shade_core/contract_gate.py` | Implemented as one internal validator for checkpoint bridge fields | `tests/test_contract_gate.py`   |
@@ -101,4 +110,4 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration release-view serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for release-view bridge fields | `tests/test_serialization.py` |
 | Publication release-view snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the publication/release-view bridge view | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
-| Worker orchestration      | No current code file                | Documented target only; role vocabulary only in current code          | None                            |
+| Worker orchestration behavior | No current code file             | Documented target only; current code stops at internal contract prep and does not execute worker orchestration | None                      |

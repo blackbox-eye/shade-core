@@ -26,6 +26,12 @@ from .models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerResult,
     WorkerTask,
 )
@@ -220,6 +226,72 @@ def serialize_task_route(route: TaskRoute) -> dict[str, str]:
         "source_role": route.source_role,
         "target_role": route.target_role,
         "route_ref": route.route_ref,
+    }
+
+
+def serialize_worker_orchestration_plan(
+    plan: WorkerOrchestrationPlan,
+) -> dict[str, str]:
+    return {
+        "task_id": plan.task_id,
+        "route_ref": plan.route_ref,
+        "plan_status": plan.plan_status,
+        "plan_ref": plan.plan_ref,
+    }
+
+
+def serialize_worker_orchestration_step(
+    step: WorkerOrchestrationStep,
+) -> dict[str, str]:
+    return {
+        "plan_ref": step.plan_ref,
+        "task_transition_ref": step.task_transition_ref,
+        "step_status": step.step_status,
+        "step_ref": step.step_ref,
+    }
+
+
+def serialize_worker_orchestration_handoff(
+    handoff: WorkerOrchestrationHandoff,
+) -> dict[str, str]:
+    return {
+        "step_ref": handoff.step_ref,
+        "output_ref": handoff.output_ref,
+        "checkpoint_ref": handoff.checkpoint_ref,
+        "handoff_ref": handoff.handoff_ref,
+    }
+
+
+def serialize_worker_orchestration_status(
+    status: WorkerOrchestrationStatus,
+) -> dict[str, str]:
+    return {
+        "handoff_ref": status.handoff_ref,
+        "junction_ref": status.junction_ref,
+        "status_value": status.status_value,
+        "status_ref": status.status_ref,
+    }
+
+
+def serialize_worker_orchestration_summary(
+    summary: WorkerOrchestrationSummary,
+) -> dict[str, str]:
+    return {
+        "plan_ref": summary.plan_ref,
+        "status_ref": summary.status_ref,
+        "summary_status": summary.summary_status,
+        "summary_ref": summary.summary_ref,
+    }
+
+
+def serialize_worker_orchestration_review(
+    review: WorkerOrchestrationReview,
+) -> dict[str, str]:
+    return {
+        "summary_ref": review.summary_ref,
+        "status_ref": review.status_ref,
+        "review_status": review.review_status,
+        "review_ref": review.review_ref,
     }
 
 

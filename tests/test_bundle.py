@@ -36,6 +36,7 @@ from shade_core.bundle import _build_runtime_contract_integration_snapshot  # no
 from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
 from shade_core.bundle import _run_runtime_evaluation_fabric_guards  # noqa: E402
 from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
+from shade_core.bundle import _build_worker_orchestration_prep_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
     OrchestrationAssertion,
@@ -55,6 +56,12 @@ from shade_core.models import (  # noqa: E402
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerResult,
     WorkerTask,
 )
@@ -2012,6 +2019,91 @@ def test_build_checkpoint_junction_snapshot_returns_expected_structure() -> None
             "task_transition_ref": "task-transition-1",
             "run_transition_ref": "run-transition-1",
             "junction_ref": "junction-1",
+        },
+    }
+
+
+def test_build_worker_orchestration_prep_snapshot_returns_expected_structure() -> None:
+    plan = WorkerOrchestrationPlan(
+        task_id="task-1",
+        route_ref="route-1",
+        plan_status="prepared",
+        plan_ref="plan-1",
+    )
+    step = WorkerOrchestrationStep(
+        plan_ref="plan-1",
+        task_transition_ref="task-transition-1",
+        step_status="prepared",
+        step_ref="step-1",
+    )
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="step-1",
+        output_ref="output-1",
+        checkpoint_ref="checkpoint-1",
+        handoff_ref="handoff-1",
+    )
+    status = WorkerOrchestrationStatus(
+        handoff_ref="handoff-1",
+        junction_ref="junction-1",
+        status_value="pending",
+        status_ref="status-1",
+    )
+    summary = WorkerOrchestrationSummary(
+        plan_ref="plan-1",
+        status_ref="status-1",
+        summary_status="aligned",
+        summary_ref="summary-1",
+    )
+    review = WorkerOrchestrationReview(
+        summary_ref="summary-1",
+        status_ref="status-1",
+        review_status="pending",
+        review_ref="worker-review-1",
+    )
+
+    assert _build_worker_orchestration_prep_snapshot(
+        plan,
+        step,
+        handoff,
+        status,
+        summary,
+        review,
+    ) == {
+        "worker_orchestration_plan": {
+            "task_id": "task-1",
+            "route_ref": "route-1",
+            "plan_status": "prepared",
+            "plan_ref": "plan-1",
+        },
+        "worker_orchestration_step": {
+            "plan_ref": "plan-1",
+            "task_transition_ref": "task-transition-1",
+            "step_status": "prepared",
+            "step_ref": "step-1",
+        },
+        "worker_orchestration_handoff": {
+            "step_ref": "step-1",
+            "output_ref": "output-1",
+            "checkpoint_ref": "checkpoint-1",
+            "handoff_ref": "handoff-1",
+        },
+        "worker_orchestration_status": {
+            "handoff_ref": "handoff-1",
+            "junction_ref": "junction-1",
+            "status_value": "pending",
+            "status_ref": "status-1",
+        },
+        "worker_orchestration_summary": {
+            "plan_ref": "plan-1",
+            "status_ref": "status-1",
+            "summary_status": "aligned",
+            "summary_ref": "summary-1",
+        },
+        "worker_orchestration_review": {
+            "summary_ref": "summary-1",
+            "status_ref": "status-1",
+            "review_status": "pending",
+            "review_ref": "worker-review-1",
         },
     }
 

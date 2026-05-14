@@ -12,6 +12,7 @@
 - Adapter-awareness in the current core is limited to one neutral typed handoff boundary for `artifact_ref`, `source_lane`, and `target_lane`.
 - The current internal fabric links run state, handoff, decision, audit event, and evaluation gate result into one inspectable snapshot.
 - The current internal contract layer also prepares worker-task, worker-result, and task-route boundaries as neutral typed objects. These do not implement orchestration behavior.
+- The current internal contract layer also prepares worker-orchestration plan, step, handoff, status, summary, and review boundaries as neutral typed bridge objects across the current task, route, checkpoint, junction, and transition-prep seam. These do not implement planning, worker execution, routing, or orchestration behavior.
 - The current internal contract layer also prepares orchestration-checkpoint and orchestration-junction boundaries as neutral typed bridge objects between the current worker-result and route layer and the current transition-prep layer. These do not implement orchestration or routing behavior.
 - The current internal contract layer also prepares task-transition and run-transition boundaries as neutral typed objects. These prepare step-junction boundaries without implementing step transitions.
 - The current internal contract layer also prepares orchestration-verification and orchestration-outcome boundaries as neutral typed bridge objects between the current checkpoint/junction plus transition-prep layer and the current decision/evaluation side. These do not implement verification, evaluation, or decision behavior.
@@ -30,6 +31,7 @@
 - It does not describe deploy, VPS, production, or integration.
 - It does not implement adapters, provider bindings, or runtime wiring for that handoff boundary.
 - It does not claim full runtime orchestration as implemented today; the worker-task contract objects are preparation boundaries only.
+- It does not claim worker-orchestration planning, handoff, status propagation, summary, or review behavior as implemented today; those bridge objects are preparation boundaries only.
 - It does not claim checkpoint or junction execution behavior as implemented today; those bridge objects are preparation boundaries only.
 - It does not claim verification or outcome execution behavior as implemented today; those bridge objects are preparation boundaries only.
 - It does not claim evidence or gate execution behavior as implemented today; those bridge objects are preparation boundaries only.

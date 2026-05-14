@@ -31,6 +31,12 @@ from shade_core.contract_gate import (
     validate_self_model,
     validate_task_route,
     validate_task_transition,
+    validate_worker_orchestration_handoff,
+    validate_worker_orchestration_plan,
+    validate_worker_orchestration_review,
+    validate_worker_orchestration_status,
+    validate_worker_orchestration_step,
+    validate_worker_orchestration_summary,
     validate_worker_registry,
     validate_worker_result,
     validate_worker_task,
@@ -54,6 +60,12 @@ from shade_core.models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerResult,
     WorkerTask,
 )
@@ -390,6 +402,204 @@ def test_validate_task_route_fails_for_invalid_route() -> None:
         "source_role is required",
         "target_role is required",
         "route_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_plan_passes_for_valid_plan() -> None:
+    plan = WorkerOrchestrationPlan(
+        task_id="task-1",
+        route_ref="route-1",
+        plan_status="prepared",
+        plan_ref="plan-1",
+    )
+
+    result = validate_worker_orchestration_plan(plan)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_plan_fails_for_invalid_plan() -> None:
+    plan = WorkerOrchestrationPlan(
+        task_id="",
+        route_ref="",
+        plan_status="stale",
+        plan_ref="",
+    )
+
+    result = validate_worker_orchestration_plan(plan)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "task_id is required",
+        "route_ref is required",
+        "plan_status is invalid",
+        "plan_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_step_passes_for_valid_step() -> None:
+    step = WorkerOrchestrationStep(
+        plan_ref="plan-1",
+        task_transition_ref="task-transition-1",
+        step_status="prepared",
+        step_ref="step-1",
+    )
+
+    result = validate_worker_orchestration_step(step)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_step_fails_for_invalid_step() -> None:
+    step = WorkerOrchestrationStep(
+        plan_ref="",
+        task_transition_ref="",
+        step_status="stale",
+        step_ref="",
+    )
+
+    result = validate_worker_orchestration_step(step)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "plan_ref is required",
+        "task_transition_ref is required",
+        "step_status is invalid",
+        "step_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_handoff_passes_for_valid_handoff() -> None:
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="step-1",
+        output_ref="output-1",
+        checkpoint_ref="checkpoint-1",
+        handoff_ref="handoff-1",
+    )
+
+    result = validate_worker_orchestration_handoff(handoff)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_handoff_fails_for_invalid_handoff() -> None:
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="",
+        output_ref="",
+        checkpoint_ref="",
+        handoff_ref="",
+    )
+
+    result = validate_worker_orchestration_handoff(handoff)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "step_ref is required",
+        "output_ref is required",
+        "checkpoint_ref is required",
+        "handoff_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_status_passes_for_valid_status() -> None:
+    status = WorkerOrchestrationStatus(
+        handoff_ref="handoff-1",
+        junction_ref="junction-1",
+        status_value="pending",
+        status_ref="status-1",
+    )
+
+    result = validate_worker_orchestration_status(status)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_status_fails_for_invalid_status() -> None:
+    status = WorkerOrchestrationStatus(
+        handoff_ref="",
+        junction_ref="",
+        status_value="stale",
+        status_ref="",
+    )
+
+    result = validate_worker_orchestration_status(status)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "handoff_ref is required",
+        "junction_ref is required",
+        "status_value is invalid",
+        "status_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_summary_passes_for_valid_summary() -> None:
+    summary = WorkerOrchestrationSummary(
+        plan_ref="plan-1",
+        status_ref="status-1",
+        summary_status="aligned",
+        summary_ref="summary-1",
+    )
+
+    result = validate_worker_orchestration_summary(summary)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_summary_fails_for_invalid_summary() -> None:
+    summary = WorkerOrchestrationSummary(
+        plan_ref="",
+        status_ref="",
+        summary_status="stale",
+        summary_ref="",
+    )
+
+    result = validate_worker_orchestration_summary(summary)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "plan_ref is required",
+        "status_ref is required",
+        "summary_status is invalid",
+        "summary_ref is required",
+    )
+
+
+def test_validate_worker_orchestration_review_passes_for_valid_review() -> None:
+    review = WorkerOrchestrationReview(
+        summary_ref="summary-1",
+        status_ref="status-1",
+        review_status="pending",
+        review_ref="worker-review-1",
+    )
+
+    result = validate_worker_orchestration_review(review)
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_worker_orchestration_review_fails_for_invalid_review() -> None:
+    review = WorkerOrchestrationReview(
+        summary_ref="",
+        status_ref="",
+        review_status="stale",
+        review_ref="",
+    )
+
+    result = validate_worker_orchestration_review(review)
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "summary_ref is required",
+        "status_ref is required",
+        "review_status is invalid",
+        "review_ref is required",
     )
 
 
