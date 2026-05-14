@@ -1,3 +1,5 @@
+import shade_core
+
 from shade_core import (  # noqa: E402
     ConfidenceRecord,
     MetaAuditEvent,
@@ -24,6 +26,12 @@ from shade_core.models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerResult,
     WorkerTask,
 )
@@ -175,6 +183,102 @@ def test_task_route_retains_fields() -> None:
     assert route.source_role == "analysis"
     assert route.target_role == "review"
     assert route.route_ref == "route-1"
+
+
+def test_worker_orchestration_plan_retains_fields() -> None:
+    plan = WorkerOrchestrationPlan(
+        task_id="task-1",
+        route_ref="route-1",
+        plan_status="prepared",
+        plan_ref="plan-1",
+    )
+
+    assert plan.task_id == "task-1"
+    assert plan.route_ref == "route-1"
+    assert plan.plan_status == "prepared"
+    assert plan.plan_ref == "plan-1"
+
+
+def test_worker_orchestration_step_retains_fields() -> None:
+    step = WorkerOrchestrationStep(
+        plan_ref="plan-1",
+        task_transition_ref="task-transition-1",
+        step_status="prepared",
+        step_ref="step-1",
+    )
+
+    assert step.plan_ref == "plan-1"
+    assert step.task_transition_ref == "task-transition-1"
+    assert step.step_status == "prepared"
+    assert step.step_ref == "step-1"
+
+
+def test_worker_orchestration_handoff_retains_fields() -> None:
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="step-1",
+        output_ref="output-1",
+        checkpoint_ref="checkpoint-1",
+        handoff_ref="handoff-1",
+    )
+
+    assert handoff.step_ref == "step-1"
+    assert handoff.output_ref == "output-1"
+    assert handoff.checkpoint_ref == "checkpoint-1"
+    assert handoff.handoff_ref == "handoff-1"
+
+
+def test_worker_orchestration_status_retains_fields() -> None:
+    status = WorkerOrchestrationStatus(
+        handoff_ref="handoff-1",
+        junction_ref="junction-1",
+        status_value="pending",
+        status_ref="status-1",
+    )
+
+    assert status.handoff_ref == "handoff-1"
+    assert status.junction_ref == "junction-1"
+    assert status.status_value == "pending"
+    assert status.status_ref == "status-1"
+
+
+def test_worker_orchestration_summary_retains_fields() -> None:
+    summary = WorkerOrchestrationSummary(
+        plan_ref="plan-1",
+        status_ref="status-1",
+        summary_status="aligned",
+        summary_ref="summary-1",
+    )
+
+    assert summary.plan_ref == "plan-1"
+    assert summary.status_ref == "status-1"
+    assert summary.summary_status == "aligned"
+    assert summary.summary_ref == "summary-1"
+
+
+def test_worker_orchestration_review_retains_fields() -> None:
+    review = WorkerOrchestrationReview(
+        summary_ref="summary-1",
+        status_ref="status-1",
+        review_status="pending",
+        review_ref="worker-review-1",
+    )
+
+    assert review.summary_ref == "summary-1"
+    assert review.status_ref == "status-1"
+    assert review.review_status == "pending"
+    assert review.review_ref == "worker-review-1"
+
+
+def test_worker_orchestration_contract_prep_objects_are_not_public_exports() -> None:
+    for name in (
+        "WorkerOrchestrationPlan",
+        "WorkerOrchestrationStep",
+        "WorkerOrchestrationHandoff",
+        "WorkerOrchestrationStatus",
+        "WorkerOrchestrationSummary",
+        "WorkerOrchestrationReview",
+    ):
+        assert name not in shade_core.__all__
 
 
 def test_orchestration_checkpoint_retains_fields() -> None:

@@ -6,6 +6,7 @@ This file locks the central contract objects and their fields for V1.
 The current code implements only a smaller typed subset through `src/shade_core/models.py` and `src/shade_core/state.py`.
 The current public package surface exposes only the implemented subset through the root `shade_core` import path.
 The current internal model set also includes one neutral handoff object for future adapter preparation without adding adapters now, three neutral worker-task/orchestration contract objects that prepare internal boundaries without implementing orchestration, and two neutral state-transition contract objects that prepare step-junction boundaries without implementing step transitions.
+The current internal model set also includes six neutral worker-orchestration prep objects that connect the current task, route, checkpoint, junction, and transition-prep seams into one inspectable contract chain without implementing worker orchestration behavior.
 The current internal model set also includes two neutral checkpoint/junction bridge objects that connect the existing worker-result and route layer to the existing transition-prep layer without executing orchestration or routing behavior.
 The current internal model set also includes two neutral verification/outcome bridge objects that connect the existing checkpoint/junction and transition-prep layers to the decision/evaluation side without executing verification, evaluation, or decision behavior.
 The current internal model set also includes two neutral evidence/gate bridge objects that connect the existing verification/outcome seam to the evaluation-gate and audit side without executing evidence, gate, evaluation-gate, or audit behavior.
@@ -45,6 +46,60 @@ This object is an internal contract boundary only. It is not a public package ex
 - `route_ref`: reference key for this route.
 
 This object is an internal contract boundary only. It is not a public package export.
+
+## Current internal object: Worker orchestration plan
+
+- `task_id`: which task anchors the orchestration plan.
+- `route_ref`: reference to the route already associated with the task.
+- `plan_status`: neutral plan-preparation status label.
+- `plan_ref`: reference key for this worker-orchestration plan.
+
+This object is a neutral internal bridge contract only. It connects the current task and route preparation layer to a future worker-orchestration plan view without executing planning or orchestration behavior. It is not a public package export.
+
+## Current internal object: Worker orchestration step
+
+- `plan_ref`: reference to the worker-orchestration plan being stepped through.
+- `task_transition_ref`: reference to the prepared task transition carried into this step boundary.
+- `step_status`: neutral step-preparation status label.
+- `step_ref`: reference key for this worker-orchestration step.
+
+This object is a neutral internal bridge contract only. It connects the current plan preparation layer to the existing task-transition preparation seam without executing step selection or worker behavior. It is not a public package export.
+
+## Current internal object: Worker orchestration handoff
+
+- `step_ref`: reference to the worker-orchestration step producing the handoff.
+- `output_ref`: reference to the current worker-result output being handed forward.
+- `checkpoint_ref`: reference to the checkpoint already associated with this handoff.
+- `handoff_ref`: reference key for this worker-orchestration handoff.
+
+This object is a neutral internal bridge contract only. It connects the current step preparation layer to the existing worker-result output and checkpoint seam without executing handoff or routing behavior. It is not a public package export.
+
+## Current internal object: Worker orchestration status
+
+- `handoff_ref`: reference to the worker-orchestration handoff being summarized.
+- `junction_ref`: reference to the current junction seam carried into this status boundary.
+- `status_value`: neutral orchestration-status label.
+- `status_ref`: reference key for this worker-orchestration status record.
+
+This object is a neutral internal bridge contract only. It connects the current handoff and junction preparation seam into one inspectable status record without executing status propagation or orchestration behavior. It is not a public package export.
+
+## Current internal object: Worker orchestration summary
+
+- `plan_ref`: reference to the worker-orchestration plan being summarized.
+- `status_ref`: reference to the worker-orchestration status being summarized.
+- `summary_status`: neutral summary status label.
+- `summary_ref`: reference key for this worker-orchestration summary.
+
+This object is a neutral internal bridge contract only. It consolidates the current plan and status preparation seams into one inspectable summary record without executing summary or runtime behavior. It is not a public package export.
+
+## Current internal object: Worker orchestration review
+
+- `summary_ref`: reference to the worker-orchestration summary being reviewed.
+- `status_ref`: reference to the worker-orchestration status carried into review.
+- `review_status`: neutral review status label.
+- `review_ref`: reference key for this worker-orchestration review.
+
+This object is a neutral internal bridge contract only. It consolidates the current summary and status preparation seams into one inspectable review record without executing review or orchestration behavior. It is not a public package export.
 
 ## Current internal object: Orchestration checkpoint
 

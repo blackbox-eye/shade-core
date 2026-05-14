@@ -27,6 +27,12 @@ from .models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerRegistry,
     WorkerResult,
     WorkerTask,
@@ -37,6 +43,11 @@ _DECISION_CLASSES = {"accept", "reject", "needs_review"}
 _VERIFICATION_STATES = {"pending", "verified", "failed"}
 _VERIFICATION_ALIGNMENTS = {"aligned", "fail_closed", "drifted"}
 _VERIFICATION_SUMMARY_STATUSES = {"verified", "failed"}
+_WORKER_ORCHESTRATION_PLAN_STATUSES = {"prepared", "ready", "blocked"}
+_WORKER_ORCHESTRATION_STEP_STATUSES = {"prepared", "ready", "blocked"}
+_WORKER_ORCHESTRATION_STATUS_VALUES = {"pending", "aligned", "blocked"}
+_WORKER_ORCHESTRATION_SUMMARY_STATUSES = {"prepared", "aligned", "blocked"}
+_WORKER_ORCHESTRATION_REVIEW_STATUSES = {"pending", "approved", "needs_review"}
 _RUNTIME_CONTRACT_GATE_KEYS = (
     "self_model",
     "worker_registry",
@@ -643,6 +654,118 @@ def validate_task_route(route: TaskRoute) -> ContractGateResult:
         errors.append("target_role is required")
     if not route.route_ref:
         errors.append("route_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_plan(
+    plan: WorkerOrchestrationPlan,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not plan.task_id:
+        errors.append("task_id is required")
+    if not plan.route_ref:
+        errors.append("route_ref is required")
+    if not plan.plan_status:
+        errors.append("plan_status is required")
+    elif plan.plan_status not in _WORKER_ORCHESTRATION_PLAN_STATUSES:
+        errors.append("plan_status is invalid")
+    if not plan.plan_ref:
+        errors.append("plan_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_step(
+    step: WorkerOrchestrationStep,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not step.plan_ref:
+        errors.append("plan_ref is required")
+    if not step.task_transition_ref:
+        errors.append("task_transition_ref is required")
+    if not step.step_status:
+        errors.append("step_status is required")
+    elif step.step_status not in _WORKER_ORCHESTRATION_STEP_STATUSES:
+        errors.append("step_status is invalid")
+    if not step.step_ref:
+        errors.append("step_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_handoff(
+    handoff: WorkerOrchestrationHandoff,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not handoff.step_ref:
+        errors.append("step_ref is required")
+    if not handoff.output_ref:
+        errors.append("output_ref is required")
+    if not handoff.checkpoint_ref:
+        errors.append("checkpoint_ref is required")
+    if not handoff.handoff_ref:
+        errors.append("handoff_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_status(
+    status: WorkerOrchestrationStatus,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not status.handoff_ref:
+        errors.append("handoff_ref is required")
+    if not status.junction_ref:
+        errors.append("junction_ref is required")
+    if not status.status_value:
+        errors.append("status_value is required")
+    elif status.status_value not in _WORKER_ORCHESTRATION_STATUS_VALUES:
+        errors.append("status_value is invalid")
+    if not status.status_ref:
+        errors.append("status_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_summary(
+    summary: WorkerOrchestrationSummary,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not summary.plan_ref:
+        errors.append("plan_ref is required")
+    if not summary.status_ref:
+        errors.append("status_ref is required")
+    if not summary.summary_status:
+        errors.append("summary_status is required")
+    elif summary.summary_status not in _WORKER_ORCHESTRATION_SUMMARY_STATUSES:
+        errors.append("summary_status is invalid")
+    if not summary.summary_ref:
+        errors.append("summary_ref is required")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_worker_orchestration_review(
+    review: WorkerOrchestrationReview,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    if not review.summary_ref:
+        errors.append("summary_ref is required")
+    if not review.status_ref:
+        errors.append("status_ref is required")
+    if not review.review_status:
+        errors.append("review_status is required")
+    elif review.review_status not in _WORKER_ORCHESTRATION_REVIEW_STATUSES:
+        errors.append("review_status is invalid")
+    if not review.review_ref:
+        errors.append("review_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 

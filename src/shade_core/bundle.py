@@ -44,6 +44,12 @@ from .models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerRegistry,
     WorkerResult,
     WorkerTask,
@@ -79,6 +85,12 @@ from .serialization import (
     serialize_runtime_decision,
     serialize_task_route,
     serialize_task_transition,
+    serialize_worker_orchestration_handoff,
+    serialize_worker_orchestration_plan,
+    serialize_worker_orchestration_review,
+    serialize_worker_orchestration_status,
+    serialize_worker_orchestration_step,
+    serialize_worker_orchestration_summary,
     serialize_worker_result,
     serialize_worker_task,
 )
@@ -577,6 +589,32 @@ def _build_checkpoint_junction_snapshot(
         ),
         "orchestration_junction": serialize_orchestration_junction(
             junction,
+        ),
+    }
+
+
+def _build_worker_orchestration_prep_snapshot(
+    plan: WorkerOrchestrationPlan,
+    step: WorkerOrchestrationStep,
+    handoff: WorkerOrchestrationHandoff,
+    status: WorkerOrchestrationStatus,
+    summary: WorkerOrchestrationSummary,
+    review: WorkerOrchestrationReview,
+) -> Mapping[str, Mapping[str, str]]:
+    return {
+        "worker_orchestration_plan": serialize_worker_orchestration_plan(plan),
+        "worker_orchestration_step": serialize_worker_orchestration_step(step),
+        "worker_orchestration_handoff": serialize_worker_orchestration_handoff(
+            handoff,
+        ),
+        "worker_orchestration_status": serialize_worker_orchestration_status(
+            status,
+        ),
+        "worker_orchestration_summary": serialize_worker_orchestration_summary(
+            summary,
+        ),
+        "worker_orchestration_review": serialize_worker_orchestration_review(
+            review,
         ),
     }
 

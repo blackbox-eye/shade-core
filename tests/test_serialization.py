@@ -27,6 +27,12 @@ from shade_core.models import (
     RunTransition,
     TaskRoute,
     TaskTransition,
+    WorkerOrchestrationHandoff,
+    WorkerOrchestrationPlan,
+    WorkerOrchestrationReview,
+    WorkerOrchestrationStatus,
+    WorkerOrchestrationStep,
+    WorkerOrchestrationSummary,
     WorkerResult,
     WorkerTask,
 )
@@ -57,6 +63,12 @@ from shade_core.serialization import (
     serialize_run_transition,
     serialize_task_route,
     serialize_task_transition,
+    serialize_worker_orchestration_handoff,
+    serialize_worker_orchestration_plan,
+    serialize_worker_orchestration_review,
+    serialize_worker_orchestration_status,
+    serialize_worker_orchestration_step,
+    serialize_worker_orchestration_summary,
     serialize_worker_result,
     serialize_worker_task,
 )
@@ -344,6 +356,102 @@ def test_serialize_task_route() -> None:
         "source_role": "analysis",
         "target_role": "review",
         "route_ref": "route-1",
+    }
+
+
+def test_serialize_worker_orchestration_plan() -> None:
+    plan = WorkerOrchestrationPlan(
+        task_id="task-1",
+        route_ref="route-1",
+        plan_status="prepared",
+        plan_ref="plan-1",
+    )
+
+    assert serialize_worker_orchestration_plan(plan) == {
+        "task_id": "task-1",
+        "route_ref": "route-1",
+        "plan_status": "prepared",
+        "plan_ref": "plan-1",
+    }
+
+
+def test_serialize_worker_orchestration_step() -> None:
+    step = WorkerOrchestrationStep(
+        plan_ref="plan-1",
+        task_transition_ref="task-transition-1",
+        step_status="prepared",
+        step_ref="step-1",
+    )
+
+    assert serialize_worker_orchestration_step(step) == {
+        "plan_ref": "plan-1",
+        "task_transition_ref": "task-transition-1",
+        "step_status": "prepared",
+        "step_ref": "step-1",
+    }
+
+
+def test_serialize_worker_orchestration_handoff() -> None:
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="step-1",
+        output_ref="output-1",
+        checkpoint_ref="checkpoint-1",
+        handoff_ref="handoff-1",
+    )
+
+    assert serialize_worker_orchestration_handoff(handoff) == {
+        "step_ref": "step-1",
+        "output_ref": "output-1",
+        "checkpoint_ref": "checkpoint-1",
+        "handoff_ref": "handoff-1",
+    }
+
+
+def test_serialize_worker_orchestration_status() -> None:
+    status = WorkerOrchestrationStatus(
+        handoff_ref="handoff-1",
+        junction_ref="junction-1",
+        status_value="pending",
+        status_ref="status-1",
+    )
+
+    assert serialize_worker_orchestration_status(status) == {
+        "handoff_ref": "handoff-1",
+        "junction_ref": "junction-1",
+        "status_value": "pending",
+        "status_ref": "status-1",
+    }
+
+
+def test_serialize_worker_orchestration_summary() -> None:
+    summary = WorkerOrchestrationSummary(
+        plan_ref="plan-1",
+        status_ref="status-1",
+        summary_status="aligned",
+        summary_ref="summary-1",
+    )
+
+    assert serialize_worker_orchestration_summary(summary) == {
+        "plan_ref": "plan-1",
+        "status_ref": "status-1",
+        "summary_status": "aligned",
+        "summary_ref": "summary-1",
+    }
+
+
+def test_serialize_worker_orchestration_review() -> None:
+    review = WorkerOrchestrationReview(
+        summary_ref="summary-1",
+        status_ref="status-1",
+        review_status="pending",
+        review_ref="worker-review-1",
+    )
+
+    assert serialize_worker_orchestration_review(review) == {
+        "summary_ref": "summary-1",
+        "status_ref": "status-1",
+        "review_status": "pending",
+        "review_ref": "worker-review-1",
     }
 
 

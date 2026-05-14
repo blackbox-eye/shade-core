@@ -77,6 +77,54 @@ class TaskRoute:
 
 
 @dataclass(slots=True)
+class WorkerOrchestrationPlan:
+    task_id: str
+    route_ref: str
+    plan_status: str
+    plan_ref: str
+
+
+@dataclass(slots=True)
+class WorkerOrchestrationStep:
+    plan_ref: str
+    task_transition_ref: str
+    step_status: str
+    step_ref: str
+
+
+@dataclass(slots=True)
+class WorkerOrchestrationHandoff:
+    step_ref: str
+    output_ref: str
+    checkpoint_ref: str
+    handoff_ref: str
+
+
+@dataclass(slots=True)
+class WorkerOrchestrationStatus:
+    handoff_ref: str
+    junction_ref: str
+    status_value: str
+    status_ref: str
+
+
+@dataclass(slots=True)
+class WorkerOrchestrationSummary:
+    plan_ref: str
+    status_ref: str
+    summary_status: str
+    summary_ref: str
+
+
+@dataclass(slots=True)
+class WorkerOrchestrationReview:
+    summary_ref: str
+    status_ref: str
+    review_status: str
+    review_ref: str
+
+
+@dataclass(slots=True)
 class OrchestrationCheckpoint:
     task_id: str
     output_ref: str
