@@ -6,7 +6,7 @@
 
 ## System frame
 
-- `src/shade_core/` currently implements a minimal core of contract, gate, evaluation, serialization, bundle primitives, one internal runtime-fabric snapshot path, and three internal worker-task/orchestration contract objects as preparation boundaries.
+- `src/shade_core/` currently implements a minimal core of contract, gate, evaluation, serialization, bundle primitives, one internal runtime-fabric snapshot path, and internal contract-prep boundaries for worker task, worker result, task route, worker-orchestration plan, worker-orchestration step, worker-orchestration handoff, worker-orchestration status, worker-orchestration summary, and worker-orchestration review. These are typed preparation boundaries only and do not implement planning, worker execution, routing, or runtime orchestration behavior.
 - `src/shade_core/__init__.py` defines the stable root package API for that current minimal core.
 - The remaining `src/shade_core/*.py` files are internal implementation modules behind the root package surface.
 - Adapter-awareness in the current core is limited to one neutral typed handoff boundary for `artifact_ref`, `source_lane`, and `target_lane`.
