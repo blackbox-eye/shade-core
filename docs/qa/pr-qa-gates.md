@@ -3,11 +3,16 @@
 ## Purpose
 
 - Define the expected evidence and stop conditions for each common PR type.
-- Use this with [PR workflow SOP](../governance/pr-workflow-sop.md) and [PR review and merge gates](../governance/pr-review-and-merge-gates.md).
+- Use this with [PR workflow SOP](../governance/pr-workflow-sop.md), [PR review and merge gates](../governance/pr-review-and-merge-gates.md), and the [repo consistency contract](repo-consistency-contract.md).
+
+## Repo consistency enforcement
+
+- Workflow docs, the PR template, and Copilot instructions are guarded by [repo consistency contract](repo-consistency-contract.md) and `tests/test_repo_consistency.py`.
+- Stop if a workflow-doc PR changes that surface without keeping the contract and repo consistency tests green.
 
 ## Docs PR
 
-- Expected evidence: allowed files stay in docs or approved `.github` docs/template/instructions paths, `python -m pytest -q` passes, and the PR body records changed files and validation.
+- Expected evidence: allowed files stay in docs or approved `.github` docs/template/instructions paths, `python -m pytest -q` passes, the PR body records changed files and validation, and any playbook-doc changes stay aligned with the [repo consistency contract](repo-consistency-contract.md).
 - Stop conditions: source code, tests, workflow YAML, or runtime behavior drift enters the diff; validation is missing; the PR is a micro change without justification.
 
 ## Test PR

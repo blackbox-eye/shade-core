@@ -20,6 +20,7 @@ Follow [PR workflow SOP](../docs/governance/pr-workflow-sop.md) as the repositor
 - Use [PR command bundles](../docs/governance/pr-command-bundles.md) for PowerShell-ready Git and PR steps.
 - Use [Copilot bundle prompts](../docs/governance/copilot-bundle-prompts.md) when the user or ChatGPT/tovholder is shaping a larger bundle.
 - Use [PR review and merge gates](../docs/governance/pr-review-and-merge-gates.md) and [PR QA gates](../docs/qa/pr-qa-gates.md) when reporting completion.
+- Use [Repo consistency contract](../docs/qa/repo-consistency-contract.md) when editing playbook docs, the PR template, or Copilot instructions.
 
 ## Scope locks
 

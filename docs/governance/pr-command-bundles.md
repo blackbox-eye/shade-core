@@ -21,6 +21,7 @@ git status -sb
 ## Validation gate
 
 - Run before commit and before major PR updates.
+- When workflow docs, the PR template, or Copilot instructions change, run `python -m pytest -q tests/test_repo_consistency.py` before the full suite.
 
 ```powershell
 git diff --stat

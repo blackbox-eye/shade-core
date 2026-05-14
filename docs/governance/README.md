@@ -23,5 +23,6 @@ This folder describes the repository working rules and change control.
 - [PR command bundles](pr-command-bundles.md) keeps the PowerShell-ready Git and PR commands.
 - [Copilot bundle prompts](copilot-bundle-prompts.md) keeps reusable PR-level prompt templates.
 - [PR review and merge gates](pr-review-and-merge-gates.md) keeps the stop/go review and merge gates.
+- [Repo consistency contract](../qa/repo-consistency-contract.md) keeps the playbook invariants enforced at the repo level.
 - [Branch and PR rules](branch-pr-rules.md) keeps the short branch and merge policy.
 - [Copilot instructions](../../.github/copilot-instructions.md) keeps Copilot execution inside the same operating model.

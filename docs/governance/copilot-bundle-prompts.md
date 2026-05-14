@@ -4,6 +4,7 @@
 
 - Reuse one PR-level prompt shape instead of issuing serial micro-tasks.
 - Use these templates with [PR workflow SOP](pr-workflow-sop.md).
+- Use [repo consistency contract](../qa/repo-consistency-contract.md) when a workflow bundle changes enforced playbook docs.
 
 ## Docs-only bundle
 
@@ -140,8 +141,10 @@ Acceptance criteria:
 - Diff stays limited to the allowed files.
 - The workflow remains operational and non-essay-like.
 - The bundle is a real PR-level unit, not a wording patch.
+- The [repo consistency contract](../qa/repo-consistency-contract.md) stays aligned when enforced playbook docs change.
 
 Validation commands:
+- python -m pytest -q tests/test_repo_consistency.py
 - python -m pytest -q
 - git diff --stat
 - git diff -- <relevant-path>

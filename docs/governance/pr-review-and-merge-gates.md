@@ -10,6 +10,7 @@
 - Scope is locked and the bundle stays at 2-4 related items unless a micro-PR exception is recorded.
 - Diff is limited to the allowed files.
 - The validation bundle has passed.
+- When workflow docs, the PR template, or Copilot instructions change, the [repo consistency contract](../qa/repo-consistency-contract.md) stays aligned and `tests/test_repo_consistency.py` passes.
 - The PR body fields are complete.
 - Stop and ask ChatGPT/tovholder if the work drifted outside scope.
 
