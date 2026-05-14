@@ -6,7 +6,7 @@ This file compares the safe Cycle 9.2 contract-slice options from the current ru
 
 ## Selection rule
 
-- Prefer the next slice that extends the current implemented contract-prep chain.
+- Prefer the next slice that extends the currently implemented contract-prep chain.
 - Do not imply runtime execution, deploy, provider wiring, memory behavior, or production integration.
 - Keep the next slice small enough to stay reviewable and explicit.
 
@@ -14,7 +14,7 @@ This file compares the safe Cycle 9.2 contract-slice options from the current ru
 
 ### Worker orchestration contract prep
 
-- Fit: closest to the current implemented worker-task, worker-result, task-route, checkpoint, junction, and transition prep seam.
+- Fit: closest to the currently implemented worker-task, worker-result, task-route, checkpoint, junction, and transition prep seam.
 - Benefit: extends the earliest orchestration-facing contract boundary without claiming execution behavior.
 - Risk: low, because it stays inside internal contract objects, validation, serialization, and snapshot composition.
 
