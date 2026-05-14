@@ -11,6 +11,7 @@
 - [Copilot bundle prompts](copilot-bundle-prompts.md) owns reusable PR-level prompt templates.
 - [PR review and merge gates](pr-review-and-merge-gates.md) owns the stop/go review flow.
 - [PR QA gates](../qa/pr-qa-gates.md) owns PR-type evidence and stop conditions.
+- [Repo consistency contract](../qa/repo-consistency-contract.md) owns the repo-level invariants guarded by `tests/test_repo_consistency.py`.
 
 ## Production-mode communication standard
 
@@ -69,6 +70,7 @@
 - Do not commit while the diff has drifted outside the locked scope.
 - Do not commit while `git status -sb` shows unrelated changes.
 - Use [PR QA gates](../qa/pr-qa-gates.md) to match the evidence to the PR type.
+- When workflow docs, the PR template, or Copilot instructions change, keep `tests/test_repo_consistency.py` green against the [repo consistency contract](../qa/repo-consistency-contract.md).
 
 ## PR body requirements
 

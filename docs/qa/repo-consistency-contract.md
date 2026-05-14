@@ -1,0 +1,53 @@
+# Repo consistency contract
+
+## Purpose
+
+- Define what the repository consistency tests protect for the PR operations playbook.
+- Keep the workflow model enforced as a repo-local contract, not docs-only guidance.
+
+## Protected workflow surface
+
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/copilot-instructions.md`
+- `docs/governance/pr-workflow-sop.md`
+- `docs/governance/pr-command-bundles.md`
+- `docs/governance/copilot-bundle-prompts.md`
+- `docs/governance/pr-review-and-merge-gates.md`
+- `docs/qa/pr-qa-gates.md`
+- `docs/qa/README.md`
+- `docs/qa/test-strategy.md`
+
+## What repo consistency tests protect
+
+- Required playbook docs and instructions stay present.
+- The canonical PR bundle taxonomy stays `docs`, `test`, `code`, `release`, `cleanup`, `hotfix`, `other`.
+- PR body examples use a temp-file flow instead of writing `pr-body.md` in the repo root.
+- The PR workflow SOP keeps 2-4 item bundle guidance, micro-PR exceptions, validation, Copilot non-merge authority, and post-merge cleanup.
+- Governance and QA indexes keep linking to the enforced playbook docs.
+
+## When to update tests
+
+- A playbook rule changes intentionally in the same locked governance or QA bundle.
+- A new enforced workflow doc becomes required.
+- The canonical bundle taxonomy changes intentionally.
+- The temp-file PR body rule changes intentionally.
+
+## When not to update tests
+
+- To silence drift in workflow docs that was not intentionally approved.
+- To re-allow micro-task patterns as the default operating mode.
+- To reintroduce repo-root `pr-body.md` guidance.
+- To rename canonical bundle types ad hoc.
+
+## Stop conditions
+
+- Workflow docs, the PR template, or Copilot instructions change without keeping `tests/test_repo_consistency.py` green.
+- A playbook edit would weaken the canonical taxonomy, validation gate, or merge-authority rules.
+- Governance or QA indexes drop required links to the playbook or QA gate docs.
+- The PR cannot explain why a repo consistency invariant changed.
+
+## Relation to SOP and QA gates
+
+- [PR workflow SOP](../governance/pr-workflow-sop.md) defines the operating model.
+- [PR QA gates](pr-qa-gates.md) defines evidence and stop conditions by PR type.
+- `tests/test_repo_consistency.py` enforces the stable repo-level invariants from those docs.

@@ -10,11 +10,12 @@ This file covers only local repo baseline, PR baseline, and later test direction
 - Scope is locked before implementation and kept within the intended bundle.
 - Simple repository and file checks can be run locally in PowerShell.
 - The current pytest suite covers the implemented minimal Python core.
-- The current pytest suite also includes one narrow repo consistency check for stable workflow and documented path drift.
+- The current pytest suite also includes deterministic repo consistency coverage for stable workflow and documented path drift.
 - Pull request is the fixed quality gate before merge.
 - The `pr-baseline` workflow verifies baseline files and runs `python -m pytest`.
 
 The operating sequence for validation and cleanup lives in [PR workflow SOP](../governance/pr-workflow-sop.md).
+The enforced workflow invariants live in [repo consistency contract](repo-consistency-contract.md).
 
 ## Standard validation gate
 
@@ -22,6 +23,7 @@ The operating sequence for validation and cleanup lives in [PR workflow SOP](../
 - The standard local gate stays `git diff --stat`, relevant `git diff`, `python -m pytest -q`, and `git status -sb`.
 - Record validation results and changed files in the PR body.
 - Use [PR QA gates](pr-qa-gates.md) for PR-type evidence and stop conditions.
+- When workflow docs, the PR template, or Copilot instructions change, keep `tests/test_repo_consistency.py` green against the [repo consistency contract](repo-consistency-contract.md).
 
 ## Before pull request
 

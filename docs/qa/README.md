@@ -7,7 +7,7 @@ This folder describes the local baseline for quality assurance in the repository
 - Simple, local checks before pull request.
 - Reviewable documentation and small changes.
 - Traceable quality without environment-specific operations.
-- The existing pytest path includes one narrow automated repo consistency check for stable workflow and path drift.
+- The existing pytest path includes deterministic repo consistency tests for stable workflow and path drift.
 
 ## Working frame
 
@@ -18,4 +18,5 @@ This folder describes the local baseline for quality assurance in the repository
 - Use [PR workflow SOP](../governance/pr-workflow-sop.md) for validation and cleanup gates.
 - Use [test strategy](test-strategy.md) for the local QA baseline and PR reporting expectations.
 - Use [PR QA gates](pr-qa-gates.md) for PR-type evidence and stop conditions.
+- Use [Repo consistency contract](repo-consistency-contract.md) when workflow docs, the PR template, or Copilot instructions change.
 - No deploy-, VPS-, or secrets-scope.
