@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -22,6 +23,11 @@ PR_QA_GATES_PATH = REPO_ROOT / "docs" / "qa" / "pr-qa-gates.md"
 REPO_CONSISTENCY_CONTRACT_PATH = (
     REPO_ROOT / "docs" / "qa" / "repo-consistency-contract.md"
 )
+CURRENT_RUNTIME_SLICE_PATH = (
+    REPO_ROOT / "docs" / "architecture" / "current-runtime-slice.md"
+)
+SYSTEM_OVERVIEW_PATH = REPO_ROOT / "docs" / "architecture" / "system-overview.md"
+ROOT_PACKAGE_INIT_PATH = REPO_ROOT / "src" / "shade_core" / "__init__.py"
 INDEX_PATHS = (
     REPO_ROOT / "docs" / "README.md",
     REPO_ROOT / "docs" / "architecture" / "README.md",
@@ -54,6 +60,154 @@ CANONICAL_BUNDLE_TYPE_PATHS = (
     PR_TEMPLATE_PATH,
     PR_COMMAND_BUNDLES_PATH,
 )
+WORKER_ORCHESTRATION_CONTRACT_TRACEABILITY_ROWS = (
+    (
+        "Worker orchestration plan contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+    (
+        "Worker orchestration step contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+    (
+        "Worker orchestration handoff contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+    (
+        "Worker orchestration status contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+    (
+        "Worker orchestration summary contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+    (
+        "Worker orchestration review contract",
+        "src/shade_core/models.py",
+        "tests/test_models.py",
+    ),
+)
+WORKER_ORCHESTRATION_VALIDATION_TRACEABILITY_ROWS = (
+    (
+        "Worker orchestration plan validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+    (
+        "Worker orchestration step validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+    (
+        "Worker orchestration handoff validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+    (
+        "Worker orchestration status validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+    (
+        "Worker orchestration summary validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+    (
+        "Worker orchestration review validation",
+        "src/shade_core/contract_gate.py",
+        "tests/test_contract_gate.py",
+    ),
+)
+WORKER_ORCHESTRATION_SERIALIZATION_TRACEABILITY_ROWS = (
+    (
+        "Worker orchestration plan serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+    (
+        "Worker orchestration step serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+    (
+        "Worker orchestration handoff serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+    (
+        "Worker orchestration status serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+    (
+        "Worker orchestration summary serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+    (
+        "Worker orchestration review serialization",
+        "src/shade_core/serialization.py",
+        "tests/test_serialization.py",
+    ),
+)
+WORKER_ORCHESTRATION_ROOT_API_NAMES = (
+    "WorkerOrchestrationPlan",
+    "WorkerOrchestrationStep",
+    "WorkerOrchestrationHandoff",
+    "WorkerOrchestrationStatus",
+    "WorkerOrchestrationSummary",
+    "WorkerOrchestrationReview",
+)
+EXPECTED_ROOT_PACKAGE_INIT_TEXT = '''"""Minimal package for shade-core."""
+
+from .bundle import build_bundle
+from .contract_gate import ContractGateResult, validate_state_contract
+from .evaluation import evaluate
+from .evaluation_gate import EvaluationGateResult, run_evaluation_gate
+from .models import (
+    ConfidenceRecord,
+    MetaAuditEvent,
+    RuntimeDecision,
+    SelfModel,
+    WorkerRegistry,
+)
+from .runtime_loop import audit_decision, decide
+from .serialization import (
+    serialize_evaluation_result,
+    serialize_meta_audit_event,
+    serialize_runtime_decision,
+)
+from .state import RunState
+
+__all__ = [
+    "__version__",
+    "ContractGateResult",
+    "ConfidenceRecord",
+    "EvaluationGateResult",
+    "MetaAuditEvent",
+    "RunState",
+    "RuntimeDecision",
+    "SelfModel",
+    "WorkerRegistry",
+    "build_bundle",
+    "evaluate",
+    "run_evaluation_gate",
+    "audit_decision",
+    "decide",
+    "serialize_evaluation_result",
+    "serialize_meta_audit_event",
+    "serialize_runtime_decision",
+    "validate_state_contract",
+]
+
+__version__ = "0.1.0"
+'''
 
 
 def _traceability_has_row(
@@ -75,6 +229,10 @@ def _read_repo_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _normalized_repo_text(path: Path) -> str:
+    return _read_repo_text(path).replace("\r\n", "\n").strip()
+
+
 def _line_with_prefix(text: str, prefix: str) -> str:
     for line in text.splitlines():
         stripped = line.strip()
@@ -87,6 +245,36 @@ def _line_with_prefix(text: str, prefix: str) -> str:
 def _bundle_types_from_line(line: str) -> tuple[str, ...]:
     values = line.split(":", 1)[1].strip().strip("_<>")
     return tuple(part.strip() for part in values.split("|"))
+
+
+def _module_all_exports(path: Path) -> tuple[str, ...]:
+    module = ast.parse(_read_repo_text(path))
+
+    for node in module.body:
+        if not isinstance(node, ast.Assign):
+            continue
+
+        for target in node.targets:
+            if isinstance(target, ast.Name) and target.id == "__all__":
+                value = ast.literal_eval(node.value)
+                assert isinstance(value, list)
+                assert all(isinstance(item, str) for item in value)
+                return tuple(value)
+
+    raise AssertionError("Could not find __all__ assignment in src/shade_core/__init__.py")
+
+
+def _assert_traceability_rows_present(
+    traceability_text: str,
+    rows: tuple[tuple[str, str, str], ...],
+) -> None:
+    for capability, code_path, test_path in rows:
+        assert _traceability_has_row(
+            traceability_text,
+            capability,
+            code_path,
+            test_path,
+        ), f"Missing traceability row for {capability!r}"
 
 
 def test_pr_baseline_workflow_has_expected_tokens() -> None:
@@ -327,3 +515,102 @@ def test_governance_docs_reference_repo_consistency_contract() -> None:
         "[Repo consistency contract](../docs/qa/repo-consistency-contract.md)"
         in _read_repo_text(COPILOT_INSTRUCTIONS_PATH)
     )
+
+
+def test_traceability_includes_worker_orchestration_contract_rows() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    _assert_traceability_rows_present(
+        traceability_text,
+        WORKER_ORCHESTRATION_CONTRACT_TRACEABILITY_ROWS,
+    )
+
+
+def test_traceability_includes_worker_orchestration_validation_rows() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    _assert_traceability_rows_present(
+        traceability_text,
+        WORKER_ORCHESTRATION_VALIDATION_TRACEABILITY_ROWS,
+    )
+
+
+def test_traceability_includes_worker_orchestration_serialization_rows() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    _assert_traceability_rows_present(
+        traceability_text,
+        WORKER_ORCHESTRATION_SERIALIZATION_TRACEABILITY_ROWS,
+    )
+
+
+def test_traceability_includes_worker_orchestration_prep_snapshot_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        "Worker orchestration prep snapshot",
+        "src/shade_core/bundle.py",
+        "tests/test_bundle.py",
+    )
+
+
+def test_root_package_keeps_worker_orchestration_symbols_out_of_public_api() -> None:
+    root_exports = _module_all_exports(ROOT_PACKAGE_INIT_PATH)
+
+    for name in WORKER_ORCHESTRATION_ROOT_API_NAMES:
+        assert name not in root_exports
+
+
+def test_root_package_init_file_matches_locked_public_api_surface() -> None:
+    assert _normalized_repo_text(ROOT_PACKAGE_INIT_PATH) == (
+        EXPECTED_ROOT_PACKAGE_INIT_TEXT.strip()
+    )
+
+
+def test_worker_orchestration_architecture_docs_use_contract_prep_wording() -> None:
+    current_runtime_slice_text = _read_repo_text(CURRENT_RUNTIME_SLICE_PATH)
+    system_overview_text = _read_repo_text(SYSTEM_OVERVIEW_PATH)
+
+    assert "contract-prep" in current_runtime_slice_text
+    assert "preparation boundaries" in system_overview_text
+    assert "Worker orchestration behavior." in current_runtime_slice_text
+    assert "typed preparation boundaries only" in system_overview_text
+
+
+def test_worker_orchestration_architecture_docs_keep_runtime_and_integration_out_of_scope() -> None:
+    current_runtime_slice_text = _read_repo_text(CURRENT_RUNTIME_SLICE_PATH)
+    system_overview_text = _read_repo_text(SYSTEM_OVERVIEW_PATH)
+
+    expected_current_runtime_tokens = (
+        "do not execute worker selection, worker steps, routing, transitions, closure, publication, or release behavior.",
+        "- Adapter or provider implementations.",
+        "- Memory layer behavior.",
+        "- Deploy or VPS behavior.",
+        "- Production integration.",
+    )
+    expected_system_overview_tokens = (
+        "do not implement planning, worker execution, routing, or runtime orchestration behavior.",
+        "It does not describe deploy, VPS, production, or integration.",
+        "It does not implement adapters, provider bindings, or runtime wiring for that handoff boundary.",
+    )
+
+    for token in expected_current_runtime_tokens:
+        assert token in current_runtime_slice_text
+
+    for token in expected_system_overview_tokens:
+        assert token in system_overview_text
+
+
+def test_repo_consistency_contract_describes_worker_orchestration_contract_prep_enforcement() -> None:
+    contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
+
+    assert "## Worker orchestration contract-prep enforcement" in contract_text
+    expected_tokens = (
+        "docs-to-code traceability",
+        "must not widen `src/shade_core/__init__.py`",
+        "non-runtime wording",
+    )
+
+    for token in expected_tokens:
+        assert token in contract_text
