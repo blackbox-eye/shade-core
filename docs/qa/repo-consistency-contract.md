@@ -25,6 +25,12 @@
 - The PR workflow SOP keeps 2-4 item bundle guidance, micro-PR exceptions, validation, Copilot non-merge authority, and post-merge cleanup.
 - Governance and QA indexes keep linking to the enforced playbook docs.
 
+## Worker orchestration contract-prep enforcement
+
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the internal worker-orchestration plan, step, handoff, status, summary, review, validation, serialization, and prep-snapshot rows.
+- The same test file enforces that worker-orchestration contract-prep additions must not widen `src/shade_core/__init__.py`.
+- The same test file also protects non-runtime wording in the current architecture docs so this seam stays documented as contract-prep and preparation boundaries only.
+
 ## When to update tests
 
 - A playbook rule changes intentionally in the same locked governance or QA bundle.
