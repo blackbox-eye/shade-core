@@ -37,6 +37,12 @@
 - `validate_orchestration_manifest_chain` and `_build_manifest_verification_snapshot` are internal contract-prep symbols only; they must not be exported via `src/shade_core/__init__.py`.
 - This enforcement is restricted to internal contract-prep cross-reference verification; it does not extend to runtime, integration, or deployment scope.
 
+## Publication release-view consistency enforcement
+
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Publication release-view consistency row (`src/shade_core/contract_gate.py`) and the Publication release-view consistency snapshot row (`src/shade_core/bundle.py`).
+- `validate_orchestration_publication_release_view_consistency` and `_build_publication_release_view_consistency_snapshot` are internal contract-prep symbols only; they must not be exported via `src/shade_core/__init__.py`.
+- This enforcement is restricted to internal contract-prep verification of the release-view boundary; it does not extend to runtime, integration, or deployment scope.
+
 ## When to update tests
 
 - A playbook rule changes intentionally in the same locked governance or QA bundle.

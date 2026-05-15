@@ -991,6 +991,34 @@ def validate_orchestration_release_view(
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 
 
+def validate_orchestration_publication_release_view_consistency(
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    for prefix, individual_result in (
+        ("publication.", validate_orchestration_publication(publication)),
+        ("release_view.", validate_orchestration_release_view(release_view)),
+    ):
+        errors.extend(f"{prefix}{error}" for error in individual_result.errors)
+
+    if release_view.publication_ref != publication.publication_ref:
+        errors.append(
+            "release_view.publication_ref must equal publication.publication_ref"
+        )
+    if release_view.assertion_ref != publication.assertion_ref:
+        errors.append(
+            "release_view.assertion_ref must equal publication.assertion_ref"
+        )
+    if release_view.review_ref != publication.review_ref:
+        errors.append(
+            "release_view.review_ref must equal publication.review_ref"
+        )
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
 def validate_orchestration_assertion(
     assertion: OrchestrationAssertion,
 ) -> ContractGateResult:

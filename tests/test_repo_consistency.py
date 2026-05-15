@@ -174,6 +174,20 @@ MANIFEST_VERIFICATION_SNAPSHOT_TRACEABILITY_ROW = (
     "src/shade_core/bundle.py",
     "tests/test_bundle.py",
 )
+PUBLICATION_RELEASE_VIEW_CONSISTENCY_TRACEABILITY_ROW = (
+    "Publication release-view consistency",
+    "src/shade_core/contract_gate.py",
+    "tests/test_contract_gate.py",
+)
+PUBLICATION_RELEASE_VIEW_CONSISTENCY_SNAPSHOT_TRACEABILITY_ROW = (
+    "Publication release-view consistency snapshot",
+    "src/shade_core/bundle.py",
+    "tests/test_bundle.py",
+)
+PUBLICATION_RELEASE_VIEW_CONSISTENCY_ROOT_API_NAMES = (
+    "validate_orchestration_publication_release_view_consistency",
+    "_build_publication_release_view_consistency_snapshot",
+)
 EXPECTED_ROOT_PACKAGE_INIT_TEXT = '''"""Minimal package for shade-core."""
 
 from .bundle import build_bundle
@@ -652,6 +666,31 @@ def test_traceability_includes_manifest_verification_snapshot_row() -> None:
     )
 
 
+def test_traceability_includes_publication_release_view_consistency_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        *PUBLICATION_RELEASE_VIEW_CONSISTENCY_TRACEABILITY_ROW,
+    )
+
+
+def test_traceability_includes_publication_release_view_consistency_snapshot_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        *PUBLICATION_RELEASE_VIEW_CONSISTENCY_SNAPSHOT_TRACEABILITY_ROW,
+    )
+
+
+def test_root_package_keeps_publication_release_view_consistency_symbols_out_of_public_api() -> None:
+    root_exports = _module_all_exports(ROOT_PACKAGE_INIT_PATH)
+
+    for name in PUBLICATION_RELEASE_VIEW_CONSISTENCY_ROOT_API_NAMES:
+        assert name not in root_exports
+
+
 def test_repo_consistency_contract_describes_manifest_chain_verification_enforcement() -> None:
     contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
 
@@ -662,6 +701,26 @@ def test_repo_consistency_contract_describes_manifest_chain_verification_enforce
         "Manifest verification snapshot",
         "validate_orchestration_manifest_chain",
         "_build_manifest_verification_snapshot",
+        "must not be exported via `src/shade_core/__init__.py`",
+        "runtime",
+        "integration",
+        "deployment",
+    )
+
+    for token in expected_tokens:
+        assert token in contract_text
+
+
+def test_repo_consistency_contract_describes_publication_release_view_consistency_enforcement() -> None:
+    contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
+
+    assert "## Publication release-view consistency enforcement" in contract_text
+    expected_tokens = (
+        "docs-to-code traceability",
+        "Publication release-view consistency",
+        "Publication release-view consistency snapshot",
+        "validate_orchestration_publication_release_view_consistency",
+        "_build_publication_release_view_consistency_snapshot",
         "must not be exported via `src/shade_core/__init__.py`",
         "runtime",
         "integration",

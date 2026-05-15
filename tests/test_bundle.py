@@ -30,6 +30,7 @@ from shade_core.bundle import _guard_prepared_runtime_evaluation_fabric  # noqa:
 from shade_core.bundle import _guard_runtime_evaluation_fabric_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
 from shade_core.bundle import _build_manifest_verification_snapshot  # noqa: E402
+from shade_core.bundle import _build_publication_release_view_consistency_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
 from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
@@ -2286,6 +2287,69 @@ def test_build_publication_release_view_snapshot_returns_expected_structure() ->
             "review_ref": "review-1",
             "release_view_ref": "release-view-1",
         },
+    }
+
+
+def _valid_publication_release_view_bundle_objects(
+) -> tuple[OrchestrationPublication, OrchestrationReleaseView]:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    return publication, release_view
+
+
+def test_build_publication_release_view_consistency_snapshot_returns_expected_structure() -> None:
+    publication, release_view = _valid_publication_release_view_bundle_objects()
+
+    snapshot = _build_publication_release_view_consistency_snapshot(
+        publication,
+        release_view,
+    )
+
+    assert snapshot == {
+        "orchestration_publication": {
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "publication_ref": "publication-1",
+        },
+        "orchestration_release_view": {
+            "publication_ref": "publication-1",
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "release_view_ref": "release-view-1",
+        },
+        "publication_release_view_consistency": {
+            "is_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_publication_release_view_consistency_snapshot_includes_invalid_consistency_result() -> None:
+    publication, release_view = _valid_publication_release_view_bundle_objects()
+    release_view = replace(release_view, assertion_ref="wrong-assertion")
+
+    snapshot = _build_publication_release_view_consistency_snapshot(
+        publication,
+        release_view,
+    )
+
+    assert snapshot["publication_release_view_consistency"] == {
+        "is_valid": False,
+        "errors": (
+            "release_view.assertion_ref must equal publication.assertion_ref",
+        ),
     }
 
 

@@ -24,6 +24,7 @@ from shade_core.contract_gate import (
     validate_orchestration_manifest_chain,
     validate_orchestration_outcome,
     validate_orchestration_publication,
+    validate_orchestration_publication_release_view_consistency,
     validate_orchestration_release_view,
     validate_orchestration_review,
     validate_orchestration_verification,
@@ -1130,6 +1131,113 @@ def test_validate_orchestration_release_view_fails_for_invalid_release_view() ->
         "assertion_ref is required",
         "review_ref is required",
         "release_view_ref is required",
+    )
+
+
+def _valid_publication_release_view_consistency_objects(
+) -> tuple[OrchestrationPublication, OrchestrationReleaseView]:
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+
+    return publication, release_view
+
+
+def test_validate_orchestration_publication_release_view_consistency_passes_for_valid_objects() -> None:
+    publication, release_view = _valid_publication_release_view_consistency_objects()
+
+    result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_publication_release_view_consistency_fails_for_invalid_individual_objects() -> None:
+    publication = OrchestrationPublication(
+        assertion_ref="",
+        review_ref="",
+        manifest_ref="",
+        publication_ref="",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="",
+        assertion_ref="",
+        review_ref="",
+        release_view_ref="",
+    )
+
+    result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "publication.assertion_ref is required",
+        "publication.review_ref is required",
+        "publication.manifest_ref is required",
+        "publication.publication_ref is required",
+        "release_view.publication_ref is required",
+        "release_view.assertion_ref is required",
+        "release_view.review_ref is required",
+        "release_view.release_view_ref is required",
+    )
+
+
+def test_validate_orchestration_publication_release_view_consistency_fails_for_publication_ref_mismatch() -> None:
+    publication, release_view = _valid_publication_release_view_consistency_objects()
+    release_view = dc_replace(release_view, publication_ref="wrong-publication")
+
+    result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "release_view.publication_ref must equal publication.publication_ref",
+    )
+
+
+def test_validate_orchestration_publication_release_view_consistency_fails_for_assertion_ref_mismatch() -> None:
+    publication, release_view = _valid_publication_release_view_consistency_objects()
+    release_view = dc_replace(release_view, assertion_ref="wrong-assertion")
+
+    result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "release_view.assertion_ref must equal publication.assertion_ref",
+    )
+
+
+def test_validate_orchestration_publication_release_view_consistency_fails_for_review_ref_mismatch() -> None:
+    publication, release_view = _valid_publication_release_view_consistency_objects()
+    release_view = dc_replace(release_view, review_ref="wrong-review")
+
+    result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "release_view.review_ref must equal publication.review_ref",
     )
 
 

@@ -9,6 +9,7 @@ from .contract_gate import (
     validate_confidence_record,
     validate_meta_audit_event,
     validate_orchestration_manifest_chain,
+    validate_orchestration_publication_release_view_consistency,
     validate_runtime_evaluation_guard_verification_snapshot,
     validate_self_model,
     validate_state_contract,
@@ -689,6 +690,23 @@ def _build_publication_release_view_snapshot(
         "orchestration_release_view": serialize_orchestration_release_view(
             release_view,
         ),
+    }
+
+
+def _build_publication_release_view_consistency_snapshot(
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> Mapping[str, object]:
+    consistency_result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        release_view,
+    )
+    return {
+        **_build_publication_release_view_snapshot(publication, release_view),
+        "publication_release_view_consistency": {
+            "is_valid": consistency_result.is_valid,
+            "errors": consistency_result.errors,
+        },
     }
 
 
