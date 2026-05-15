@@ -123,5 +123,6 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Publication release-view consistency snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper composing the publication/release-view snapshot with consistency verification result | `tests/test_bundle.py` |
 | Manifest chain verification | `src/shade_core/contract_gate.py` | Implemented as one internal validator checking cross-reference consistency across the orchestration manifest chain | `tests/test_contract_gate.py` |
 | Manifest verification snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper composing the manifest chain snapshot with chain verification result | `tests/test_bundle.py` |
+| Unified orchestration contract snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper composing existing orchestration contract-prep snapshots into one deterministic whole-chain view | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration behavior | No current code file             | Documented target only; current code stops at internal contract prep and does not execute worker orchestration | None                      |
