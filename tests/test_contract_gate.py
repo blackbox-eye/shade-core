@@ -24,6 +24,7 @@ from shade_core.contract_gate import (
     validate_orchestration_manifest_chain,
     validate_orchestration_outcome,
     validate_orchestration_publication,
+    _collect_publication_release_view_consistency_errors,
     validate_orchestration_publication_release_view_consistency,
     validate_orchestration_release_view,
     validate_orchestration_review,
@@ -1239,6 +1240,50 @@ def test_validate_orchestration_publication_release_view_consistency_fails_for_r
     assert result.errors == (
         "release_view.review_ref must equal publication.review_ref",
     )
+
+
+def test_collect_publication_release_view_consistency_errors_returns_same_errors_as_both_validators() -> None:
+    publication, release_view = _valid_publication_release_view_consistency_objects()
+    mismatched_release_view = dc_replace(
+        release_view,
+        publication_ref="wrong-pub",
+        assertion_ref="wrong-assert",
+        review_ref="wrong-review",
+    )
+
+    shared_errors = _collect_publication_release_view_consistency_errors(
+        publication,
+        mismatched_release_view,
+    )
+
+    standalone_result = validate_orchestration_publication_release_view_consistency(
+        publication,
+        mismatched_release_view,
+    )
+    chain_objects = _valid_manifest_chain_objects()
+    chain_publication = chain_objects[4]
+    chain_release_view = dc_replace(
+        chain_objects[5],
+        publication_ref="wrong-pub",
+        assertion_ref="wrong-assert",
+        review_ref="wrong-review",
+    )
+    manifest_chain_result = validate_orchestration_manifest_chain(
+        chain_objects[0],
+        chain_objects[1],
+        chain_objects[2],
+        chain_objects[3],
+        chain_publication,
+        chain_release_view,
+    )
+
+    assert shared_errors == (
+        "release_view.publication_ref must equal publication.publication_ref",
+        "release_view.assertion_ref must equal publication.assertion_ref",
+        "release_view.review_ref must equal publication.review_ref",
+    )
+    assert all(e in standalone_result.errors for e in shared_errors)
+    assert all(e in manifest_chain_result.errors for e in shared_errors)
 
 
 def test_validate_runtime_evaluation_guard_verification_snapshot_passes_for_valid_snapshot() -> None:

@@ -991,17 +991,11 @@ def validate_orchestration_release_view(
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 
 
-def validate_orchestration_publication_release_view_consistency(
+def _collect_publication_release_view_consistency_errors(
     publication: OrchestrationPublication,
     release_view: OrchestrationReleaseView,
-) -> ContractGateResult:
+) -> tuple[str, ...]:
     errors: list[str] = []
-
-    for prefix, individual_result in (
-        ("publication.", validate_orchestration_publication(publication)),
-        ("release_view.", validate_orchestration_release_view(release_view)),
-    ):
-        errors.extend(f"{prefix}{error}" for error in individual_result.errors)
 
     if release_view.publication_ref != publication.publication_ref:
         errors.append(
@@ -1015,6 +1009,23 @@ def validate_orchestration_publication_release_view_consistency(
         errors.append(
             "release_view.review_ref must equal publication.review_ref"
         )
+
+    return tuple(errors)
+
+
+def validate_orchestration_publication_release_view_consistency(
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    for prefix, individual_result in (
+        ("publication.", validate_orchestration_publication(publication)),
+        ("release_view.", validate_orchestration_release_view(release_view)),
+    ):
+        errors.extend(f"{prefix}{error}" for error in individual_result.errors)
+
+    errors.extend(_collect_publication_release_view_consistency_errors(publication, release_view))
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
 
@@ -1078,11 +1089,6 @@ def validate_orchestration_manifest_chain(
         errors.append("publication.review_ref must equal assertion.review_ref")
     if publication.manifest_ref != assertion.manifest_ref:
         errors.append("publication.manifest_ref must equal assertion.manifest_ref")
-    if release_view.publication_ref != publication.publication_ref:
-        errors.append("release_view.publication_ref must equal publication.publication_ref")
-    if release_view.assertion_ref != publication.assertion_ref:
-        errors.append("release_view.assertion_ref must equal publication.assertion_ref")
-    if release_view.review_ref != publication.review_ref:
-        errors.append("release_view.review_ref must equal publication.review_ref")
+    errors.extend(_collect_publication_release_view_consistency_errors(publication, release_view))
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
