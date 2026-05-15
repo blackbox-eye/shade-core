@@ -33,7 +33,7 @@
 
 ## Manifest chain verification enforcement
 
-- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the manifest chain verification row (`src/shade_core/contract_gate.py`) and the manifest verification snapshot row (`src/shade_core/bundle.py`).
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Manifest chain verification row (`src/shade_core/contract_gate.py`) and the Manifest verification snapshot row (`src/shade_core/bundle.py`).
 - `validate_orchestration_manifest_chain` and `_build_manifest_verification_snapshot` are internal contract-prep symbols only; they must not be exported via `src/shade_core/__init__.py`.
 - This enforcement is restricted to internal contract-prep cross-reference verification; it does not extend to runtime, integration, or deployment scope.
 

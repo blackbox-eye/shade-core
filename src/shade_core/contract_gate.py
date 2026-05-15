@@ -1018,15 +1018,15 @@ def validate_orchestration_manifest_chain(
 ) -> ContractGateResult:
     errors: list[str] = []
 
-    for individual_result in (
-        validate_orchestration_lineage(lineage),
-        validate_orchestration_manifest(manifest),
-        validate_orchestration_review(review),
-        validate_orchestration_assertion(assertion),
-        validate_orchestration_publication(publication),
-        validate_orchestration_release_view(release_view),
+    for prefix, individual_result in (
+        ("lineage.", validate_orchestration_lineage(lineage)),
+        ("manifest.", validate_orchestration_manifest(manifest)),
+        ("review.", validate_orchestration_review(review)),
+        ("assertion.", validate_orchestration_assertion(assertion)),
+        ("publication.", validate_orchestration_publication(publication)),
+        ("release_view.", validate_orchestration_release_view(release_view)),
     ):
-        errors.extend(individual_result.errors)
+        errors.extend(f"{prefix}{e}" for e in individual_result.errors)
 
     if manifest.lineage_ref != lineage.lineage_ref:
         errors.append("manifest.lineage_ref must equal lineage.lineage_ref")

@@ -2338,13 +2338,48 @@ def test_build_manifest_verification_snapshot_returns_expected_structure() -> No
         lineage, manifest, review, assertion, publication, release_view,
     )
 
-    assert "orchestration_lineage" in snapshot
-    assert "orchestration_manifest" in snapshot
-    assert "orchestration_review" in snapshot
-    assert "orchestration_assertion" in snapshot
-    assert "orchestration_publication" in snapshot
-    assert "orchestration_release_view" in snapshot
-    assert "manifest_chain_verification" in snapshot
+    assert snapshot == {
+        "orchestration_lineage": {
+            "closure_ref": "closure-1",
+            "audit_ref": "audit-1",
+            "outcome_ref": "outcome-1",
+            "lineage_ref": "lineage-1",
+        },
+        "orchestration_manifest": {
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "evidence_ref": "evidence-1",
+            "manifest_ref": "manifest-1",
+        },
+        "orchestration_review": {
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "review_ref": "review-1",
+        },
+        "orchestration_assertion": {
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "assertion_ref": "assertion-1",
+        },
+        "orchestration_publication": {
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "publication_ref": "publication-1",
+        },
+        "orchestration_release_view": {
+            "publication_ref": "publication-1",
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "release_view_ref": "release-view-1",
+        },
+        "manifest_chain_verification": {
+            "is_valid": True,
+            "errors": (),
+        },
+    }
 
 
 def test_build_manifest_verification_snapshot_includes_valid_chain_verification() -> None:

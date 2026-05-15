@@ -1,3 +1,4 @@
+from dataclasses import replace as dc_replace
 from shade_core import (
     ConfidenceRecord,
     MetaAuditEvent,
@@ -1518,20 +1519,38 @@ def test_validate_orchestration_manifest_chain_fails_for_invalid_individual_obje
     )
 
     assert result.is_valid is False
-    assert "closure_ref is required" in result.errors
-    assert "lineage_ref is required" in result.errors
-    assert "manifest_ref is required" in result.errors
-    assert "review_ref is required" in result.errors
-    assert "assertion_ref is required" in result.errors
-    assert "publication_ref is required" in result.errors
-    assert "release_view_ref is required" in result.errors
+    assert result.errors == (
+        "lineage.closure_ref is required",
+        "lineage.audit_ref is required",
+        "lineage.outcome_ref is required",
+        "lineage.lineage_ref is required",
+        "manifest.lineage_ref is required",
+        "manifest.closure_ref is required",
+        "manifest.evidence_ref is required",
+        "manifest.manifest_ref is required",
+        "review.manifest_ref is required",
+        "review.lineage_ref is required",
+        "review.closure_ref is required",
+        "review.review_ref is required",
+        "assertion.review_ref is required",
+        "assertion.manifest_ref is required",
+        "assertion.lineage_ref is required",
+        "assertion.assertion_ref is required",
+        "publication.assertion_ref is required",
+        "publication.review_ref is required",
+        "publication.manifest_ref is required",
+        "publication.publication_ref is required",
+        "release_view.publication_ref is required",
+        "release_view.assertion_ref is required",
+        "release_view.review_ref is required",
+        "release_view.release_view_ref is required",
+    )
 
 
 def test_validate_orchestration_manifest_chain_fails_for_manifest_lineage_ref_mismatch() -> None:
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     manifest = dc_replace(manifest, lineage_ref="wrong-lineage")
 
     result = validate_orchestration_manifest_chain(
@@ -1546,7 +1565,6 @@ def test_validate_orchestration_manifest_chain_fails_for_manifest_closure_ref_mi
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     manifest = dc_replace(manifest, closure_ref="wrong-closure")
 
     result = validate_orchestration_manifest_chain(
@@ -1561,7 +1579,6 @@ def test_validate_orchestration_manifest_chain_fails_for_review_manifest_ref_mis
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     review = dc_replace(review, manifest_ref="wrong-manifest")
 
     result = validate_orchestration_manifest_chain(
@@ -1576,7 +1593,6 @@ def test_validate_orchestration_manifest_chain_fails_for_review_lineage_ref_mism
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     review = dc_replace(review, lineage_ref="wrong-lineage")
 
     result = validate_orchestration_manifest_chain(
@@ -1591,7 +1607,6 @@ def test_validate_orchestration_manifest_chain_fails_for_review_closure_ref_mism
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     review = dc_replace(review, closure_ref="wrong-closure")
 
     result = validate_orchestration_manifest_chain(
@@ -1606,7 +1621,6 @@ def test_validate_orchestration_manifest_chain_fails_for_assertion_review_ref_mi
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     assertion = dc_replace(assertion, review_ref="wrong-review")
 
     result = validate_orchestration_manifest_chain(
@@ -1621,7 +1635,6 @@ def test_validate_orchestration_manifest_chain_fails_for_assertion_manifest_ref_
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     assertion = dc_replace(assertion, manifest_ref="wrong-manifest")
 
     result = validate_orchestration_manifest_chain(
@@ -1636,7 +1649,6 @@ def test_validate_orchestration_manifest_chain_fails_for_assertion_lineage_ref_m
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     assertion = dc_replace(assertion, lineage_ref="wrong-lineage")
 
     result = validate_orchestration_manifest_chain(
@@ -1651,7 +1663,6 @@ def test_validate_orchestration_manifest_chain_fails_for_publication_assertion_r
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     publication = dc_replace(publication, assertion_ref="wrong-assertion")
 
     result = validate_orchestration_manifest_chain(
@@ -1666,7 +1677,6 @@ def test_validate_orchestration_manifest_chain_fails_for_publication_review_ref_
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     publication = dc_replace(publication, review_ref="wrong-review")
 
     result = validate_orchestration_manifest_chain(
@@ -1681,7 +1691,6 @@ def test_validate_orchestration_manifest_chain_fails_for_publication_manifest_re
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     publication = dc_replace(publication, manifest_ref="wrong-manifest")
 
     result = validate_orchestration_manifest_chain(
@@ -1696,7 +1705,6 @@ def test_validate_orchestration_manifest_chain_fails_for_release_view_publicatio
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     release_view = dc_replace(release_view, publication_ref="wrong-publication")
 
     result = validate_orchestration_manifest_chain(
@@ -1711,7 +1719,6 @@ def test_validate_orchestration_manifest_chain_fails_for_release_view_assertion_
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     release_view = dc_replace(release_view, assertion_ref="wrong-assertion")
 
     result = validate_orchestration_manifest_chain(
@@ -1726,7 +1733,6 @@ def test_validate_orchestration_manifest_chain_fails_for_release_view_review_ref
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_objects()
     )
-    from dataclasses import replace as dc_replace
     release_view = dc_replace(release_view, review_ref="wrong-review")
 
     result = validate_orchestration_manifest_chain(

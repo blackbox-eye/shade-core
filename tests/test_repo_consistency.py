@@ -656,3 +656,17 @@ def test_repo_consistency_contract_describes_manifest_chain_verification_enforce
     contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
 
     assert "## Manifest chain verification enforcement" in contract_text
+    expected_tokens = (
+        "docs-to-code traceability",
+        "Manifest chain verification",
+        "Manifest verification snapshot",
+        "validate_orchestration_manifest_chain",
+        "_build_manifest_verification_snapshot",
+        "must not be exported via `src/shade_core/__init__.py`",
+        "runtime",
+        "integration",
+        "deployment",
+    )
+
+    for token in expected_tokens:
+        assert token in contract_text
