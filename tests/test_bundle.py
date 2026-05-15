@@ -29,6 +29,7 @@ from shade_core.bundle import _build_runtime_evaluation_guard_verification_snaps
 from shade_core.bundle import _guard_prepared_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _guard_runtime_evaluation_fabric_snapshot  # noqa: E402
 from shade_core.bundle import _build_lineage_manifest_snapshot  # noqa: E402
+from shade_core.bundle import _build_manifest_verification_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
 from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
@@ -2285,4 +2286,178 @@ def test_build_publication_release_view_snapshot_returns_expected_structure() ->
             "review_ref": "review-1",
             "release_view_ref": "release-view-1",
         },
+    }
+
+
+def _valid_manifest_chain_bundle_objects() -> tuple:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+    review = OrchestrationReview(
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        review_ref="review-1",
+    )
+    assertion = OrchestrationAssertion(
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        assertion_ref="assertion-1",
+    )
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+    return lineage, manifest, review, assertion, publication, release_view
+
+
+def test_build_manifest_verification_snapshot_returns_expected_structure() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_bundle_objects()
+    )
+
+    snapshot = _build_manifest_verification_snapshot(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert snapshot == {
+        "orchestration_lineage": {
+            "closure_ref": "closure-1",
+            "audit_ref": "audit-1",
+            "outcome_ref": "outcome-1",
+            "lineage_ref": "lineage-1",
+        },
+        "orchestration_manifest": {
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "evidence_ref": "evidence-1",
+            "manifest_ref": "manifest-1",
+        },
+        "orchestration_review": {
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "review_ref": "review-1",
+        },
+        "orchestration_assertion": {
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "assertion_ref": "assertion-1",
+        },
+        "orchestration_publication": {
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "publication_ref": "publication-1",
+        },
+        "orchestration_release_view": {
+            "publication_ref": "publication-1",
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "release_view_ref": "release-view-1",
+        },
+        "manifest_chain_verification": {
+            "is_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_manifest_verification_snapshot_includes_valid_chain_verification() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_bundle_objects()
+    )
+
+    snapshot = _build_manifest_verification_snapshot(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    verification = snapshot["manifest_chain_verification"]
+    assert verification["is_valid"] is True
+    assert verification["errors"] == ()
+
+
+def test_build_manifest_verification_snapshot_includes_invalid_chain_verification() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_bundle_objects()
+    )
+    mismatched_manifest = OrchestrationManifest(
+        lineage_ref="wrong-lineage",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+
+    snapshot = _build_manifest_verification_snapshot(
+        lineage, mismatched_manifest, review, assertion, publication, release_view,
+    )
+
+    verification = snapshot["manifest_chain_verification"]
+    assert verification["is_valid"] is False
+    assert "manifest.lineage_ref must equal lineage.lineage_ref" in verification["errors"]
+
+
+def test_build_manifest_verification_snapshot_composes_sub_snapshots() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_bundle_objects()
+    )
+
+    snapshot = _build_manifest_verification_snapshot(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert snapshot["orchestration_lineage"] == {
+        "closure_ref": "closure-1",
+        "audit_ref": "audit-1",
+        "outcome_ref": "outcome-1",
+        "lineage_ref": "lineage-1",
+    }
+    assert snapshot["orchestration_manifest"] == {
+        "lineage_ref": "lineage-1",
+        "closure_ref": "closure-1",
+        "evidence_ref": "evidence-1",
+        "manifest_ref": "manifest-1",
+    }
+    assert snapshot["orchestration_review"] == {
+        "manifest_ref": "manifest-1",
+        "lineage_ref": "lineage-1",
+        "closure_ref": "closure-1",
+        "review_ref": "review-1",
+    }
+    assert snapshot["orchestration_assertion"] == {
+        "review_ref": "review-1",
+        "manifest_ref": "manifest-1",
+        "lineage_ref": "lineage-1",
+        "assertion_ref": "assertion-1",
+    }
+    assert snapshot["orchestration_publication"] == {
+        "assertion_ref": "assertion-1",
+        "review_ref": "review-1",
+        "manifest_ref": "manifest-1",
+        "publication_ref": "publication-1",
+    }
+    assert snapshot["orchestration_release_view"] == {
+        "publication_ref": "publication-1",
+        "assertion_ref": "assertion-1",
+        "review_ref": "review-1",
+        "release_view_ref": "release-view-1",
     }

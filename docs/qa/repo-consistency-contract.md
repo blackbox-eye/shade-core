@@ -31,6 +31,12 @@
 - The same test file enforces that worker-orchestration contract-prep additions must not widen `src/shade_core/__init__.py`.
 - The same test file also protects non-runtime wording in the current architecture docs so this seam stays documented as contract-prep and preparation boundaries only.
 
+## Manifest chain verification enforcement
+
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Manifest chain verification row (`src/shade_core/contract_gate.py`) and the Manifest verification snapshot row (`src/shade_core/bundle.py`).
+- `validate_orchestration_manifest_chain` and `_build_manifest_verification_snapshot` are internal contract-prep symbols only; they must not be exported via `src/shade_core/__init__.py`.
+- This enforcement is restricted to internal contract-prep cross-reference verification; it does not extend to runtime, integration, or deployment scope.
+
 ## When to update tests
 
 - A playbook rule changes intentionally in the same locked governance or QA bundle.

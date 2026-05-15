@@ -1,3 +1,4 @@
+from dataclasses import replace as dc_replace
 from shade_core import (
     ConfidenceRecord,
     MetaAuditEvent,
@@ -20,6 +21,7 @@ from shade_core.contract_gate import (
     validate_orchestration_junction,
     validate_orchestration_lineage,
     validate_orchestration_manifest,
+    validate_orchestration_manifest_chain,
     validate_orchestration_outcome,
     validate_orchestration_publication,
     validate_orchestration_release_view,
@@ -1419,3 +1421,323 @@ def test_validate_runtime_evaluation_guard_verification_snapshot_fails_for_malfo
     assert result.errors == (
         "verification_snapshot.runtime_evaluation.runtime_contract_integration.runtime_fabric.evaluation_gate must be a mapping",
     )
+
+
+def _valid_manifest_chain_objects() -> tuple:
+    lineage = OrchestrationLineage(
+        closure_ref="closure-1",
+        audit_ref="audit-1",
+        outcome_ref="outcome-1",
+        lineage_ref="lineage-1",
+    )
+    manifest = OrchestrationManifest(
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        evidence_ref="evidence-1",
+        manifest_ref="manifest-1",
+    )
+    review = OrchestrationReview(
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        closure_ref="closure-1",
+        review_ref="review-1",
+    )
+    assertion = OrchestrationAssertion(
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        lineage_ref="lineage-1",
+        assertion_ref="assertion-1",
+    )
+    publication = OrchestrationPublication(
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        manifest_ref="manifest-1",
+        publication_ref="publication-1",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="publication-1",
+        assertion_ref="assertion-1",
+        review_ref="review-1",
+        release_view_ref="release-view-1",
+    )
+    return lineage, manifest, review, assertion, publication, release_view
+
+
+def test_validate_orchestration_manifest_chain_passes_for_valid_chain() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is True
+    assert result.errors == ()
+
+
+def test_validate_orchestration_manifest_chain_fails_for_invalid_individual_objects() -> None:
+    lineage = OrchestrationLineage(
+        closure_ref="",
+        audit_ref="",
+        outcome_ref="",
+        lineage_ref="",
+    )
+    manifest = OrchestrationManifest(
+        lineage_ref="",
+        closure_ref="",
+        evidence_ref="",
+        manifest_ref="",
+    )
+    review = OrchestrationReview(
+        manifest_ref="",
+        lineage_ref="",
+        closure_ref="",
+        review_ref="",
+    )
+    assertion = OrchestrationAssertion(
+        review_ref="",
+        manifest_ref="",
+        lineage_ref="",
+        assertion_ref="",
+    )
+    publication = OrchestrationPublication(
+        assertion_ref="",
+        review_ref="",
+        manifest_ref="",
+        publication_ref="",
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref="",
+        assertion_ref="",
+        review_ref="",
+        release_view_ref="",
+    )
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert result.errors == (
+        "lineage.closure_ref is required",
+        "lineage.audit_ref is required",
+        "lineage.outcome_ref is required",
+        "lineage.lineage_ref is required",
+        "manifest.lineage_ref is required",
+        "manifest.closure_ref is required",
+        "manifest.evidence_ref is required",
+        "manifest.manifest_ref is required",
+        "review.manifest_ref is required",
+        "review.lineage_ref is required",
+        "review.closure_ref is required",
+        "review.review_ref is required",
+        "assertion.review_ref is required",
+        "assertion.manifest_ref is required",
+        "assertion.lineage_ref is required",
+        "assertion.assertion_ref is required",
+        "publication.assertion_ref is required",
+        "publication.review_ref is required",
+        "publication.manifest_ref is required",
+        "publication.publication_ref is required",
+        "release_view.publication_ref is required",
+        "release_view.assertion_ref is required",
+        "release_view.review_ref is required",
+        "release_view.release_view_ref is required",
+    )
+
+
+def test_validate_orchestration_manifest_chain_fails_for_manifest_lineage_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    manifest = dc_replace(manifest, lineage_ref="wrong-lineage")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "manifest.lineage_ref must equal lineage.lineage_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_manifest_closure_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    manifest = dc_replace(manifest, closure_ref="wrong-closure")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "manifest.closure_ref must equal lineage.closure_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_review_manifest_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    review = dc_replace(review, manifest_ref="wrong-manifest")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "review.manifest_ref must equal manifest.manifest_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_review_lineage_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    review = dc_replace(review, lineage_ref="wrong-lineage")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "review.lineage_ref must equal manifest.lineage_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_review_closure_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    review = dc_replace(review, closure_ref="wrong-closure")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "review.closure_ref must equal manifest.closure_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_assertion_review_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    assertion = dc_replace(assertion, review_ref="wrong-review")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "assertion.review_ref must equal review.review_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_assertion_manifest_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    assertion = dc_replace(assertion, manifest_ref="wrong-manifest")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "assertion.manifest_ref must equal review.manifest_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_assertion_lineage_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    assertion = dc_replace(assertion, lineage_ref="wrong-lineage")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "assertion.lineage_ref must equal review.lineage_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_publication_assertion_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    publication = dc_replace(publication, assertion_ref="wrong-assertion")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "publication.assertion_ref must equal assertion.assertion_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_publication_review_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    publication = dc_replace(publication, review_ref="wrong-review")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "publication.review_ref must equal assertion.review_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_publication_manifest_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    publication = dc_replace(publication, manifest_ref="wrong-manifest")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "publication.manifest_ref must equal assertion.manifest_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_release_view_publication_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    release_view = dc_replace(release_view, publication_ref="wrong-publication")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "release_view.publication_ref must equal publication.publication_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_release_view_assertion_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    release_view = dc_replace(release_view, assertion_ref="wrong-assertion")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "release_view.assertion_ref must equal publication.assertion_ref" in result.errors
+
+
+def test_validate_orchestration_manifest_chain_fails_for_release_view_review_ref_mismatch() -> None:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_objects()
+    )
+    release_view = dc_replace(release_view, review_ref="wrong-review")
+
+    result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+
+    assert result.is_valid is False
+    assert "release_view.review_ref must equal publication.review_ref" in result.errors
