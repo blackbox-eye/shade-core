@@ -249,6 +249,7 @@ def _bundle_types_from_line(line: str) -> tuple[str, ...]:
 
 def _module_all_exports(path: Path) -> tuple[str, ...]:
     module = ast.parse(_read_repo_text(path))
+    all_assignments: list[ast.Assign] = []
 
     for node in module.body:
         if not isinstance(node, ast.Assign):
@@ -256,12 +257,19 @@ def _module_all_exports(path: Path) -> tuple[str, ...]:
 
         for target in node.targets:
             if isinstance(target, ast.Name) and target.id == "__all__":
-                value = ast.literal_eval(node.value)
-                assert isinstance(value, list)
-                assert all(isinstance(item, str) for item in value)
-                return tuple(value)
+                all_assignments.append(node)
+                break
 
-    raise AssertionError("Could not find __all__ assignment in src/shade_core/__init__.py")
+    relative_path = path.relative_to(REPO_ROOT)
+    assert len(all_assignments) == 1, (
+        f"Expected exactly one top-level __all__ assignment in {relative_path}, "
+        f"found {len(all_assignments)}"
+    )
+
+    value = ast.literal_eval(all_assignments[0].value)
+    assert isinstance(value, list)
+    assert all(isinstance(item, str) for item in value)
+    return tuple(value)
 
 
 def _assert_traceability_rows_present(
