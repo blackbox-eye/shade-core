@@ -37,7 +37,12 @@ from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
 from shade_core.bundle import _run_runtime_evaluation_fabric_guards  # noqa: E402
-from shade_core.bundle import _build_orchestration_contract_snapshot, _build_runtime_fabric_snapshot, _build_state_transition_snapshot  # noqa: E402
+from shade_core.bundle import (  # noqa: E402
+    _build_orchestration_contract_snapshot,
+    _build_runtime_fabric_snapshot,
+    _build_state_transition_snapshot,
+    _build_unified_orchestration_contract_snapshot,
+)
 from shade_core.bundle import _build_worker_orchestration_prep_snapshot  # noqa: E402
 from shade_core.bundle import _build_verification_outcome_snapshot  # noqa: E402
 from shade_core.models import (  # noqa: E402
@@ -2393,6 +2398,154 @@ def _valid_manifest_chain_bundle_objects() -> tuple:
     return lineage, manifest, review, assertion, publication, release_view
 
 
+def _valid_unified_orchestration_contract_snapshot_objects() -> tuple:
+    lineage, manifest, review, assertion, publication, release_view = (
+        _valid_manifest_chain_bundle_objects()
+    )
+    task = WorkerTask(
+        task_id="task-1",
+        worker_role="analysis",
+        input_ref="artifact-1",
+        task_status="pending",
+    )
+    result = WorkerResult(
+        task_id="task-1",
+        worker_role="analysis",
+        output_ref="output-1",
+        result_status="complete",
+    )
+    route = TaskRoute(
+        task_id="task-1",
+        source_role="analysis",
+        target_role="review",
+        route_ref="route-1",
+    )
+    task_transition = TaskTransition(
+        task_id="task-1",
+        from_status="pending",
+        to_status="running",
+        transition_ref="task-transition-1",
+    )
+    run_transition = RunTransition(
+        run_id="run-1",
+        from_step="ingest",
+        to_step="evaluate",
+        transition_ref="run-transition-1",
+    )
+    checkpoint = OrchestrationCheckpoint(
+        task_id="task-1",
+        output_ref="output-1",
+        route_ref="route-1",
+        checkpoint_ref="checkpoint-1",
+    )
+    junction = OrchestrationJunction(
+        route_ref="route-1",
+        task_transition_ref="task-transition-1",
+        run_transition_ref="run-transition-1",
+        junction_ref="junction-1",
+    )
+    plan = WorkerOrchestrationPlan(
+        task_id="task-1",
+        route_ref="route-1",
+        plan_status="prepared",
+        plan_ref="plan-1",
+    )
+    step = WorkerOrchestrationStep(
+        plan_ref="plan-1",
+        task_transition_ref="task-transition-1",
+        step_status="prepared",
+        step_ref="step-1",
+    )
+    handoff = WorkerOrchestrationHandoff(
+        step_ref="step-1",
+        output_ref="output-1",
+        checkpoint_ref="checkpoint-1",
+        handoff_ref="handoff-1",
+    )
+    status = WorkerOrchestrationStatus(
+        handoff_ref="handoff-1",
+        junction_ref="junction-1",
+        status_value="pending",
+        status_ref="status-1",
+    )
+    summary = WorkerOrchestrationSummary(
+        plan_ref="plan-1",
+        status_ref="status-1",
+        summary_status="aligned",
+        summary_ref="summary-1",
+    )
+    worker_review = WorkerOrchestrationReview(
+        summary_ref="summary-1",
+        status_ref="status-1",
+        review_status="pending",
+        review_ref="worker-review-1",
+    )
+    verification = OrchestrationVerification(
+        checkpoint_ref="checkpoint-1",
+        junction_ref="junction-1",
+        task_transition_ref="task-transition-1",
+        verification_ref="verification-1",
+    )
+    outcome = OrchestrationOutcome(
+        verification_ref="verification-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        outcome_ref="outcome-1",
+    )
+    evidence = OrchestrationEvidence(
+        verification_ref="verification-1",
+        outcome_ref="outcome-1",
+        evaluation_ref="evaluation-1",
+        evidence_ref="evidence-1",
+    )
+    gate = OrchestrationGate(
+        evidence_ref="evidence-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_ref="audit-1",
+        gate_ref="gate-1",
+    )
+    audit = OrchestrationAudit(
+        gate_ref="gate-1",
+        evaluation_gate_ref="evaluation-gate-1",
+        audit_event_ref="audit-event-1",
+        audit_ref="audit-1",
+    )
+    closure = OrchestrationClosure(
+        audit_ref="audit-1",
+        decision_ref="decision-1",
+        evaluation_ref="evaluation-1",
+        closure_ref="closure-1",
+    )
+
+    return (
+        task,
+        result,
+        route,
+        task_transition,
+        run_transition,
+        checkpoint,
+        junction,
+        plan,
+        step,
+        handoff,
+        status,
+        summary,
+        worker_review,
+        verification,
+        outcome,
+        evidence,
+        gate,
+        audit,
+        closure,
+        lineage,
+        manifest,
+        review,
+        assertion,
+        publication,
+        release_view,
+    )
+
+
 def test_build_manifest_verification_snapshot_returns_expected_structure() -> None:
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_bundle_objects()
@@ -2525,3 +2678,322 @@ def test_build_manifest_verification_snapshot_composes_sub_snapshots() -> None:
         "review_ref": "review-1",
         "release_view_ref": "release-view-1",
     }
+
+
+def test_build_unified_orchestration_contract_snapshot_returns_expected_structure() -> None:
+    snapshot = _build_unified_orchestration_contract_snapshot(
+        *_valid_unified_orchestration_contract_snapshot_objects(),
+    )
+
+    assert snapshot == {
+        "worker_task": {
+            "task_id": "task-1",
+            "worker_role": "analysis",
+            "input_ref": "artifact-1",
+            "task_status": "pending",
+        },
+        "worker_result": {
+            "task_id": "task-1",
+            "worker_role": "analysis",
+            "output_ref": "output-1",
+            "result_status": "complete",
+        },
+        "task_route": {
+            "task_id": "task-1",
+            "source_role": "analysis",
+            "target_role": "review",
+            "route_ref": "route-1",
+        },
+        "task_transition": {
+            "task_id": "task-1",
+            "from_status": "pending",
+            "to_status": "running",
+            "transition_ref": "task-transition-1",
+        },
+        "run_transition": {
+            "run_id": "run-1",
+            "from_step": "ingest",
+            "to_step": "evaluate",
+            "transition_ref": "run-transition-1",
+        },
+        "orchestration_checkpoint": {
+            "task_id": "task-1",
+            "output_ref": "output-1",
+            "route_ref": "route-1",
+            "checkpoint_ref": "checkpoint-1",
+        },
+        "orchestration_junction": {
+            "route_ref": "route-1",
+            "task_transition_ref": "task-transition-1",
+            "run_transition_ref": "run-transition-1",
+            "junction_ref": "junction-1",
+        },
+        "worker_orchestration_plan": {
+            "task_id": "task-1",
+            "route_ref": "route-1",
+            "plan_status": "prepared",
+            "plan_ref": "plan-1",
+        },
+        "worker_orchestration_step": {
+            "plan_ref": "plan-1",
+            "task_transition_ref": "task-transition-1",
+            "step_status": "prepared",
+            "step_ref": "step-1",
+        },
+        "worker_orchestration_handoff": {
+            "step_ref": "step-1",
+            "output_ref": "output-1",
+            "checkpoint_ref": "checkpoint-1",
+            "handoff_ref": "handoff-1",
+        },
+        "worker_orchestration_status": {
+            "handoff_ref": "handoff-1",
+            "junction_ref": "junction-1",
+            "status_value": "pending",
+            "status_ref": "status-1",
+        },
+        "worker_orchestration_summary": {
+            "plan_ref": "plan-1",
+            "status_ref": "status-1",
+            "summary_status": "aligned",
+            "summary_ref": "summary-1",
+        },
+        "worker_orchestration_review": {
+            "summary_ref": "summary-1",
+            "status_ref": "status-1",
+            "review_status": "pending",
+            "review_ref": "worker-review-1",
+        },
+        "orchestration_verification": {
+            "checkpoint_ref": "checkpoint-1",
+            "junction_ref": "junction-1",
+            "task_transition_ref": "task-transition-1",
+            "verification_ref": "verification-1",
+        },
+        "orchestration_outcome": {
+            "verification_ref": "verification-1",
+            "decision_ref": "decision-1",
+            "evaluation_ref": "evaluation-1",
+            "outcome_ref": "outcome-1",
+        },
+        "orchestration_evidence": {
+            "verification_ref": "verification-1",
+            "outcome_ref": "outcome-1",
+            "evaluation_ref": "evaluation-1",
+            "evidence_ref": "evidence-1",
+        },
+        "orchestration_gate": {
+            "evidence_ref": "evidence-1",
+            "evaluation_gate_ref": "evaluation-gate-1",
+            "audit_ref": "audit-1",
+            "gate_ref": "gate-1",
+        },
+        "orchestration_audit": {
+            "gate_ref": "gate-1",
+            "evaluation_gate_ref": "evaluation-gate-1",
+            "audit_event_ref": "audit-event-1",
+            "audit_ref": "audit-1",
+        },
+        "orchestration_closure": {
+            "audit_ref": "audit-1",
+            "decision_ref": "decision-1",
+            "evaluation_ref": "evaluation-1",
+            "closure_ref": "closure-1",
+        },
+        "orchestration_lineage": {
+            "closure_ref": "closure-1",
+            "audit_ref": "audit-1",
+            "outcome_ref": "outcome-1",
+            "lineage_ref": "lineage-1",
+        },
+        "orchestration_manifest": {
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "evidence_ref": "evidence-1",
+            "manifest_ref": "manifest-1",
+        },
+        "orchestration_review": {
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "closure_ref": "closure-1",
+            "review_ref": "review-1",
+        },
+        "orchestration_assertion": {
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "lineage_ref": "lineage-1",
+            "assertion_ref": "assertion-1",
+        },
+        "orchestration_publication": {
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "manifest_ref": "manifest-1",
+            "publication_ref": "publication-1",
+        },
+        "orchestration_release_view": {
+            "publication_ref": "publication-1",
+            "assertion_ref": "assertion-1",
+            "review_ref": "review-1",
+            "release_view_ref": "release-view-1",
+        },
+        "publication_release_view_consistency": {
+            "is_valid": True,
+            "errors": (),
+        },
+        "manifest_chain_verification": {
+            "is_valid": True,
+            "errors": (),
+        },
+    }
+
+
+def test_build_unified_orchestration_contract_snapshot_has_exact_top_level_key_order() -> None:
+    snapshot = _build_unified_orchestration_contract_snapshot(
+        *_valid_unified_orchestration_contract_snapshot_objects(),
+    )
+
+    assert tuple(snapshot) == (
+        "worker_task",
+        "worker_result",
+        "task_route",
+        "task_transition",
+        "run_transition",
+        "orchestration_checkpoint",
+        "orchestration_junction",
+        "worker_orchestration_plan",
+        "worker_orchestration_step",
+        "worker_orchestration_handoff",
+        "worker_orchestration_status",
+        "worker_orchestration_summary",
+        "worker_orchestration_review",
+        "orchestration_verification",
+        "orchestration_outcome",
+        "orchestration_evidence",
+        "orchestration_gate",
+        "orchestration_audit",
+        "orchestration_closure",
+        "orchestration_lineage",
+        "orchestration_manifest",
+        "orchestration_review",
+        "orchestration_assertion",
+        "orchestration_publication",
+        "orchestration_release_view",
+        "publication_release_view_consistency",
+        "manifest_chain_verification",
+    )
+
+
+def test_build_unified_orchestration_contract_snapshot_includes_valid_boundary_and_chain_checks() -> None:
+    snapshot = _build_unified_orchestration_contract_snapshot(
+        *_valid_unified_orchestration_contract_snapshot_objects(),
+    )
+
+    assert snapshot["publication_release_view_consistency"] == {
+        "is_valid": True,
+        "errors": (),
+    }
+    assert snapshot["manifest_chain_verification"] == {
+        "is_valid": True,
+        "errors": (),
+    }
+
+
+def test_build_unified_orchestration_contract_snapshot_includes_invalid_publication_release_view_consistency() -> None:
+    objects = list(_valid_unified_orchestration_contract_snapshot_objects())
+    objects[-1] = replace(objects[-1], assertion_ref="wrong-assertion")
+
+    snapshot = _build_unified_orchestration_contract_snapshot(*objects)
+
+    assert snapshot["publication_release_view_consistency"] == {
+        "is_valid": False,
+        "errors": (
+            "release_view.assertion_ref must equal publication.assertion_ref",
+        ),
+    }
+
+
+def test_build_unified_orchestration_contract_snapshot_includes_invalid_manifest_chain_verification() -> None:
+    objects = list(_valid_unified_orchestration_contract_snapshot_objects())
+    objects[20] = replace(objects[20], lineage_ref="wrong-lineage")
+
+    snapshot = _build_unified_orchestration_contract_snapshot(*objects)
+
+    verification = snapshot["manifest_chain_verification"]
+    assert verification["is_valid"] is False
+    assert "manifest.lineage_ref must equal lineage.lineage_ref" in verification[
+        "errors"
+    ]
+
+
+def test_build_unified_orchestration_contract_snapshot_preserves_fragment_outputs() -> None:
+    objects = _valid_unified_orchestration_contract_snapshot_objects()
+    snapshot = _build_unified_orchestration_contract_snapshot(*objects)
+    (
+        task,
+        result,
+        route,
+        task_transition,
+        run_transition,
+        checkpoint,
+        junction,
+        plan,
+        step,
+        handoff,
+        status,
+        summary,
+        worker_review,
+        verification,
+        outcome,
+        evidence,
+        gate,
+        audit,
+        closure,
+        lineage,
+        manifest,
+        review,
+        assertion,
+        publication,
+        release_view,
+    ) = objects
+
+    fragment_snapshots = (
+        _build_orchestration_contract_snapshot(task, result, route),
+        _build_state_transition_snapshot(task_transition, run_transition),
+        _build_checkpoint_junction_snapshot(checkpoint, junction),
+        _build_worker_orchestration_prep_snapshot(
+            plan,
+            step,
+            handoff,
+            status,
+            summary,
+            worker_review,
+        ),
+        _build_verification_outcome_snapshot(verification, outcome),
+        _build_evidence_gate_snapshot(evidence, gate),
+        _build_audit_closure_snapshot(audit, closure),
+        _build_lineage_manifest_snapshot(lineage, manifest),
+        _build_review_assertion_snapshot(review, assertion),
+        _build_publication_release_view_snapshot(publication, release_view),
+    )
+
+    for fragment_snapshot in fragment_snapshots:
+        assert {
+            key: snapshot[key] for key in fragment_snapshot
+        } == fragment_snapshot
+
+    assert snapshot["publication_release_view_consistency"] == (
+        _build_publication_release_view_consistency_snapshot(
+            publication,
+            release_view,
+        )["publication_release_view_consistency"]
+    )
+    assert snapshot["manifest_chain_verification"] == (
+        _build_manifest_verification_snapshot(
+            lineage,
+            manifest,
+            review,
+            assertion,
+            publication,
+            release_view,
+        )["manifest_chain_verification"]
+    )

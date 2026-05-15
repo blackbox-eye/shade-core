@@ -43,6 +43,12 @@
 - `validate_orchestration_publication_release_view_consistency` and `_build_publication_release_view_consistency_snapshot` are internal contract-prep symbols only; they must not be exported via `src/shade_core/__init__.py`.
 - This enforcement is restricted to internal contract-prep verification of the release-view boundary; it does not extend to runtime, integration, or deployment scope.
 
+## Unified orchestration contract snapshot enforcement
+
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Unified orchestration contract snapshot row (`src/shade_core/bundle.py`).
+- `_build_unified_orchestration_contract_snapshot` is internal contract-prep only and must not widen `src/shade_core/__init__.py`.
+- This enforcement is limited to deterministic composition of existing internal contract-prep snapshot fragments; it does not implement runtime, routing, worker execution, adapters, memory, deploy, VPS, production integration, or release behavior.
+
 ## When to update tests
 
 - A playbook rule changes intentionally in the same locked governance or QA bundle.

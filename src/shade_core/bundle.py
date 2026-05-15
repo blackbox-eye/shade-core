@@ -730,3 +730,78 @@ def _build_manifest_verification_snapshot(
             "errors": chain_result.errors,
         },
     }
+
+
+def _build_unified_orchestration_contract_snapshot(
+    task: WorkerTask,
+    result: WorkerResult,
+    route: TaskRoute,
+    task_transition: TaskTransition,
+    run_transition: RunTransition,
+    checkpoint: OrchestrationCheckpoint,
+    junction: OrchestrationJunction,
+    plan: WorkerOrchestrationPlan,
+    step: WorkerOrchestrationStep,
+    handoff: WorkerOrchestrationHandoff,
+    status: WorkerOrchestrationStatus,
+    summary: WorkerOrchestrationSummary,
+    worker_review: WorkerOrchestrationReview,
+    verification: OrchestrationVerification,
+    outcome: OrchestrationOutcome,
+    evidence: OrchestrationEvidence,
+    gate: OrchestrationGate,
+    audit: OrchestrationAudit,
+    closure: OrchestrationClosure,
+    lineage: OrchestrationLineage,
+    manifest: OrchestrationManifest,
+    review: OrchestrationReview,
+    assertion: OrchestrationAssertion,
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> Mapping[str, object]:
+    publication_release_view_snapshot = _build_publication_release_view_snapshot(
+        publication,
+        release_view,
+    )
+    publication_release_view_consistency_snapshot = (
+        _build_publication_release_view_consistency_snapshot(
+            publication,
+            release_view,
+        )
+    )
+    manifest_verification_snapshot = _build_manifest_verification_snapshot(
+        lineage,
+        manifest,
+        review,
+        assertion,
+        publication,
+        release_view,
+    )
+
+    return {
+        **_build_orchestration_contract_snapshot(task, result, route),
+        **_build_state_transition_snapshot(task_transition, run_transition),
+        **_build_checkpoint_junction_snapshot(checkpoint, junction),
+        **_build_worker_orchestration_prep_snapshot(
+            plan,
+            step,
+            handoff,
+            status,
+            summary,
+            worker_review,
+        ),
+        **_build_verification_outcome_snapshot(verification, outcome),
+        **_build_evidence_gate_snapshot(evidence, gate),
+        **_build_audit_closure_snapshot(audit, closure),
+        **_build_lineage_manifest_snapshot(lineage, manifest),
+        **_build_review_assertion_snapshot(review, assertion),
+        **publication_release_view_snapshot,
+        "publication_release_view_consistency": (
+            publication_release_view_consistency_snapshot[
+                "publication_release_view_consistency"
+            ]
+        ),
+        "manifest_chain_verification": manifest_verification_snapshot[
+            "manifest_chain_verification"
+        ],
+    }
