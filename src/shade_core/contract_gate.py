@@ -1006,3 +1006,55 @@ def validate_orchestration_assertion(
         errors.append("assertion_ref is required")
 
     return ContractGateResult(is_valid=not errors, errors=tuple(errors))
+
+
+def validate_orchestration_manifest_chain(
+    lineage: OrchestrationLineage,
+    manifest: OrchestrationManifest,
+    review: OrchestrationReview,
+    assertion: OrchestrationAssertion,
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> ContractGateResult:
+    errors: list[str] = []
+
+    for individual_result in (
+        validate_orchestration_lineage(lineage),
+        validate_orchestration_manifest(manifest),
+        validate_orchestration_review(review),
+        validate_orchestration_assertion(assertion),
+        validate_orchestration_publication(publication),
+        validate_orchestration_release_view(release_view),
+    ):
+        errors.extend(individual_result.errors)
+
+    if manifest.lineage_ref != lineage.lineage_ref:
+        errors.append("manifest.lineage_ref must equal lineage.lineage_ref")
+    if manifest.closure_ref != lineage.closure_ref:
+        errors.append("manifest.closure_ref must equal lineage.closure_ref")
+    if review.manifest_ref != manifest.manifest_ref:
+        errors.append("review.manifest_ref must equal manifest.manifest_ref")
+    if review.lineage_ref != manifest.lineage_ref:
+        errors.append("review.lineage_ref must equal manifest.lineage_ref")
+    if review.closure_ref != manifest.closure_ref:
+        errors.append("review.closure_ref must equal manifest.closure_ref")
+    if assertion.review_ref != review.review_ref:
+        errors.append("assertion.review_ref must equal review.review_ref")
+    if assertion.manifest_ref != review.manifest_ref:
+        errors.append("assertion.manifest_ref must equal review.manifest_ref")
+    if assertion.lineage_ref != review.lineage_ref:
+        errors.append("assertion.lineage_ref must equal review.lineage_ref")
+    if publication.assertion_ref != assertion.assertion_ref:
+        errors.append("publication.assertion_ref must equal assertion.assertion_ref")
+    if publication.review_ref != assertion.review_ref:
+        errors.append("publication.review_ref must equal assertion.review_ref")
+    if publication.manifest_ref != assertion.manifest_ref:
+        errors.append("publication.manifest_ref must equal assertion.manifest_ref")
+    if release_view.publication_ref != publication.publication_ref:
+        errors.append("release_view.publication_ref must equal publication.publication_ref")
+    if release_view.assertion_ref != publication.assertion_ref:
+        errors.append("release_view.assertion_ref must equal publication.assertion_ref")
+    if release_view.review_ref != publication.review_ref:
+        errors.append("release_view.review_ref must equal publication.review_ref")
+
+    return ContractGateResult(is_valid=not errors, errors=tuple(errors))

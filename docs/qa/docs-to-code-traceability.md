@@ -119,5 +119,7 @@ Concrete code and test paths in the table are kept machine-checkable through one
 | Orchestration publication serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for publication bridge fields | `tests/test_serialization.py` |
 | Orchestration release-view serial. | `src/shade_core/serialization.py` | Implemented as one internal serializer for release-view bridge fields | `tests/test_serialization.py` |
 | Publication release-view snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper for the publication/release-view bridge view | `tests/test_bundle.py` |
+| Manifest chain verification | `src/shade_core/contract_gate.py` | Implemented as one internal validator checking cross-reference consistency across the orchestration manifest chain | `tests/test_contract_gate.py` |
+| Manifest verification snapshot | `src/shade_core/bundle.py` | Implemented as one internal helper composing the manifest chain snapshot with chain verification result | `tests/test_bundle.py` |
 | Full A-to-O runtime loop  | No current code file                | Documented target only; not implemented as orchestration              | None                            |
 | Worker orchestration behavior | No current code file             | Documented target only; current code stops at internal contract prep and does not execute worker orchestration | None                      |

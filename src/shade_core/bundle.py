@@ -8,6 +8,7 @@ from .contract_gate import (
     ContractGateResult,
     validate_confidence_record,
     validate_meta_audit_event,
+    validate_orchestration_manifest_chain,
     validate_runtime_evaluation_guard_verification_snapshot,
     validate_self_model,
     validate_state_contract,
@@ -688,4 +689,26 @@ def _build_publication_release_view_snapshot(
         "orchestration_release_view": serialize_orchestration_release_view(
             release_view,
         ),
+    }
+
+
+def _build_manifest_verification_snapshot(
+    lineage: OrchestrationLineage,
+    manifest: OrchestrationManifest,
+    review: OrchestrationReview,
+    assertion: OrchestrationAssertion,
+    publication: OrchestrationPublication,
+    release_view: OrchestrationReleaseView,
+) -> Mapping[str, object]:
+    chain_result = validate_orchestration_manifest_chain(
+        lineage, manifest, review, assertion, publication, release_view,
+    )
+    return {
+        **_build_lineage_manifest_snapshot(lineage, manifest),
+        **_build_review_assertion_snapshot(review, assertion),
+        **_build_publication_release_view_snapshot(publication, release_view),
+        "manifest_chain_verification": {
+            "is_valid": chain_result.is_valid,
+            "errors": chain_result.errors,
+        },
     }

@@ -164,6 +164,16 @@ WORKER_ORCHESTRATION_ROOT_API_NAMES = (
     "WorkerOrchestrationSummary",
     "WorkerOrchestrationReview",
 )
+MANIFEST_CHAIN_VERIFICATION_TRACEABILITY_ROW = (
+    "Manifest chain verification",
+    "src/shade_core/contract_gate.py",
+    "tests/test_contract_gate.py",
+)
+MANIFEST_VERIFICATION_SNAPSHOT_TRACEABILITY_ROW = (
+    "Manifest verification snapshot",
+    "src/shade_core/bundle.py",
+    "tests/test_bundle.py",
+)
 EXPECTED_ROOT_PACKAGE_INIT_TEXT = '''"""Minimal package for shade-core."""
 
 from .bundle import build_bundle
@@ -622,3 +632,27 @@ def test_repo_consistency_contract_describes_worker_orchestration_contract_prep_
 
     for token in expected_tokens:
         assert token in contract_text
+
+
+def test_traceability_includes_manifest_chain_verification_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        *MANIFEST_CHAIN_VERIFICATION_TRACEABILITY_ROW,
+    )
+
+
+def test_traceability_includes_manifest_verification_snapshot_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        *MANIFEST_VERIFICATION_SNAPSHOT_TRACEABILITY_ROW,
+    )
+
+
+def test_repo_consistency_contract_describes_manifest_chain_verification_enforcement() -> None:
+    contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
+
+    assert "## Manifest chain verification enforcement" in contract_text
