@@ -2852,7 +2852,7 @@ def test_build_unified_orchestration_contract_snapshot_has_exact_top_level_key_o
         *_valid_unified_orchestration_contract_snapshot_objects(),
     )
 
-    assert tuple(snapshot) == (
+    assert tuple(snapshot.keys()) == (
         "worker_task",
         "worker_result",
         "task_route",
@@ -2903,13 +2903,16 @@ def test_build_unified_orchestration_contract_snapshot_includes_invalid_publicat
     objects[-1] = replace(objects[-1], assertion_ref="wrong-assertion")
 
     snapshot = _build_unified_orchestration_contract_snapshot(*objects)
+    expected_error = (
+        "release_view.assertion_ref must equal publication.assertion_ref"
+    )
+    consistency = snapshot["publication_release_view_consistency"]
+    verification = snapshot["manifest_chain_verification"]
 
-    assert snapshot["publication_release_view_consistency"] == {
-        "is_valid": False,
-        "errors": (
-            "release_view.assertion_ref must equal publication.assertion_ref",
-        ),
-    }
+    assert consistency["is_valid"] is False
+    assert expected_error in consistency["errors"]
+    assert verification["is_valid"] is False
+    assert expected_error in verification["errors"]
 
 
 def test_build_unified_orchestration_contract_snapshot_includes_invalid_manifest_chain_verification() -> None:
@@ -2918,7 +2921,12 @@ def test_build_unified_orchestration_contract_snapshot_includes_invalid_manifest
 
     snapshot = _build_unified_orchestration_contract_snapshot(*objects)
 
+    consistency = snapshot["publication_release_view_consistency"]
     verification = snapshot["manifest_chain_verification"]
+    assert consistency == {
+        "is_valid": True,
+        "errors": (),
+    }
     assert verification["is_valid"] is False
     assert "manifest.lineage_ref must equal lineage.lineage_ref" in verification[
         "errors"
@@ -2956,6 +2964,51 @@ def test_build_unified_orchestration_contract_snapshot_preserves_fragment_output
         release_view,
     ) = objects
 
+    publication_release_view_snapshot = _build_publication_release_view_snapshot(
+        publication,
+        release_view,
+    )
+    publication_release_view_consistency_snapshot = (
+        _build_publication_release_view_consistency_snapshot(
+            publication,
+            release_view,
+        )
+    )
+    manifest_verification_snapshot = _build_manifest_verification_snapshot(
+        lineage,
+        manifest,
+        review,
+        assertion,
+        publication,
+        release_view,
+    )
+    expected_snapshot = {
+        **_build_orchestration_contract_snapshot(task, result, route),
+        **_build_state_transition_snapshot(task_transition, run_transition),
+        **_build_checkpoint_junction_snapshot(checkpoint, junction),
+        **_build_worker_orchestration_prep_snapshot(
+            plan,
+            step,
+            handoff,
+            status,
+            summary,
+            worker_review,
+        ),
+        **_build_verification_outcome_snapshot(verification, outcome),
+        **_build_evidence_gate_snapshot(evidence, gate),
+        **_build_audit_closure_snapshot(audit, closure),
+        **_build_lineage_manifest_snapshot(lineage, manifest),
+        **_build_review_assertion_snapshot(review, assertion),
+        **publication_release_view_snapshot,
+        "publication_release_view_consistency": (
+            publication_release_view_consistency_snapshot[
+                "publication_release_view_consistency"
+            ]
+        ),
+        "manifest_chain_verification": manifest_verification_snapshot[
+            "manifest_chain_verification"
+        ],
+    }
     fragment_snapshots = (
         _build_orchestration_contract_snapshot(task, result, route),
         _build_state_transition_snapshot(task_transition, run_transition),
@@ -2973,27 +3026,27 @@ def test_build_unified_orchestration_contract_snapshot_preserves_fragment_output
         _build_audit_closure_snapshot(audit, closure),
         _build_lineage_manifest_snapshot(lineage, manifest),
         _build_review_assertion_snapshot(review, assertion),
-        _build_publication_release_view_snapshot(publication, release_view),
+        publication_release_view_snapshot,
     )
+
+    assert snapshot == expected_snapshot
 
     for fragment_snapshot in fragment_snapshots:
         assert {
             key: snapshot[key] for key in fragment_snapshot
         } == fragment_snapshot
 
+    assert snapshot["orchestration_publication"] == publication_release_view_snapshot[
+        "orchestration_publication"
+    ]
+    assert snapshot["orchestration_release_view"] == publication_release_view_snapshot[
+        "orchestration_release_view"
+    ]
     assert snapshot["publication_release_view_consistency"] == (
-        _build_publication_release_view_consistency_snapshot(
-            publication,
-            release_view,
-        )["publication_release_view_consistency"]
+        publication_release_view_consistency_snapshot[
+            "publication_release_view_consistency"
+        ]
     )
     assert snapshot["manifest_chain_verification"] == (
-        _build_manifest_verification_snapshot(
-            lineage,
-            manifest,
-            review,
-            assertion,
-            publication,
-            release_view,
-        )["manifest_chain_verification"]
+        manifest_verification_snapshot["manifest_chain_verification"]
     )

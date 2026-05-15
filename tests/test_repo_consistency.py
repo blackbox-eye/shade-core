@@ -762,6 +762,8 @@ def test_repo_consistency_contract_describes_unified_orchestration_contract_snap
     expected_tokens = (
         "docs-to-code traceability",
         "Unified orchestration contract snapshot",
+        "deterministic key order",
+        "controlled fragment composition",
         "_build_unified_orchestration_contract_snapshot",
         "internal contract-prep only",
         "must not widen `src/shade_core/__init__.py`",
@@ -778,3 +780,24 @@ def test_repo_consistency_contract_describes_unified_orchestration_contract_snap
 
     for token in expected_tokens:
         assert token in contract_text
+
+
+def test_repo_consistency_contract_keeps_unified_snapshot_enforcement_non_runtime() -> None:
+    contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
+    section_start = contract_text.index(
+        "## Unified orchestration contract snapshot enforcement"
+    )
+    next_section_start = contract_text.find("\n## ", section_start + 1)
+    if next_section_start == -1:
+        section_text = contract_text[section_start:]
+    else:
+        section_text = contract_text[section_start:next_section_start]
+
+    unexpected_tokens = (
+        "runtime behavior",
+        "runtime orchestration behavior",
+        "worker execution engine",
+    )
+
+    for token in unexpected_tokens:
+        assert token not in section_text
