@@ -46,8 +46,10 @@
 ## Unified orchestration contract snapshot enforcement
 
 - `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Unified orchestration contract snapshot row (`src/shade_core/bundle.py`).
+- `tests/test_bundle.py` keeps deterministic key order and controlled fragment composition explicit for `_build_unified_orchestration_contract_snapshot`.
 - `_build_unified_orchestration_contract_snapshot` is internal contract-prep only and must not widen `src/shade_core/__init__.py`.
-- This enforcement is limited to deterministic composition of existing internal contract-prep snapshot fragments; it does not implement runtime, routing, worker execution, adapters, memory, deploy, VPS, production integration, or release behavior.
+- The same test surface keeps `publication_release_view_consistency` and `manifest_chain_verification` aligned with their dedicated helper payloads while publication and release-view serialization stays controlled through `_build_publication_release_view_snapshot`.
+- This enforcement is limited to internal contract-prep composition only; it does not implement runtime, routing, worker execution, adapters, memory, deploy, VPS, production integration, or release behavior.
 
 ## When to update tests
 
