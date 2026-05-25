@@ -33,6 +33,7 @@ from shade_core.bundle import _build_manifest_verification_snapshot  # noqa: E40
 from shade_core.bundle import _build_publication_release_view_consistency_snapshot  # noqa: E402
 from shade_core.bundle import _build_review_assertion_snapshot  # noqa: E402
 from shade_core.bundle import _build_publication_release_view_snapshot  # noqa: E402
+from shade_core.bundle import _prepare_unified_orchestration_contract_snapshot  # noqa: E402
 from shade_core.bundle import _prepare_runtime_evaluation_fabric  # noqa: E402
 from shade_core.bundle import _build_runtime_contract_integration_snapshot  # noqa: E402
 from shade_core.bundle import _build_runtime_evaluation_gate_integration_snapshot  # noqa: E402
@@ -2546,6 +2547,226 @@ def _valid_unified_orchestration_contract_snapshot_objects() -> tuple:
     )
 
 
+def _valid_unified_orchestration_contract_preparer_kwargs() -> dict[str, str]:
+    return {
+        "task_id": "task-1",
+        "run_id": "run-1",
+        "worker_role": "analysis",
+        "source_role": "analysis",
+        "target_role": "review",
+        "input_ref": "artifact-1",
+        "output_ref": "output-1",
+        "decision_ref": "decision-1",
+        "evaluation_ref": "evaluation-1",
+        "evaluation_gate_ref": "evaluation-gate-1",
+        "audit_event_ref": "audit-event-1",
+    }
+
+
+def _expected_unified_orchestration_contract_preparer_snapshot(
+    **overrides: str,
+) -> dict[str, object]:
+    kwargs = _valid_unified_orchestration_contract_preparer_kwargs()
+    kwargs.update(overrides)
+
+    task_id = kwargs["task_id"]
+    run_id = kwargs["run_id"]
+    worker_role = kwargs["worker_role"]
+    source_role = kwargs["source_role"]
+    target_role = kwargs["target_role"]
+    input_ref = kwargs["input_ref"]
+    output_ref = kwargs["output_ref"]
+    decision_ref = kwargs["decision_ref"]
+    evaluation_ref = kwargs["evaluation_ref"]
+    evaluation_gate_ref = kwargs["evaluation_gate_ref"]
+    audit_event_ref = kwargs["audit_event_ref"]
+
+    route_ref = f"{task_id}:route"
+    task_transition_ref = f"{task_id}:task-transition"
+    run_transition_ref = f"{run_id}:run-transition"
+    checkpoint_ref = f"{task_id}:checkpoint"
+    junction_ref = f"{task_id}:junction"
+    plan_ref = f"{task_id}:plan"
+    step_ref = f"{task_id}:step"
+    handoff_ref = f"{task_id}:handoff"
+    status_ref = f"{task_id}:status"
+    summary_ref = f"{task_id}:summary"
+    worker_review_ref = f"{task_id}:worker-review"
+    verification_ref = f"{task_id}:verification"
+    outcome_ref = f"{task_id}:outcome"
+    evidence_ref = f"{task_id}:evidence"
+    gate_ref = f"{task_id}:gate"
+    audit_ref = f"{task_id}:audit"
+    closure_ref = f"{task_id}:closure"
+    lineage_ref = f"{task_id}:lineage"
+    manifest_ref = f"{task_id}:manifest"
+    review_ref = f"{task_id}:review"
+    assertion_ref = f"{task_id}:assertion"
+    publication_ref = f"{task_id}:publication"
+    release_view_ref = f"{task_id}:release-view"
+
+    return {
+        "worker_task": {
+            "task_id": task_id,
+            "worker_role": worker_role,
+            "input_ref": input_ref,
+            "task_status": "pending",
+        },
+        "worker_result": {
+            "task_id": task_id,
+            "worker_role": worker_role,
+            "output_ref": output_ref,
+            "result_status": "complete",
+        },
+        "task_route": {
+            "task_id": task_id,
+            "source_role": source_role,
+            "target_role": target_role,
+            "route_ref": route_ref,
+        },
+        "task_transition": {
+            "task_id": task_id,
+            "from_status": "pending",
+            "to_status": "running",
+            "transition_ref": task_transition_ref,
+        },
+        "run_transition": {
+            "run_id": run_id,
+            "from_step": "ingest",
+            "to_step": "evaluate",
+            "transition_ref": run_transition_ref,
+        },
+        "orchestration_checkpoint": {
+            "task_id": task_id,
+            "output_ref": output_ref,
+            "route_ref": route_ref,
+            "checkpoint_ref": checkpoint_ref,
+        },
+        "orchestration_junction": {
+            "route_ref": route_ref,
+            "task_transition_ref": task_transition_ref,
+            "run_transition_ref": run_transition_ref,
+            "junction_ref": junction_ref,
+        },
+        "worker_orchestration_plan": {
+            "task_id": task_id,
+            "route_ref": route_ref,
+            "plan_status": "prepared",
+            "plan_ref": plan_ref,
+        },
+        "worker_orchestration_step": {
+            "plan_ref": plan_ref,
+            "task_transition_ref": task_transition_ref,
+            "step_status": "prepared",
+            "step_ref": step_ref,
+        },
+        "worker_orchestration_handoff": {
+            "step_ref": step_ref,
+            "output_ref": output_ref,
+            "checkpoint_ref": checkpoint_ref,
+            "handoff_ref": handoff_ref,
+        },
+        "worker_orchestration_status": {
+            "handoff_ref": handoff_ref,
+            "junction_ref": junction_ref,
+            "status_value": "pending",
+            "status_ref": status_ref,
+        },
+        "worker_orchestration_summary": {
+            "plan_ref": plan_ref,
+            "status_ref": status_ref,
+            "summary_status": "prepared",
+            "summary_ref": summary_ref,
+        },
+        "worker_orchestration_review": {
+            "summary_ref": summary_ref,
+            "status_ref": status_ref,
+            "review_status": "pending",
+            "review_ref": worker_review_ref,
+        },
+        "orchestration_verification": {
+            "checkpoint_ref": checkpoint_ref,
+            "junction_ref": junction_ref,
+            "task_transition_ref": task_transition_ref,
+            "verification_ref": verification_ref,
+        },
+        "orchestration_outcome": {
+            "verification_ref": verification_ref,
+            "decision_ref": decision_ref,
+            "evaluation_ref": evaluation_ref,
+            "outcome_ref": outcome_ref,
+        },
+        "orchestration_evidence": {
+            "verification_ref": verification_ref,
+            "outcome_ref": outcome_ref,
+            "evaluation_ref": evaluation_ref,
+            "evidence_ref": evidence_ref,
+        },
+        "orchestration_gate": {
+            "evidence_ref": evidence_ref,
+            "evaluation_gate_ref": evaluation_gate_ref,
+            "audit_ref": audit_ref,
+            "gate_ref": gate_ref,
+        },
+        "orchestration_audit": {
+            "gate_ref": gate_ref,
+            "evaluation_gate_ref": evaluation_gate_ref,
+            "audit_event_ref": audit_event_ref,
+            "audit_ref": audit_ref,
+        },
+        "orchestration_closure": {
+            "audit_ref": audit_ref,
+            "decision_ref": decision_ref,
+            "evaluation_ref": evaluation_ref,
+            "closure_ref": closure_ref,
+        },
+        "orchestration_lineage": {
+            "closure_ref": closure_ref,
+            "audit_ref": audit_ref,
+            "outcome_ref": outcome_ref,
+            "lineage_ref": lineage_ref,
+        },
+        "orchestration_manifest": {
+            "lineage_ref": lineage_ref,
+            "closure_ref": closure_ref,
+            "evidence_ref": evidence_ref,
+            "manifest_ref": manifest_ref,
+        },
+        "orchestration_review": {
+            "manifest_ref": manifest_ref,
+            "lineage_ref": lineage_ref,
+            "closure_ref": closure_ref,
+            "review_ref": review_ref,
+        },
+        "orchestration_assertion": {
+            "review_ref": review_ref,
+            "manifest_ref": manifest_ref,
+            "lineage_ref": lineage_ref,
+            "assertion_ref": assertion_ref,
+        },
+        "orchestration_publication": {
+            "assertion_ref": assertion_ref,
+            "review_ref": review_ref,
+            "manifest_ref": manifest_ref,
+            "publication_ref": publication_ref,
+        },
+        "orchestration_release_view": {
+            "publication_ref": publication_ref,
+            "assertion_ref": assertion_ref,
+            "review_ref": review_ref,
+            "release_view_ref": release_view_ref,
+        },
+        "publication_release_view_consistency": {
+            "is_valid": True,
+            "errors": (),
+        },
+        "manifest_chain_verification": {
+            "is_valid": True,
+            "errors": (),
+        },
+    }
+
+
 def test_build_manifest_verification_snapshot_returns_expected_structure() -> None:
     lineage, manifest, review, assertion, publication, release_view = (
         _valid_manifest_chain_bundle_objects()
@@ -3049,4 +3270,115 @@ def test_build_unified_orchestration_contract_snapshot_preserves_fragment_output
     )
     assert snapshot["manifest_chain_verification"] == (
         manifest_verification_snapshot["manifest_chain_verification"]
+    )
+
+
+def test_prepare_unified_orchestration_contract_snapshot_returns_expected_structure() -> None:
+    kwargs = _valid_unified_orchestration_contract_preparer_kwargs()
+
+    snapshot = _prepare_unified_orchestration_contract_snapshot(**kwargs)
+
+    assert snapshot == _expected_unified_orchestration_contract_preparer_snapshot()
+
+
+def test_prepare_unified_orchestration_contract_snapshot_returns_identical_mappings_for_repeated_inputs() -> None:
+    kwargs = _valid_unified_orchestration_contract_preparer_kwargs()
+
+    first_snapshot = _prepare_unified_orchestration_contract_snapshot(**kwargs)
+    second_snapshot = _prepare_unified_orchestration_contract_snapshot(**kwargs)
+
+    assert first_snapshot == second_snapshot
+    assert first_snapshot == _expected_unified_orchestration_contract_preparer_snapshot()
+
+
+def test_prepare_unified_orchestration_contract_snapshot_uses_deterministic_ref_naming_convention() -> None:
+    snapshot = _prepare_unified_orchestration_contract_snapshot(
+        **_valid_unified_orchestration_contract_preparer_kwargs(),
+    )
+
+    assert {
+        "route_ref": snapshot["task_route"]["route_ref"],
+        "task_transition_ref": snapshot["task_transition"]["transition_ref"],
+        "run_transition_ref": snapshot["run_transition"]["transition_ref"],
+        "checkpoint_ref": snapshot["orchestration_checkpoint"]["checkpoint_ref"],
+        "junction_ref": snapshot["orchestration_junction"]["junction_ref"],
+        "plan_ref": snapshot["worker_orchestration_plan"]["plan_ref"],
+        "step_ref": snapshot["worker_orchestration_step"]["step_ref"],
+        "handoff_ref": snapshot["worker_orchestration_handoff"]["handoff_ref"],
+        "status_ref": snapshot["worker_orchestration_status"]["status_ref"],
+        "summary_ref": snapshot["worker_orchestration_summary"]["summary_ref"],
+        "worker_review_ref": snapshot["worker_orchestration_review"]["review_ref"],
+        "verification_ref": snapshot["orchestration_verification"]["verification_ref"],
+        "outcome_ref": snapshot["orchestration_outcome"]["outcome_ref"],
+        "evidence_ref": snapshot["orchestration_evidence"]["evidence_ref"],
+        "gate_ref": snapshot["orchestration_gate"]["gate_ref"],
+        "audit_ref": snapshot["orchestration_audit"]["audit_ref"],
+        "closure_ref": snapshot["orchestration_closure"]["closure_ref"],
+        "lineage_ref": snapshot["orchestration_lineage"]["lineage_ref"],
+        "manifest_ref": snapshot["orchestration_manifest"]["manifest_ref"],
+        "review_ref": snapshot["orchestration_review"]["review_ref"],
+        "assertion_ref": snapshot["orchestration_assertion"]["assertion_ref"],
+        "publication_ref": snapshot["orchestration_publication"]["publication_ref"],
+        "release_view_ref": snapshot["orchestration_release_view"]["release_view_ref"],
+    } == {
+        "route_ref": "task-1:route",
+        "task_transition_ref": "task-1:task-transition",
+        "run_transition_ref": "run-1:run-transition",
+        "checkpoint_ref": "task-1:checkpoint",
+        "junction_ref": "task-1:junction",
+        "plan_ref": "task-1:plan",
+        "step_ref": "task-1:step",
+        "handoff_ref": "task-1:handoff",
+        "status_ref": "task-1:status",
+        "summary_ref": "task-1:summary",
+        "worker_review_ref": "task-1:worker-review",
+        "verification_ref": "task-1:verification",
+        "outcome_ref": "task-1:outcome",
+        "evidence_ref": "task-1:evidence",
+        "gate_ref": "task-1:gate",
+        "audit_ref": "task-1:audit",
+        "closure_ref": "task-1:closure",
+        "lineage_ref": "task-1:lineage",
+        "manifest_ref": "task-1:manifest",
+        "review_ref": "task-1:review",
+        "assertion_ref": "task-1:assertion",
+        "publication_ref": "task-1:publication",
+        "release_view_ref": "task-1:release-view",
+    }
+
+
+def test_prepare_unified_orchestration_contract_snapshot_keeps_boundary_and_chain_checks_valid() -> None:
+    snapshot = _prepare_unified_orchestration_contract_snapshot(
+        **_valid_unified_orchestration_contract_preparer_kwargs(),
+    )
+
+    assert snapshot["publication_release_view_consistency"] == {
+        "is_valid": True,
+        "errors": (),
+    }
+    assert snapshot["manifest_chain_verification"] == {
+        "is_valid": True,
+        "errors": (),
+    }
+
+
+def test_prepare_unified_orchestration_contract_snapshot_changes_derived_refs_predictably() -> None:
+    kwargs = _valid_unified_orchestration_contract_preparer_kwargs()
+
+    changed_task_snapshot = _prepare_unified_orchestration_contract_snapshot(
+        **{**kwargs, "task_id": "task-2"},
+    )
+    changed_run_snapshot = _prepare_unified_orchestration_contract_snapshot(
+        **{**kwargs, "run_id": "run-2"},
+    )
+
+    assert changed_task_snapshot == (
+        _expected_unified_orchestration_contract_preparer_snapshot(
+            task_id="task-2",
+        )
+    )
+    assert changed_run_snapshot == (
+        _expected_unified_orchestration_contract_preparer_snapshot(
+            run_id="run-2",
+        )
     )

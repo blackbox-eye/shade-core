@@ -732,6 +732,235 @@ def _build_manifest_verification_snapshot(
     }
 
 
+def _prepare_unified_orchestration_contract_snapshot(
+    *,
+    task_id: str,
+    run_id: str,
+    worker_role: str,
+    source_role: str,
+    target_role: str,
+    input_ref: str,
+    output_ref: str,
+    decision_ref: str,
+    evaluation_ref: str,
+    evaluation_gate_ref: str,
+    audit_event_ref: str,
+    task_status: str = "pending",
+    result_status: str = "complete",
+    task_transition_from_status: str = "pending",
+    task_transition_to_status: str = "running",
+    run_transition_from_step: str = "ingest",
+    run_transition_to_step: str = "evaluate",
+    plan_status: str = "prepared",
+    step_status: str = "prepared",
+    worker_orchestration_status_value: str = "pending",
+    summary_status: str = "prepared",
+    worker_review_status: str = "pending",
+) -> Mapping[str, object]:
+    route_ref = f"{task_id}:route"
+    task_transition_ref = f"{task_id}:task-transition"
+    run_transition_ref = f"{run_id}:run-transition"
+    checkpoint_ref = f"{task_id}:checkpoint"
+    junction_ref = f"{task_id}:junction"
+    plan_ref = f"{task_id}:plan"
+    step_ref = f"{task_id}:step"
+    handoff_ref = f"{task_id}:handoff"
+    status_ref = f"{task_id}:status"
+    summary_ref = f"{task_id}:summary"
+    worker_review_ref = f"{task_id}:worker-review"
+    verification_ref = f"{task_id}:verification"
+    outcome_ref = f"{task_id}:outcome"
+    evidence_ref = f"{task_id}:evidence"
+    gate_ref = f"{task_id}:gate"
+    audit_ref = f"{task_id}:audit"
+    closure_ref = f"{task_id}:closure"
+    lineage_ref = f"{task_id}:lineage"
+    manifest_ref = f"{task_id}:manifest"
+    review_ref = f"{task_id}:review"
+    assertion_ref = f"{task_id}:assertion"
+    publication_ref = f"{task_id}:publication"
+    release_view_ref = f"{task_id}:release-view"
+
+    task = WorkerTask(
+        task_id=task_id,
+        worker_role=worker_role,
+        input_ref=input_ref,
+        task_status=task_status,
+    )
+    result = WorkerResult(
+        task_id=task_id,
+        worker_role=worker_role,
+        output_ref=output_ref,
+        result_status=result_status,
+    )
+    route = TaskRoute(
+        task_id=task_id,
+        source_role=source_role,
+        target_role=target_role,
+        route_ref=route_ref,
+    )
+    task_transition = TaskTransition(
+        task_id=task_id,
+        from_status=task_transition_from_status,
+        to_status=task_transition_to_status,
+        transition_ref=task_transition_ref,
+    )
+    run_transition = RunTransition(
+        run_id=run_id,
+        from_step=run_transition_from_step,
+        to_step=run_transition_to_step,
+        transition_ref=run_transition_ref,
+    )
+    checkpoint = OrchestrationCheckpoint(
+        task_id=task_id,
+        output_ref=output_ref,
+        route_ref=route_ref,
+        checkpoint_ref=checkpoint_ref,
+    )
+    junction = OrchestrationJunction(
+        route_ref=route_ref,
+        task_transition_ref=task_transition_ref,
+        run_transition_ref=run_transition_ref,
+        junction_ref=junction_ref,
+    )
+    plan = WorkerOrchestrationPlan(
+        task_id=task_id,
+        route_ref=route_ref,
+        plan_status=plan_status,
+        plan_ref=plan_ref,
+    )
+    step = WorkerOrchestrationStep(
+        plan_ref=plan_ref,
+        task_transition_ref=task_transition_ref,
+        step_status=step_status,
+        step_ref=step_ref,
+    )
+    handoff = WorkerOrchestrationHandoff(
+        step_ref=step_ref,
+        output_ref=output_ref,
+        checkpoint_ref=checkpoint_ref,
+        handoff_ref=handoff_ref,
+    )
+    status = WorkerOrchestrationStatus(
+        handoff_ref=handoff_ref,
+        junction_ref=junction_ref,
+        status_value=worker_orchestration_status_value,
+        status_ref=status_ref,
+    )
+    summary = WorkerOrchestrationSummary(
+        plan_ref=plan_ref,
+        status_ref=status_ref,
+        summary_status=summary_status,
+        summary_ref=summary_ref,
+    )
+    worker_review = WorkerOrchestrationReview(
+        summary_ref=summary_ref,
+        status_ref=status_ref,
+        review_status=worker_review_status,
+        review_ref=worker_review_ref,
+    )
+    verification = OrchestrationVerification(
+        checkpoint_ref=checkpoint_ref,
+        junction_ref=junction_ref,
+        task_transition_ref=task_transition_ref,
+        verification_ref=verification_ref,
+    )
+    outcome = OrchestrationOutcome(
+        verification_ref=verification_ref,
+        decision_ref=decision_ref,
+        evaluation_ref=evaluation_ref,
+        outcome_ref=outcome_ref,
+    )
+    evidence = OrchestrationEvidence(
+        verification_ref=verification_ref,
+        outcome_ref=outcome_ref,
+        evaluation_ref=evaluation_ref,
+        evidence_ref=evidence_ref,
+    )
+    gate = OrchestrationGate(
+        evidence_ref=evidence_ref,
+        evaluation_gate_ref=evaluation_gate_ref,
+        audit_ref=audit_ref,
+        gate_ref=gate_ref,
+    )
+    audit = OrchestrationAudit(
+        gate_ref=gate_ref,
+        evaluation_gate_ref=evaluation_gate_ref,
+        audit_event_ref=audit_event_ref,
+        audit_ref=audit_ref,
+    )
+    closure = OrchestrationClosure(
+        audit_ref=audit_ref,
+        decision_ref=decision_ref,
+        evaluation_ref=evaluation_ref,
+        closure_ref=closure_ref,
+    )
+    lineage = OrchestrationLineage(
+        closure_ref=closure_ref,
+        audit_ref=audit_ref,
+        outcome_ref=outcome_ref,
+        lineage_ref=lineage_ref,
+    )
+    manifest = OrchestrationManifest(
+        lineage_ref=lineage_ref,
+        closure_ref=closure_ref,
+        evidence_ref=evidence_ref,
+        manifest_ref=manifest_ref,
+    )
+    review = OrchestrationReview(
+        manifest_ref=manifest_ref,
+        lineage_ref=lineage_ref,
+        closure_ref=closure_ref,
+        review_ref=review_ref,
+    )
+    assertion = OrchestrationAssertion(
+        review_ref=review_ref,
+        manifest_ref=manifest_ref,
+        lineage_ref=lineage_ref,
+        assertion_ref=assertion_ref,
+    )
+    publication = OrchestrationPublication(
+        assertion_ref=assertion_ref,
+        review_ref=review_ref,
+        manifest_ref=manifest_ref,
+        publication_ref=publication_ref,
+    )
+    release_view = OrchestrationReleaseView(
+        publication_ref=publication_ref,
+        assertion_ref=assertion_ref,
+        review_ref=review_ref,
+        release_view_ref=release_view_ref,
+    )
+
+    return _build_unified_orchestration_contract_snapshot(
+        task,
+        result,
+        route,
+        task_transition,
+        run_transition,
+        checkpoint,
+        junction,
+        plan,
+        step,
+        handoff,
+        status,
+        summary,
+        worker_review,
+        verification,
+        outcome,
+        evidence,
+        gate,
+        audit,
+        closure,
+        lineage,
+        manifest,
+        review,
+        assertion,
+        publication,
+        release_view,
+    )
+
+
 def _build_unified_orchestration_contract_snapshot(
     task: WorkerTask,
     result: WorkerResult,

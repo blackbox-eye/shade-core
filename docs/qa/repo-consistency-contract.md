@@ -51,6 +51,12 @@
 - The same test surface keeps `publication_release_view_consistency` and `manifest_chain_verification` aligned with their dedicated helper payloads while publication and release-view serialization stays controlled through `_build_publication_release_view_snapshot`.
 - This enforcement is limited to internal contract-prep composition only; it does not implement runtime, routing, worker execution, adapters, memory, deploy, VPS, production integration, or release behavior.
 
+## Unified orchestration contract preparer enforcement
+
+- `tests/test_repo_consistency.py` keeps docs-to-code traceability explicit for the Unified orchestration contract preparer row (`src/shade_core/bundle.py`).
+- `_prepare_unified_orchestration_contract_snapshot` is internal-only deterministic contract preparation for existing orchestration contract-prep objects and must not widen `src/shade_core/__init__.py`.
+- This enforcement is limited to internal-only deterministic contract preparation; it has no runtime behavior, no worker execution, no routing behavior, and no adapters, providers, memory, deploy, VPS, production integration, or release behavior.
+
 ## When to update tests
 
 - A playbook rule changes intentionally in the same locked governance or QA bundle.

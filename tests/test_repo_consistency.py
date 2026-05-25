@@ -189,12 +189,20 @@ UNIFIED_ORCHESTRATION_CONTRACT_SNAPSHOT_TRACEABILITY_ROW = (
     "src/shade_core/bundle.py",
     "tests/test_bundle.py",
 )
+UNIFIED_ORCHESTRATION_CONTRACT_PREPARER_TRACEABILITY_ROW = (
+    "Unified orchestration contract preparer",
+    "src/shade_core/bundle.py",
+    "tests/test_bundle.py",
+)
 PUBLICATION_RELEASE_VIEW_CONSISTENCY_ROOT_API_NAMES = (
     "validate_orchestration_publication_release_view_consistency",
     "_build_publication_release_view_consistency_snapshot",
 )
 UNIFIED_ORCHESTRATION_CONTRACT_SNAPSHOT_ROOT_API_NAMES = (
     "_build_unified_orchestration_contract_snapshot",
+)
+UNIFIED_ORCHESTRATION_CONTRACT_PREPARER_ROOT_API_NAMES = (
+    "_prepare_unified_orchestration_contract_snapshot",
 )
 EXPECTED_ROOT_PACKAGE_INIT_TEXT = '''"""Minimal package for shade-core."""
 
@@ -701,6 +709,15 @@ def test_traceability_includes_unified_orchestration_contract_snapshot_row() -> 
     )
 
 
+def test_traceability_includes_unified_orchestration_contract_preparer_row() -> None:
+    traceability_text = _read_repo_text(TRACEABILITY_PATH)
+
+    assert _traceability_has_row(
+        traceability_text,
+        *UNIFIED_ORCHESTRATION_CONTRACT_PREPARER_TRACEABILITY_ROW,
+    )
+
+
 def test_root_package_keeps_publication_release_view_consistency_symbols_out_of_public_api() -> None:
     root_exports = _module_all_exports(ROOT_PACKAGE_INIT_PATH)
 
@@ -712,6 +729,13 @@ def test_root_package_keeps_unified_orchestration_contract_snapshot_symbol_out_o
     root_exports = _module_all_exports(ROOT_PACKAGE_INIT_PATH)
 
     for name in UNIFIED_ORCHESTRATION_CONTRACT_SNAPSHOT_ROOT_API_NAMES:
+        assert name not in root_exports
+
+
+def test_root_package_keeps_unified_orchestration_contract_preparer_symbol_out_of_public_api() -> None:
+    root_exports = _module_all_exports(ROOT_PACKAGE_INIT_PATH)
+
+    for name in UNIFIED_ORCHESTRATION_CONTRACT_PREPARER_ROOT_API_NAMES:
         assert name not in root_exports
 
 
@@ -771,6 +795,33 @@ def test_repo_consistency_contract_describes_unified_orchestration_contract_snap
         "routing",
         "worker execution",
         "adapters",
+        "memory",
+        "deploy",
+        "VPS",
+        "production integration",
+        "release behavior",
+    )
+
+    for token in expected_tokens:
+        assert token in contract_text
+
+
+def test_repo_consistency_contract_describes_unified_orchestration_contract_preparer_enforcement() -> None:
+    contract_text = _read_repo_text(REPO_CONSISTENCY_CONTRACT_PATH)
+
+    assert "## Unified orchestration contract preparer enforcement" in contract_text
+    expected_tokens = (
+        "docs-to-code traceability",
+        "Unified orchestration contract preparer",
+        "_prepare_unified_orchestration_contract_snapshot",
+        "deterministic contract preparation",
+        "internal-only",
+        "must not widen `src/shade_core/__init__.py`",
+        "no runtime behavior",
+        "no worker execution",
+        "no routing behavior",
+        "adapters",
+        "providers",
         "memory",
         "deploy",
         "VPS",

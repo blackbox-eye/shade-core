@@ -11,6 +11,7 @@ This file is the source-of-truth description of what `shade-core` implements now
 - The current core also implements one neutral handoff seam through internal `ArtifactHandoff`, `validate_artifact_handoff`, `serialize_artifact_handoff`, and the `artifact_handoff` snapshot entry. This seam is a typed handoff boundary only, not adapter or provider integration.
 - The current core implements one internal runtime/evaluation fabric path that prepares state validation, neutral handoff serialization, decision, audit, evaluation, evaluation gate, and inspectable snapshot output.
 - The current core implements internal contract-prep objects, validators, serializers, and snapshot helpers for worker task, worker result, task route, worker orchestration plan, worker orchestration step, worker orchestration handoff, worker orchestration status, worker orchestration summary, worker orchestration review, checkpoint, junction, task transition, run transition, verification, outcome, evidence, gate, audit, closure, lineage, manifest, review, assertion, publication, and release-view seams.
+- The current core also includes one internal deterministic contract-prep helper for preparing existing orchestration contract objects before unified snapshot composition.
 
 ## Runtime/evaluation fabric versus orchestration
 
